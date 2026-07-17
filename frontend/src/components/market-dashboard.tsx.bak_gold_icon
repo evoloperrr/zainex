@@ -1,0 +1,1467 @@
+"use client";
+
+import { TradingViewChart } from "@/components/tradingview-chart";
+import { useEffect, useState } from "react";
+
+type MarketKey = "crypto" | "forex" | "stocks";
+
+type IconName =
+  | "home"
+  | "search"
+  | "rocket"
+  | "layers"
+  | "wallet"
+  | "bolt"
+  | "flow"
+  | "download"
+  | "link"
+  | "chart"
+  | "diamond"
+  | "crown"
+  | "star"
+  | "share"
+  | "arrow"
+  | "filter"
+  | "copy"
+  | "more";
+
+type Candle = {
+  open: number;
+  close: number;
+  high: number;
+  low: number;
+  volume: number;
+};
+
+type MarketData = {
+  label: string;
+  network: string;
+  symbol: string;
+  assetName: string;
+
+  price: string;
+  rawPrice: string;
+  currencySymbol: string;
+  change: string;
+  secondaryValue: string;
+
+  liquidityLabel: string;
+  liquidity: string;
+
+  volumeLabel: string;
+  volume: string;
+
+  pooledPrimaryLabel: string;
+  pooledPrimary: string;
+
+  pooledSecondaryLabel: string;
+  pooledSecondary: string;
+
+  score: string;
+  trust: string;
+  votes: string;
+  accent: string;
+  shift: number;
+  line: string;
+};
+
+type LiveMarketResponse = {
+  ok: boolean;
+  summary?: Partial<MarketData>;
+  error?: string;
+};
+
+const markets: Record<
+  MarketKey,
+  MarketData
+> = {
+  crypto: {
+    label: "Crypto",
+    network: "Digital asset market",
+    symbol: "BTC / USDT",
+    assetName: "Bitcoin",
+
+    price: "--",
+    rawPrice: "--",
+    currencySymbol: "$",
+    change: "--",
+    secondaryValue: "BTC / USDT",
+
+    liquidityLabel: "24H quote volume",
+    liquidity: "--",
+
+    volumeLabel: "24H base volume",
+    volume: "--",
+
+    pooledPrimaryLabel: "24H high",
+    pooledPrimary: "--",
+
+    pooledSecondaryLabel: "24H low",
+    pooledSecondary: "--",
+
+    score: "97",
+    trust: "86%",
+    votes: "25 votes",
+    accent: "#35bdf8",
+    shift: 0,
+    line:
+      "0,180 65,167 130,181 195,146 260,155 325,126 390,139 455,98 520,116 585,82 650,101 715,62 780,86 845,48 910,73 1000,42",
+  },
+
+  forex: {
+    label: "Forex",
+    network: "Global currency market",
+    symbol: "EUR / USD",
+    assetName: "Euro versus US Dollar",
+
+    price: "--",
+    rawPrice: "--",
+    currencySymbol: "",
+    change: "--",
+    secondaryValue: "EUR / USD",
+
+    liquidityLabel: "Previous close",
+    liquidity: "--",
+
+    volumeLabel: "Session high",
+    volume: "--",
+
+    pooledPrimaryLabel: "Session low",
+    pooledPrimary: "--",
+
+    pooledSecondaryLabel: "Market state",
+    pooledSecondary: "--",
+
+    score: "91",
+    trust: "82%",
+    votes: "31 votes",
+    accent: "#8b6cff",
+    shift: 10,
+    line:
+      "0,174 65,151 130,166 195,128 260,145 325,111 390,128 455,101 520,117 585,88 650,105 715,75 780,92 845,60 910,77 1000,54",
+  },
+
+  stocks: {
+    label: "Stocks",
+    network: "Global equity market",
+    symbol: "NVDA",
+    assetName: "NVIDIA Corporation",
+
+    price: "--",
+    rawPrice: "--",
+    currencySymbol: "$",
+    change: "--",
+    secondaryValue: "1 NVDA",
+
+    liquidityLabel: "Market volume",
+    liquidity: "--",
+
+    volumeLabel: "Previous close",
+    volume: "--",
+
+    pooledPrimaryLabel: "Day high",
+    pooledPrimary: "--",
+
+    pooledSecondaryLabel: "Day low",
+    pooledSecondary: "--",
+
+    score: "94",
+    trust: "88%",
+    votes: "42 votes",
+    accent: "#df58ff",
+    shift: -4,
+    line:
+      "0,192 65,171 130,184 195,151 260,164 325,130 390,144 455,110 520,125 585,90 650,111 715,70 780,94 845,55 910,78 1000,48",
+  },
+};
+const baseCandles: Candle[] = [
+  { open: 205, close: 194, high: 184, low: 216, volume: 42 },
+  { open: 196, close: 181, high: 172, low: 208, volume: 58 },
+  { open: 180, close: 187, high: 168, low: 199, volume: 36 },
+  { open: 189, close: 174, high: 162, low: 201, volume: 48 },
+  { open: 173, close: 160, high: 149, low: 187, volume: 63 },
+  { open: 160, close: 169, high: 151, low: 181, volume: 37 },
+  { open: 170, close: 153, high: 142, low: 180, volume: 54 },
+  { open: 151, close: 139, high: 130, low: 163, volume: 69 },
+  { open: 140, close: 122, high: 112, low: 152, volume: 75 },
+  { open: 121, close: 105, high: 94, low: 134, volume: 86 },
+  { open: 106, close: 96, high: 84, low: 117, volume: 93 },
+  { open: 96, close: 109, high: 88, low: 121, volume: 70 },
+  { open: 110, close: 138, high: 101, low: 149, volume: 96 },
+  { open: 138, close: 150, high: 128, low: 163, volume: 88 },
+  { open: 149, close: 139, high: 129, low: 160, volume: 64 },
+  { open: 139, close: 145, high: 131, low: 155, volume: 60 },
+  { open: 145, close: 132, high: 122, low: 158, volume: 78 },
+  { open: 133, close: 144, high: 124, low: 156, volume: 53 },
+  { open: 145, close: 137, high: 127, low: 157, volume: 47 },
+  { open: 138, close: 149, high: 129, low: 160, volume: 71 },
+  { open: 148, close: 142, high: 132, low: 159, volume: 55 },
+  { open: 143, close: 154, high: 134, low: 166, volume: 49 },
+  { open: 153, close: 147, high: 138, low: 165, volume: 62 },
+  { open: 148, close: 163, high: 139, low: 174, volume: 77 },
+];
+
+const historyRows = [
+  {
+    time: "21:05:10",
+    price: "$118,475.77",
+    quantity: "0.24984",
+    total: "$29,597.10",
+    fee: "0.0265",
+    wallet: "0X23A...421Td",
+    direction: "up",
+  },
+  {
+    time: "20:05:10",
+    price: "$117,863.61",
+    quantity: "0.25987",
+    total: "$30,630.19",
+    fee: "0.0098",
+    wallet: "95FxZ7...1dS4tF",
+    direction: "down",
+  },
+  {
+    time: "19:05:10",
+    price: "$117,524.83",
+    quantity: "0.19750",
+    total: "$23,210.36",
+    fee: "0.0190",
+    wallet: "5x00Vr...4fc2fF",
+    direction: "up",
+  },
+  {
+    time: "18:05:10",
+    price: "$118,104.17",
+    quantity: "0.28971",
+    total: "$34,219.83",
+    fee: "0.0874",
+    wallet: "Sx46Z1...1dFGtS",
+    direction: "up",
+  },
+];
+
+const desktopNav: Array<{
+  label: string;
+  icon: IconName;
+  active?: boolean;
+}> = [
+  { label: "Dashboard", icon: "home" },
+  { label: "Markets", icon: "search", active: true },
+  { label: "AI Strategies", icon: "rocket" },
+  { label: "Portfolios", icon: "layers" },
+  { label: "Wallets", icon: "wallet" },
+];
+
+const desktopTools: Array<{
+  label: string;
+  icon: IconName;
+  active?: boolean;
+}> = [
+  { label: "AI Signals", icon: "bolt", active: true },
+  { label: "Workflow", icon: "flow" },
+  { label: "Downloads", icon: "download" },
+  { label: "Connections", icon: "link" },
+  { label: "Analytics", icon: "chart" },
+  { label: "Rewards", icon: "diamond" },
+  { label: "Premium", icon: "crown" },
+];
+
+function Icon({
+  name,
+  size = 20,
+}: {
+  name: IconName;
+  size?: number;
+}) {
+  const common = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+  };
+
+  switch (name) {
+    case "home":
+      return (
+        <svg {...common}>
+          <path d="M3 11.5 12 4l9 7.5" />
+          <path d="M5.5 10.5V20h13v-9.5" />
+          <path d="M9.5 20v-6h5v6" />
+        </svg>
+      );
+
+    case "search":
+      return (
+        <svg {...common}>
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path d="m15.5 15.5 5 5" />
+        </svg>
+      );
+
+    case "rocket":
+      return (
+        <svg {...common}>
+          <path d="M14 5c2.7-2.1 5.7-1.5 6-1.4.1.4.7 3.3-1.4 6l-5.8 5.8-4.2-4.2L14 5Z" />
+          <path d="m8.6 11.2-3.1.6-2 2 4.2 1.1" />
+          <path d="m12.8 15.4-.6 3.1-2 2-1.1-4.2" />
+          <circle cx="15.7" cy="7.9" r="1.5" />
+        </svg>
+      );
+
+    case "layers":
+      return (
+        <svg {...common}>
+          <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+          <path d="m3 12 9 5 9-5" />
+          <path d="m3 16 9 5 9-5" />
+        </svg>
+      );
+
+    case "wallet":
+      return (
+        <svg {...common}>
+          <path d="M4 6.5h14.5A1.5 1.5 0 0 1 20 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11" />
+          <path d="M15 11h6v5h-6a2.5 2.5 0 0 1 0-5Z" />
+          <circle cx="15.5" cy="13.5" r=".6" fill="currentColor" />
+        </svg>
+      );
+
+    case "bolt":
+      return (
+        <svg {...common}>
+          <path d="m13 2-8 12h6l-1 8 9-13h-6V2Z" />
+        </svg>
+      );
+
+    case "flow":
+      return (
+        <svg {...common}>
+          <circle cx="6" cy="5" r="2" />
+          <circle cx="18" cy="5" r="2" />
+          <circle cx="12" cy="19" r="2" />
+          <path d="M6 7v3c0 2 2 3 6 3s6-1 6-3V7" />
+          <path d="M12 13v4" />
+        </svg>
+      );
+
+    case "download":
+      return (
+        <svg {...common}>
+          <path d="M12 3v12" />
+          <path d="m7 10 5 5 5-5" />
+          <path d="M4 20h16" />
+        </svg>
+      );
+
+    case "link":
+      return (
+        <svg {...common}>
+          <path d="m9.5 14.5 5-5" />
+          <path d="M7 17H5.5a4.5 4.5 0 0 1 0-9H9" />
+          <path d="M17 7h1.5a4.5 4.5 0 1 1 0 9H15" />
+        </svg>
+      );
+
+    case "chart":
+      return (
+        <svg {...common}>
+          <path d="M4 19V9" />
+          <path d="M10 19V4" />
+          <path d="M16 19v-7" />
+          <path d="M22 19V7" />
+        </svg>
+      );
+
+    case "diamond":
+      return (
+        <svg {...common}>
+          <path d="m12 3 8 6-8 12L4 9l8-6Z" />
+          <path d="m4 9 8 3 8-3" />
+        </svg>
+      );
+
+    case "crown":
+      return (
+        <svg {...common}>
+          <path d="m3 7 4 4 5-7 5 7 4-4-2 11H5L3 7Z" />
+          <path d="M5 21h14" />
+        </svg>
+      );
+
+    case "star":
+      return (
+        <svg {...common}>
+          <path d="m12 3 2.8 5.8 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.7l6.2-.9L12 3Z" />
+        </svg>
+      );
+
+    case "share":
+      return (
+        <svg {...common}>
+          <circle cx="18" cy="5" r="2.5" />
+          <circle cx="6" cy="12" r="2.5" />
+          <circle cx="18" cy="19" r="2.5" />
+          <path d="m8.2 10.8 7.6-4.5" />
+          <path d="m8.2 13.2 7.6 4.5" />
+        </svg>
+      );
+
+    case "arrow":
+      return (
+        <svg {...common}>
+          <path d="M4 12h16" />
+          <path d="m14 6 6 6-6 6" />
+        </svg>
+      );
+
+    case "filter":
+      return (
+        <svg {...common}>
+          <path d="M3 5h18l-7 8v6l-4 2v-8L3 5Z" />
+        </svg>
+      );
+
+    case "copy":
+      return (
+        <svg {...common}>
+          <rect x="8" y="8" width="11" height="11" rx="2" />
+          <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+        </svg>
+      );
+
+    case "more":
+      return (
+        <svg {...common}>
+          <circle cx="5" cy="12" r="1" fill="currentColor" />
+          <circle cx="12" cy="12" r="1" fill="currentColor" />
+          <circle cx="19" cy="12" r="1" fill="currentColor" />
+        </svg>
+      );
+
+    default:
+      return null;
+  }
+}
+
+function AmbientBackground() {
+  return (
+    <>
+      <div className="ambient-light ambient-light-one" />
+      <div className="ambient-light ambient-light-two" />
+      <div className="ambient-light ambient-light-three" />
+
+      <svg
+        className="background-wave"
+        viewBox="0 0 1600 1100"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient
+            id="backgroundWaveStroke"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="0"
+          >
+            <stop offset="0%" stopColor="#2859ff" />
+            <stop offset="45%" stopColor="#7656ff" />
+            <stop offset="100%" stopColor="#ed3dff" />
+          </linearGradient>
+
+          <pattern
+            id="backgroundDots"
+            width="18"
+            height="18"
+            patternUnits="userSpaceOnUse"
+          >
+            <circle
+              cx="2"
+              cy="2"
+              r="1"
+              fill="#9580ff"
+              fillOpacity=".24"
+            />
+          </pattern>
+
+          <filter id="backgroundGlow">
+            <feGaussianBlur stdDeviation="12" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <path
+          d="M-100 810 C230 620 430 860 720 690 C1010 510 1220 730 1700 390 L1700 1200 L-100 1200 Z"
+          fill="url(#backgroundDots)"
+          opacity=".78"
+        />
+
+        <path
+          d="M-100 745 C220 555 440 795 730 620 C1010 455 1240 660 1700 330"
+          fill="none"
+          stroke="url(#backgroundWaveStroke)"
+          strokeWidth="8"
+          strokeLinecap="round"
+          opacity=".55"
+          filter="url(#backgroundGlow)"
+        />
+
+        <path
+          d="M-100 875 C230 690 480 920 760 750 C1040 575 1270 780 1700 520"
+          fill="none"
+          stroke="#4867ff"
+          strokeWidth="3"
+          strokeLinecap="round"
+          opacity=".37"
+        />
+      </svg>
+    </>
+  );
+}
+
+function DesktopSidebar() {
+  return (
+    <aside className="desktop-sidebar">
+      <button
+        className="desktop-logo"
+        type="button"
+        aria-label="ZAINEX"
+        title="ZAINEX"
+      >
+        <span>Z</span>
+      </button>
+
+      <nav
+        className="desktop-nav desktop-nav-primary"
+        aria-label="Primary navigation"
+      >
+        {desktopNav.map((item) => (
+          <button
+            key={item.label}
+            type="button"
+            className={`desktop-nav-button ${
+              item.active ? "active" : ""
+            }`}
+            aria-label={item.label}
+            title={item.label}
+            data-label={item.label}
+          >
+            <Icon name={item.icon} />
+          </button>
+        ))}
+      </nav>
+
+      <div className="desktop-nav-divider" />
+
+      <nav
+        className="desktop-nav desktop-nav-tools"
+        aria-label="Trading tools"
+      >
+        {desktopTools.map((item) => (
+          <button
+            key={item.label}
+            type="button"
+            className={`desktop-nav-button ${
+              item.active ? "active secondary-active" : ""
+            }`}
+            aria-label={item.label}
+            title={item.label}
+            data-label={item.label}
+          >
+            <Icon name={item.icon} />
+          </button>
+        ))}
+      </nav>
+    </aside>
+  );
+}
+
+function MarketSwitcher({
+  activeMarket,
+  setActiveMarket,
+  compact = false,
+}: {
+  activeMarket: MarketKey;
+  setActiveMarket: (market: MarketKey) => void;
+  compact?: boolean;
+}) {
+  const tabs: Array<{ key: MarketKey; label: string }> = [
+    { key: "crypto", label: "Crypto" },
+    { key: "forex", label: "Forex" },
+    { key: "stocks", label: "Stocks" },
+  ];
+
+  return (
+    <div
+      className={`market-switcher ${
+        compact ? "market-switcher-compact" : ""
+      }`}
+      role="tablist"
+      aria-label="Market selector"
+    >
+      {tabs.map((tab) => (
+        <button
+          key={tab.key}
+          type="button"
+          role="tab"
+          aria-selected={activeMarket === tab.key}
+          className={`market-switch ${
+            activeMarket === tab.key ? "active" : ""
+          }`}
+          onClick={() => setActiveMarket(tab.key)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CandlestickChart({
+  market,
+}: {
+  market: MarketData;
+}) {
+  const shift = market.shift;
+
+  return (
+    <div className="desktop-chart-canvas">
+      <div className="desktop-chart-grid" />
+
+      <svg
+        className="candlestick-chart"
+        viewBox="0 0 1080 390"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={`${market.label} candlestick chart`}
+      >
+        <defs>
+          <linearGradient
+            id="volumeGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stopColor={market.accent}
+              stopOpacity=".38"
+            />
+            <stop
+              offset="100%"
+              stopColor={market.accent}
+              stopOpacity=".03"
+            />
+          </linearGradient>
+
+          <filter id="candleGlow">
+            <feGaussianBlur stdDeviation="3.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {baseCandles.map((candle, index) => {
+          const x = 36 + index * 42;
+          const open = candle.open + shift;
+          const close = candle.close + shift;
+          const high = candle.high + shift;
+          const low = candle.low + shift;
+          const rising = close < open;
+          const color = rising ? "#2fd8ff" : "#c95cff";
+          const bodyY = Math.min(open, close);
+          const bodyHeight = Math.max(7, Math.abs(close - open));
+          const volumeHeight = candle.volume * 0.78;
+
+          return (
+            <g key={`${x}-${open}-${close}`}>
+              <rect
+                x={x - 6}
+                y={350 - volumeHeight}
+                width="12"
+                height={volumeHeight}
+                rx="2"
+                fill="url(#volumeGradient)"
+                opacity={rising ? ".76" : ".38"}
+              />
+
+              <line
+                x1={x}
+                y1={high}
+                x2={x}
+                y2={low}
+                stroke={color}
+                strokeWidth="2"
+                opacity=".88"
+              />
+
+              <rect
+                x={x - 6}
+                y={bodyY}
+                width="12"
+                height={bodyHeight}
+                rx="2"
+                fill={color}
+                filter="url(#candleGlow)"
+              />
+            </g>
+          );
+        })}
+
+        <line
+          x1="36"
+          y1={138 + shift}
+          x2="1044"
+          y2={138 + shift}
+          stroke={market.accent}
+          strokeWidth="1.5"
+          strokeDasharray="5 6"
+          opacity=".42"
+        />
+
+        <circle
+          cx="1044"
+          cy={138 + shift}
+          r="4"
+          fill={market.accent}
+        />
+      </svg>
+
+      <div className="desktop-chart-price-scale">
+        <span>1.30</span>
+        <span>1.25</span>
+        <span>1.20</span>
+        <span>1.15</span>
+        <span>1.10</span>
+        <span>1.05</span>
+      </div>
+
+      <div className="desktop-chart-time-scale">
+        <span>03</span>
+        <span>06</span>
+        <span>09</span>
+        <span>12</span>
+        <span>15</span>
+        <span>18</span>
+        <span>21</span>
+        <span>00</span>
+        <span>03</span>
+        <span>06</span>
+        <span>09</span>
+        <span>12</span>
+      </div>
+
+      <div className="crosshair crosshair-horizontal" />
+      <div className="crosshair crosshair-vertical" />
+      <div className="crosshair-point" />
+    </div>
+  );
+}
+
+function DesktopHeader() {
+  return (
+    <header className="desktop-header">
+      <div className="desktop-brand">
+        <div className="desktop-brand-symbol">
+          <span>Z</span>
+        </div>
+
+        <div>
+          <strong>
+            Z<span>AI</span>NEX
+          </strong>
+          <small>multi-market terminal</small>
+        </div>
+      </div>
+
+      <label className="desktop-search">
+        <Icon name="search" size={18} />
+        <input
+          type="search"
+          placeholder="Search market, symbol or wallet"
+          aria-label="Search markets"
+        />
+        <kbd>CTRL K</kbd>
+      </label>
+
+      <div className="desktop-header-actions">
+        <button
+          className="network-button"
+          type="button"
+        >
+          <span className="network-icon">
+            <Icon name="bolt" size={15} />
+          </span>
+          AI Engine Online
+          <span className="network-chevron">v</span>
+        </button>
+
+        <button
+          className="desktop-profile"
+          type="button"
+          aria-label="Open profile"
+        >
+          <span>EB</span>
+        </button>
+      </div>
+    </header>
+  );
+}
+
+function DesktopAssetColumn({
+  market,
+  activeMarket,
+  setActiveMarket,
+}: {
+  market: MarketData;
+  activeMarket: MarketKey;
+  setActiveMarket: (market: MarketKey) => void;
+}) {
+  return (
+    <section className="desktop-asset-column">
+      <MarketSwitcher
+        activeMarket={activeMarket}
+        setActiveMarket={setActiveMarket}
+        compact
+      />
+
+      <article className="desktop-asset-summary">
+        <div className="asset-heading">
+          <div className="asset-token">
+            <div
+              className="asset-token-logo"
+              style={{
+                background: `linear-gradient(145deg, ${market.accent}, #7d51ff)`,
+              }}
+            >
+              {market.symbol.slice(0, 1)}
+            </div>
+
+            <div>
+              <span>{market.network}</span>
+              <strong>{market.symbol}</strong>
+              <small>{market.assetName}</small>
+            </div>
+          </div>
+
+          <button
+            className="asset-add-button"
+            type="button"
+            aria-label="Add asset"
+          >
+            +
+          </button>
+        </div>
+
+        <div className="asset-quick-actions">
+          <button type="button" aria-label="Open market">
+            <Icon name="arrow" size={16} />
+          </button>
+
+          <button type="button" aria-label="Favorite asset">
+            <Icon name="star" size={16} />
+          </button>
+
+          <button type="button" aria-label="Share asset">
+            <Icon name="share" size={16} />
+          </button>
+
+          <button
+            className="trade-outline-button"
+            type="button"
+          >
+            Trade
+          </button>
+        </div>
+
+        <div className="asset-main-price">
+          <strong>{market.rawPrice}</strong>
+          <span>{market.currencySymbol}</span>
+        </div>
+
+        <div className="asset-sub-price">
+          <span className="asset-diamond">+</span>
+          {market.secondaryValue}
+          <span className="asset-change">
+            24H: {market.change}
+          </span>
+        </div>
+        <div className="desktop-trade-actions">
+          <button
+            className="desktop-trade-button desktop-buy-action"
+            type="button"
+          >
+            <span>BUY LOW</span>
+            <strong>{market.price}</strong>
+            <small>Open long position</small>
+          </button>
+
+          <button
+            className="desktop-trade-button desktop-sell-action"
+            type="button"
+          >
+            <span>SELL HIGH</span>
+            <strong>{market.price}</strong>
+            <small>Open short position</small>
+          </button>
+        </div>
+      </article>
+
+      <div className="desktop-stat-grid">
+        <article className="desktop-stat-card">
+          <div className="desktop-stat-icon pink">
+            <Icon name="diamond" size={18} />
+          </div>
+          <div>
+            <span>{market.liquidityLabel}</span>
+            <strong>{market.liquidity}</strong>
+          </div>
+        </article>
+
+        <article className="desktop-stat-card">
+          <div className="desktop-stat-icon blue">
+            <Icon name="chart" size={18} />
+          </div>
+          <div>
+            <span>{market.volumeLabel}</span>
+            <strong>{market.volume}</strong>
+          </div>
+        </article>
+
+        <article className="desktop-stat-card">
+          <div className="desktop-stat-icon violet">
+            <Icon name="layers" size={18} />
+          </div>
+          <div>
+            <span>{market.pooledPrimaryLabel}</span>
+            <strong>{market.pooledPrimary}</strong>
+          </div>
+        </article>
+
+        <article className="desktop-stat-card">
+          <div className="desktop-stat-icon rose">
+            <Icon name="flow" size={18} />
+          </div>
+          <div>
+            <span>{market.pooledSecondaryLabel}</span>
+            <strong>{market.pooledSecondary}</strong>
+          </div>
+        </article>
+      </div>
+
+      <article className="desktop-score-card">
+        <div className="score-card-heading">
+          <div>
+            <span>AI MARKET SCORE</span>
+            <strong>{market.score}</strong>
+          </div>
+
+          <div
+            className="desktop-score-ring"
+            style={{
+              background:
+                "conic-gradient(#ff718f 0 20%, #ffc26a 20% 37%, #8b5cff 37% 68%, #b7b1dc 68% 86%, rgba(255,255,255,.08) 86% 100%)",
+            }}
+          >
+            <div />
+          </div>
+        </div>
+
+        <div className="community-row">
+          <span>Community trust</span>
+          <strong>Trust  {market.trust}</strong>
+          <small>{market.votes}</small>
+        </div>
+
+        <div className="community-progress">
+          <span
+            style={{
+              width: market.trust,
+            }}
+          />
+        </div>
+      </article>
+    </section>
+  );
+}
+
+function DesktopMarketColumn({
+  market,
+  activeMarket,
+}: {
+  market: MarketData;
+  activeMarket: MarketKey;
+}) {
+  return (
+    <section className="desktop-market-column">
+      <article className="desktop-chart-card desktop-live-chart-card">
+        <TradingViewChart market={activeMarket} />
+
+        <div className="desktop-chart-trade-overlay">
+          <button
+            className="desktop-chart-trade-button desktop-chart-sell-button"
+            type="button"
+          >
+            <span>SELL</span>
+            <strong>{market.price}</strong>
+            <small>Open short position</small>
+          </button>
+
+          <button
+            className="desktop-chart-trade-button desktop-chart-buy-button"
+            type="button"
+          >
+            <span>BUY</span>
+            <strong>{market.price}</strong>
+            <small>Open long position</small>
+          </button>
+        </div>
+      </article>
+
+      <article className="trade-history-card">
+        <div className="trade-history-heading">
+          <div>
+            <span>EXECUTION FEED</span>
+            <h2>Trade History</h2>
+          </div>
+
+          <div className="trade-history-actions">
+            <button
+              type="button"
+              aria-label="Filter trades"
+            >
+              <Icon name="filter" size={17} />
+            </button>
+
+            <strong>{market.label}</strong>
+            <span>Last 521 trades</span>
+          </div>
+        </div>
+
+        <div className="trade-table-header">
+          <span>Time</span>
+          <span>Price</span>
+          <span>Quantity</span>
+          <span>Total</span>
+          <span>Fee</span>
+          <span>Wallet</span>
+          <span />
+        </div>
+
+        <div className="trade-table-body">
+          {historyRows.map((row) => (
+            <div
+              className="trade-table-row"
+              key={`${row.time}-${row.wallet}`}
+            >
+              <span>{row.time}</span>
+
+              <strong>
+                {row.price}
+                <i
+                  className={
+                    row.direction === "up"
+                      ? "trade-up"
+                      : "trade-down"
+                  }
+                >
+                  {row.direction === "up" ? "UP" : "DN"}
+                </i>
+              </strong>
+
+              <span className="trade-quantity">QTY {row.quantity}</span>
+
+              <span>{row.total}</span>
+              <span>{row.fee}</span>
+
+              <span className="wallet-cell">
+                {row.wallet}
+                <Icon name="copy" size={13} />
+              </span>
+
+              <button
+                type="button"
+                aria-label="Trade options"
+              >
+                <Icon name="more" size={17} />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <button className="history-more-button" type="button">
+          More trades
+        </button>
+      </article>
+    </section>
+  );
+}
+
+function MobileDashboard({
+  market,
+  activeMarket,
+  setActiveMarket,
+}: {
+  market: MarketData;
+  activeMarket: MarketKey;
+  setActiveMarket: (market: MarketKey) => void;
+}) {
+  const mobileStats = [
+    {
+      label: "Momentum",
+      value: "82%",
+      fill: 82,
+      color: "#b45bff",
+    },
+    {
+      label: "Volume",
+      value: market.volume,
+      fill: 70,
+      color: "#6476ff",
+    },
+    {
+      label: "AI Signal",
+      value: "BUY",
+      fill: 91,
+      color: "#25d5ff",
+    },
+    {
+      label: "Risk",
+      value: "LOW",
+      fill: 42,
+      color: "#e64cff",
+    },
+  ];
+
+  return (
+    <section className="mobile-shell">
+      <header className="mobile-header">
+        <div className="mobile-profile">
+          <div className="mobile-avatar">EB</div>
+
+          <div>
+            <span>My profile</span>
+            <strong>ZAINEX Trader</strong>
+          </div>
+        </div>
+
+        <div className="mobile-balance">
+          <span>Portfolio balance</span>
+          <strong>$12,120.84</strong>
+        </div>
+      </header>
+
+      <div className="mobile-brand-row">
+        <div className="mobile-wordmark">
+          Z<span>AI</span>NEX
+        </div>
+
+        <div className="mobile-live">
+          <i />
+          LIVE
+        </div>
+      </div>
+
+      <MarketSwitcher
+        activeMarket={activeMarket}
+        setActiveMarket={setActiveMarket}
+      />
+
+      <article className="mobile-chart-card mobile-real-chart-card">
+        <div className="mobile-chart-heading">
+          <div>
+            <span>{market.network}</span>
+            <strong>{market.symbol}</strong>
+          </div>
+
+          <div>
+            <strong>{market.price}</strong>
+            <span>{market.change}</span>
+          </div>
+        </div>
+
+        <div className="mobile-chart-area mobile-live-chart-area">
+          <TradingViewChart
+            market={activeMarket}
+            compact
+          />
+        </div>
+      </article>
+
+      <div className="mobile-trade-actions">
+        <button
+          className="mobile-trade-button mobile-sell-button"
+          type="button"
+        >
+          <span>SELL</span>
+          <small>Open short position</small>
+        </button>
+
+        <button
+          className="mobile-trade-button mobile-buy-button"
+          type="button"
+        >
+          <span>BUY</span>
+          <small>Open long position</small>
+        </button>
+      </div>
+
+      <section className="mobile-statistics">
+        {mobileStats.map((stat) => (
+          <article key={stat.label}>
+            <div
+              className="mobile-stat-ring"
+              style={{
+                background: `conic-gradient(
+                  ${stat.color} ${stat.fill}%,
+                  rgba(255,255,255,.09) 0
+                )`,
+              }}
+            >
+              <div>
+                <strong>{stat.value}</strong>
+              </div>
+            </div>
+
+            <span>{stat.label}</span>
+          </article>
+        ))}
+      </section>
+
+      <article className="mobile-controls">
+        <div className="mobile-controls-heading">
+          <div>
+            <span>AI trade settings</span>
+            <strong>Position controls</strong>
+          </div>
+
+          <small>AUTO</small>
+        </div>
+
+        <label>
+          <span>
+            Position size
+            <strong>35%</strong>
+          </span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            defaultValue="35"
+          />
+        </label>
+
+        <label>
+          <span>
+            Take profit
+            <strong>72%</strong>
+          </span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            defaultValue="72"
+          />
+        </label>
+
+        <label>
+          <span>
+            Stop loss
+            <strong>48%</strong>
+          </span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            defaultValue="48"
+          />
+        </label>
+      </article>
+
+      <nav
+        className="mobile-bottom-navigation"
+        aria-label="Mobile navigation"
+      >
+        <button className="active" type="button">
+          <Icon name="home" size={17} />
+          <span>Home</span>
+        </button>
+
+        <button type="button">
+          <Icon name="chart" size={17} />
+          <span>Markets</span>
+        </button>
+
+        <button type="button">
+          <Icon name="wallet" size={17} />
+          <span>Wallet</span>
+        </button>
+
+        <button type="button">
+          <Icon name="search" size={17} />
+          <span>Profile</span>
+        </button>
+      </nav>
+    </section>
+  );
+}
+
+export function MarketDashboard() {
+  const [activeMarket, setActiveMarket] =
+    useState<MarketKey>("crypto");
+
+  const [
+    marketSnapshots,
+    setMarketSnapshots,
+  ] = useState<
+    Record<MarketKey, MarketData>
+  >(markets);
+
+  const market =
+    marketSnapshots[activeMarket];
+
+  useEffect(() => {
+    let disposed = false;
+
+    const controller =
+      new AbortController();
+
+    async function refreshSummary() {
+      try {
+        const endpoint = new URL(
+          "/api/market/candles",
+          window.location.origin,
+        );
+
+        endpoint.searchParams.set(
+          "market",
+          activeMarket,
+        );
+
+        endpoint.searchParams.set(
+          "interval",
+          "1h",
+        );
+
+        endpoint.searchParams.set(
+          "limit",
+          "120",
+        );
+
+        const response = await fetch(
+          endpoint,
+          {
+            cache: "no-store",
+            signal: controller.signal,
+          },
+        );
+
+        const payload =
+          (await response.json()) as
+            LiveMarketResponse;
+
+        if (
+          !response.ok ||
+          !payload.ok ||
+          !payload.summary
+        ) {
+          throw new Error(
+            payload.error ??
+              "Market summary unavailable.",
+          );
+        }
+
+        if (disposed) {
+          return;
+        }
+
+        setMarketSnapshots(
+          (current) => ({
+            ...current,
+
+            [activeMarket]: {
+              ...current[activeMarket],
+              ...payload.summary,
+            },
+          }),
+        );
+      }
+      catch (error) {
+        if (
+          disposed ||
+          controller.signal.aborted
+        ) {
+          return;
+        }
+
+        console.error(
+          "ZAINEX market summary failed:",
+          error,
+        );
+      }
+    }
+
+    void refreshSummary();
+
+    const refreshTimer =
+      window.setInterval(
+        () => {
+          void refreshSummary();
+        },
+        activeMarket === "crypto"
+          ? 15000
+          : 60000,
+      );
+
+    return () => {
+      disposed = true;
+
+      controller.abort();
+
+      window.clearInterval(
+        refreshTimer,
+      );
+    };
+  }, [activeMarket]);
+
+  return (
+    <main className="zainex-app">
+      <AmbientBackground />
+
+      <div className="desktop-app-frame">
+        <DesktopSidebar />
+
+        <section className="desktop-shell">
+          <DesktopHeader />
+
+          <div className="desktop-body">
+            <DesktopAssetColumn
+              market={market}
+              activeMarket={activeMarket}
+              setActiveMarket={setActiveMarket}
+            />
+
+            <DesktopMarketColumn market={market}  activeMarket={activeMarket} />
+          </div>
+        </section>
+      </div>
+
+      <MobileDashboard
+        market={market}
+        activeMarket={activeMarket}
+        setActiveMarket={setActiveMarket}
+      />
+    </main>
+  );
+}

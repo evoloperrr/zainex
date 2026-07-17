@@ -1,0 +1,1535 @@
+.root {
+  align-items: stretch;
+}
+
+.modeSwitch {
+  display: flex;
+  min-width: 0;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border:
+    1px solid
+    rgba(110, 132, 194, 0.14);
+  border-radius: 11px;
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.modeSwitch button {
+  min-width: 76px;
+  height: 31px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  color: #7e879f;
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+}
+
+.modeSwitch .activeMode {
+  color: #07111b;
+  background:
+    linear-gradient(
+      135deg,
+      #58dfff,
+      #8978ff
+    );
+}
+
+.modeSwitch > span {
+  overflow: hidden;
+  margin-left: auto;
+  color: #747d96;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel {
+  display: grid;
+  min-width: 0;
+  grid-column: 1 / -1;
+  gap: 10px;
+  padding: 12px;
+  border:
+    1px solid
+    rgba(83, 208, 255, 0.14);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(15, 22, 41, 0.98),
+      rgba(8, 13, 26, 0.99)
+    );
+}
+
+.accountGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.accountGrid > div,
+.estimateGrid > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border:
+    1px solid
+    rgba(123, 139, 191, 0.09);
+  border-radius: 9px;
+  background:
+    rgba(255, 255, 255, 0.02);
+}
+
+.accountGrid span,
+.accountGrid strong,
+.estimateGrid span,
+.estimateGrid strong {
+  display: block;
+}
+
+.accountGrid span,
+.estimateGrid span {
+  color: #727c98;
+  font-size: 7px;
+  letter-spacing: 0.4px;
+}
+
+.accountGrid strong,
+.estimateGrid strong {
+  overflow: hidden;
+  margin-top: 4px;
+  color: #e7ecfb;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 0.8fr)
+    minmax(240px, 1.2fr);
+  gap: 9px;
+}
+
+.inputGrid label,
+.leverage {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.inputGrid label > span,
+.leverage > span {
+  color: #79839d;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.inputGrid label > div {
+  display: flex;
+  min-height: 39px;
+  align-items: center;
+  padding: 0 10px;
+  border:
+    1px solid
+    rgba(128, 143, 192, 0.13);
+  border-radius: 9px;
+  background:
+    rgba(255, 255, 255, 0.023);
+}
+
+.inputGrid input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #f2f5ff;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inputGrid label b {
+  color: #717b94;
+  font-size: 8px;
+}
+
+.leverage > div {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.leverage button {
+  min-height: 39px;
+  border:
+    1px solid
+    rgba(124, 139, 191, 0.12);
+  border-radius: 9px;
+  color: #8590a9;
+  background:
+    rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.leverage .activeLeverage {
+  color: #07111b;
+  border-color: transparent;
+  background:
+    linear-gradient(
+      135deg,
+      #5ce1ff,
+      #8978ff
+    );
+}
+
+.estimateGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.warning {
+  padding: 9px 10px;
+  border:
+    1px solid
+    rgba(255, 114, 148, 0.16);
+  border-radius: 9px;
+  color: #ff879f;
+  background:
+    rgba(255, 114, 148, 0.055);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.futuresButton {
+  display: flex;
+  min-width: 0;
+  min-height: 64px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 13px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.futuresButton span,
+.futuresButton strong,
+.futuresButton small {
+  display: block;
+}
+
+.futuresButton span {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.futuresButton strong {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+.futuresButton small {
+  margin-top: 3px;
+  font-size: 7px;
+  opacity: 0.72;
+}
+
+.futuresButton:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  opacity: 0.43;
+}
+
+.shortButton {
+  border:
+    1px solid
+    rgba(255, 91, 132, 0.38);
+  color: #fff0f4;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(174, 43, 82, 0.98),
+      rgba(105, 31, 68, 0.98)
+    );
+}
+
+.longButton {
+  border:
+    1px solid
+    rgba(76, 235, 180, 0.38);
+  color: #06231b;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(86, 241, 184, 0.98),
+      rgba(68, 211, 201, 0.97)
+    );
+}
+
+.liquidationGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.liquidationGrid span {
+  display: flex;
+  padding: 8px 9px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border:
+    1px solid
+    rgba(123, 138, 188, 0.08);
+  border-radius: 8px;
+  color: #75809a;
+  background:
+    rgba(255, 255, 255, 0.016);
+  font-size: 7px;
+}
+
+.liquidationGrid strong {
+  color: #c1c9dc;
+  font-size: 8px;
+}
+
+.positionCard {
+  padding: 11px;
+  border:
+    1px solid
+    rgba(83, 218, 255, 0.17);
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(24, 42, 60, 0.72),
+      rgba(11, 20, 35, 0.94)
+    );
+}
+
+.positionCard header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.positionCard header span,
+.positionCard header strong {
+  display: block;
+}
+
+.positionCard header span {
+  color: #77839d;
+  font-size: 7px;
+  letter-spacing: 0.7px;
+}
+
+.positionCard header strong {
+  margin-top: 4px;
+  color: #f1f5ff;
+  font-size: 12px;
+}
+
+.positionCard header > b {
+  padding: 6px 8px;
+  border-radius: 8px;
+  background:
+    rgba(255, 255, 255, 0.035);
+  font-size: 9px;
+}
+
+.positionGrid {
+  display: grid;
+  margin-top: 9px;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.positionGrid span {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  color: #727d97;
+  font-size: 7px;
+}
+
+.positionGrid strong {
+  overflow: hidden;
+  color: #d9dfef;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.closePosition {
+  width: 100%;
+  min-height: 36px;
+  margin-top: 10px;
+  border:
+    1px solid
+    rgba(255, 102, 140, 0.24);
+  border-radius: 9px;
+  color: #ff86a1;
+  background:
+    rgba(255, 94, 134, 0.07);
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.positive {
+  color: #57efb5 !important;
+}
+
+.negative {
+  color: #ff7393 !important;
+}
+
+.neutral {
+  color: #ffd168 !important;
+}
+
+.modalBackdrop {
+  position: fixed;
+  z-index: 1000000;
+  inset: 0;
+  display: grid;
+  padding: 18px;
+  place-items: center;
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(67, 126, 255, 0.23),
+      transparent 42%
+    ),
+    rgba(2, 5, 13, 0.84);
+  backdrop-filter: blur(17px);
+}
+
+.modal {
+  width: min(100%, 550px);
+  max-height: calc(100vh - 30px);
+  overflow-y: auto;
+  padding: 22px;
+  border:
+    1px solid
+    rgba(101, 182, 255, 0.23);
+  border-radius: 22px;
+  color: #f5f7ff;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 28, 51, 0.995),
+      rgba(7, 12, 24, 0.995)
+    );
+  box-shadow:
+    0 40px 120px
+    rgba(0, 0, 0, 0.74);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.modalHeader span {
+  color: #7d88a4;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.modalHeader h2 {
+  margin: 5px 0 0;
+  font-size: 23px;
+}
+
+.modalHeader button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border:
+    1px solid
+    rgba(137, 154, 204, 0.16);
+  border-radius: 10px;
+  color: #acb5ca;
+  background:
+    rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+}
+
+.modalHeader button:disabled {
+  cursor: wait;
+  opacity: 0.4;
+}
+
+.paperLabel {
+  display: flex;
+  margin-top: 16px;
+  align-items: center;
+  gap: 7px;
+  color: #8590aa;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.paperLabel i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4bdcff;
+  box-shadow:
+    0 0 14px
+    rgba(75, 220, 255, 0.8);
+}
+
+.modalSummary {
+  display: grid;
+  margin-top: 18px;
+  padding: 14px;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border:
+    1px solid
+    rgba(123, 143, 201, 0.13);
+  border-radius: 14px;
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.modalSummary > b {
+  display: grid;
+  min-width: 61px;
+  min-height: 37px;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 10px;
+  letter-spacing: 0.7px;
+}
+
+.longTag {
+  color: #56efb5;
+  background:
+    rgba(86, 239, 181, 0.11);
+}
+
+.shortTag {
+  color: #ff7796;
+  background:
+    rgba(255, 119, 150, 0.11);
+}
+
+.closeTag {
+  color: #ffd168;
+  background:
+    rgba(255, 209, 104, 0.10);
+}
+
+.modalSummary div strong,
+.modalSummary div span {
+  display: block;
+}
+
+.modalSummary div strong {
+  font-size: 15px;
+}
+
+.modalSummary div span {
+  margin-top: 3px;
+  color: #7e89a4;
+  font-size: 9px;
+}
+
+.modalGrid {
+  display: grid;
+  margin-top: 10px;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.modalGrid > div {
+  min-width: 0;
+  padding: 10px 11px;
+  border:
+    1px solid
+    rgba(121, 139, 190, 0.09);
+  border-radius: 10px;
+  background:
+    rgba(255, 255, 255, 0.02);
+}
+
+.modalGrid span,
+.modalGrid strong {
+  display: block;
+}
+
+.modalGrid span {
+  color: #77819b;
+  font-size: 8px;
+}
+
+.modalGrid strong {
+  overflow: hidden;
+  margin-top: 5px;
+  color: #f0f4ff;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modalNote {
+  margin: 11px 0 0;
+  padding: 10px;
+  border-left:
+    3px solid #ffd168;
+  border-radius: 8px;
+  color: #929bb0;
+  background:
+    rgba(255, 209, 104, 0.05);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.pending {
+  display: grid;
+  min-height: 200px;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.pending > i {
+  width: 41px;
+  height: 41px;
+  border:
+    3px solid
+    rgba(86, 121, 255, 0.18);
+  border-top-color: #4ddcff;
+  border-radius: 50%;
+  animation:
+    futuresSpin 700ms linear infinite;
+}
+
+.pending strong {
+  margin-top: 14px;
+  font-size: 15px;
+}
+
+.pending span {
+  margin-top: 7px;
+  color: #858fa6;
+  font-size: 9px;
+}
+
+.success,
+.error {
+  display: flex;
+  margin-top: 17px;
+  padding: 14px;
+  align-items: center;
+  gap: 12px;
+  border-radius: 14px;
+}
+
+.success {
+  border:
+    1px solid
+    rgba(85, 239, 181, 0.17);
+  background:
+    rgba(85, 239, 181, 0.06);
+}
+
+.error {
+  border:
+    1px solid
+    rgba(255, 111, 145, 0.18);
+  background:
+    rgba(255, 111, 145, 0.06);
+}
+
+.success > i,
+.error > i {
+  position: relative;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  font-style: normal;
+}
+
+.success > i {
+  color: #56efb5;
+  background:
+    rgba(86, 239, 181, 0.12);
+}
+
+.success > i::before {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 15px;
+  margin-top: -3px;
+  border-right:
+    3px solid currentColor;
+  border-bottom:
+    3px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.error > i {
+  color: #ff7393;
+  background:
+    rgba(255, 115, 147, 0.12);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.success > div,
+.error > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.success strong,
+.success span,
+.error strong,
+.error span {
+  display: block;
+}
+
+.success strong,
+.error strong {
+  font-size: 13px;
+}
+
+.success span,
+.error span {
+  margin-top: 4px;
+  color: #919bb0;
+  font-size: 9px;
+}
+
+.success > b {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background:
+    rgba(255, 255, 255, 0.04);
+  font-size: 9px;
+}
+
+.modalActions {
+  display: flex;
+  margin-top: 16px;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modalActions button {
+  min-width: 118px;
+  min-height: 40px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.secondary {
+  border:
+    1px solid
+    rgba(132, 146, 191, 0.15);
+  color: #99a3b9;
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.primary {
+  border: 0;
+  color: #061019;
+  background:
+    linear-gradient(
+      135deg,
+      #64e3ff,
+      #8c78ff
+    );
+}
+
+.primary:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+
+@keyframes futuresSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 720px) {
+  .modeSwitch button {
+    min-width: 66px;
+  }
+
+  .panel {
+    padding: 10px;
+  }
+
+  .accountGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .inputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .estimateGrid,
+  .positionGrid,
+  .liquidationGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .modalBackdrop {
+    padding: 11px;
+  }
+
+  .modal {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .modalHeader h2 {
+    font-size: 20px;
+  }
+
+  .modalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modalActions {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .modalActions button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ZAINEX_FUTURES_ORIGINAL_COLORS_BIGGER_TEXT_V1_START */
+
+/*
+ * Futures action buttons must use the same palette
+ * as the original ZAINEX SELL and BUY buttons.
+ */
+
+/* SHORT = original SELL purple */
+.shortButton {
+  border:
+    1px solid
+    rgba(225, 115, 255, 0.62) !important;
+  color: white !important;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(178, 65, 229, 0.97),
+      rgba(112, 65, 193, 0.97)
+    ) !important;
+  box-shadow:
+    0 12px 28px
+    rgba(139, 50, 213, 0.20),
+    inset 0 1px
+    rgba(255, 255, 255, 0.13) !important;
+}
+
+.shortButton span,
+.shortButton strong {
+  color: white !important;
+}
+
+.shortButton small {
+  color:
+    rgba(255, 255, 255, 0.68) !important;
+}
+
+/* LONG = original BUY white/light palette */
+.longButton {
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.80) !important;
+  color: #291145 !important;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.99),
+      rgba(220, 235, 255, 0.98) 48%,
+      rgba(225, 205, 255, 0.98)
+    ) !important;
+  box-shadow:
+    0 12px 30px
+    rgba(212, 183, 255, 0.19),
+    inset 0 1px white !important;
+}
+
+.longButton span,
+.longButton strong {
+  color: #351452 !important;
+}
+
+.longButton small {
+  color:
+    rgba(53, 20, 82, 0.68) !important;
+}
+
+/* Larger Spot/Futures switch text */
+.modeSwitch button {
+  font-size: 12px !important;
+}
+
+.modeSwitch > span {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+/* Larger account card labels and amounts */
+.accountGrid span {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+.accountGrid strong {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+/* Larger margin and leverage controls */
+.inputGrid label > span,
+.leverage > span {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+.inputGrid input {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+}
+
+.inputGrid label b {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+.leverage button {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+/* Larger notional, quantity and fee */
+.estimateGrid span {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+.estimateGrid strong {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+/* Larger liquidation preview */
+.liquidationGrid span {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+.liquidationGrid strong {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+/* Larger LONG and SHORT action buttons */
+.futuresButton span {
+  font-size: 21px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.8px !important;
+}
+
+.futuresButton strong {
+  margin-top: 4px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+.futuresButton small {
+  margin-top: 5px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+/* Larger validation and information messages */
+.warning {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* Larger open-position text */
+.positionCard header span {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+.positionCard header strong {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+.positionCard header > b {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.positionGrid span {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+.positionGrid strong {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.closePosition {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+/* Larger Futures modal text */
+.modalHeader span {
+  font-size: 10px !important;
+}
+
+.modalHeader h2 {
+  font-size: 26px !important;
+}
+
+.paperLabel {
+  font-size: 10px !important;
+}
+
+.modalSummary > b {
+  font-size: 12px !important;
+}
+
+.modalSummary div strong {
+  font-size: 17px !important;
+}
+
+.modalSummary div span {
+  font-size: 11px !important;
+}
+
+.modalGrid span {
+  font-size: 10px !important;
+}
+
+.modalGrid strong {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.modalNote {
+  font-size: 11px !important;
+}
+
+.success strong,
+.error strong {
+  font-size: 15px !important;
+}
+
+.success span,
+.error span {
+  font-size: 11px !important;
+}
+
+.success > b {
+  font-size: 11px !important;
+}
+
+.modalActions button {
+  font-size: 12px !important;
+}
+
+/* ZAINEX_FUTURES_ORIGINAL_COLORS_BIGGER_TEXT_V1_END */
+
+/* ZAINEX_EXACT_FUTURES_BUTTON_SIZE_V1_START */
+
+/*
+ * Desktop Futures action buttons match the original
+ * desktop BUY and SELL button dimensions.
+ */
+
+:global(.desktop-chart-trade-overlay)
+.futuresButton {
+  box-sizing: border-box !important;
+  height: 76px !important;
+  min-height: 76px !important;
+  max-height: 76px !important;
+  padding: 12px 18px !important;
+  border-radius: 16px !important;
+}
+
+:global(.desktop-chart-trade-overlay)
+.futuresButton span {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  line-height: 1 !important;
+}
+
+:global(.desktop-chart-trade-overlay)
+.futuresButton strong {
+  margin-top: 4px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+:global(.desktop-chart-trade-overlay)
+.futuresButton small {
+  margin-top: 6px !important;
+  font-size: 7px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+/*
+ * Mobile Futures action buttons match the original
+ * mobile BUY and SELL button dimensions.
+ */
+
+:global(.mobile-trade-actions)
+.futuresButton {
+  box-sizing: border-box !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  padding: 7px 10px !important;
+  border-radius: 14px !important;
+}
+
+:global(.mobile-trade-actions)
+.futuresButton span {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  line-height: 1 !important;
+}
+
+:global(.mobile-trade-actions)
+.futuresButton strong {
+  margin-top: 3px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+:global(.mobile-trade-actions)
+.futuresButton small {
+  margin-top: 4px !important;
+  font-size: 7px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+/* ZAINEX_EXACT_FUTURES_BUTTON_SIZE_V1_END */
+
+/* ZAINEX_FUTURES_EXECUTION_LOGS_LAST10_V1R1_START */
+
+.executionLog {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+  padding: 12px;
+  border:
+    1px solid
+    rgba(103, 130, 206, 0.12);
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(14, 20, 37, 0.97),
+      rgba(8, 13, 26, 0.99)
+    );
+}
+
+.executionLogHeading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.executionLogHeading div {
+  min-width: 0;
+}
+
+.executionLogHeading span,
+.executionLogHeading strong {
+  display: block;
+}
+
+.executionLogHeading span {
+  color: #79839d;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+}
+
+.executionLogHeading strong {
+  margin-top: 4px;
+  color: #f1f4ff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.executionLogHeading > b {
+  color: #909ab4;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.executionLogTable {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.executionLogHeader,
+.executionLogRow {
+  display: grid;
+  min-width: 780px;
+  grid-template-columns:
+    78px
+    90px
+    100px
+    76px
+    minmax(145px, 1fr)
+    minmax(135px, 1fr)
+    minmax(165px, 1.15fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.executionLogHeader {
+  padding: 0 12px 7px;
+  color: #76809a;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.executionLogBody {
+  display: grid;
+  gap: 7px;
+}
+
+.executionLogRow {
+  min-height: 44px;
+  padding: 8px 12px;
+  border:
+    1px solid
+    rgba(125, 142, 197, 0.08);
+  border-radius: 10px;
+  color: #929cb5;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(35, 40, 65, 0.52),
+      rgba(21, 27, 49, 0.45)
+    );
+  font-size: 10px;
+}
+
+.executionLogRow > span,
+.executionLogRow > strong,
+.executionLogRow > b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.executionLogRow > strong {
+  color: #e5e9f8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.executionLogRow > b {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.executionLogEmpty {
+  display: grid;
+  min-height: 70px;
+  padding: 15px;
+  place-items: center;
+  border:
+    1px dashed
+    rgba(124, 142, 196, 0.14);
+  border-radius: 10px;
+  color: #7c86a0;
+  background:
+    rgba(255, 255, 255, 0.014);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .executionLog {
+    padding: 10px;
+  }
+
+  .executionLogHeading {
+    align-items: flex-start;
+  }
+
+  .executionLogHeading strong {
+    font-size: 13px;
+  }
+
+  .executionLogHeading > b {
+    font-size: 9px;
+  }
+
+  .executionLogHeader,
+  .executionLogRow {
+    min-width: 720px;
+  }
+}
+
+/* ZAINEX_FUTURES_EXECUTION_LOGS_LAST10_V1R1_END */
+
+
+/* ZAINEX_MOBILE_FUTURES_EXECUTION_LOGS_V1 */
+
+/*
+  Desktop retains the existing seven-column execution table.
+  Mobile converts every execution into a compact labeled card.
+*/
+
+@media (max-width: 720px) {
+  .executionLog {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .executionLogHeading {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .executionLogHeading > div {
+    min-width: 0;
+  }
+
+  .executionLogHeading > strong,
+  .executionLogHeading > div > strong {
+    overflow-wrap: anywhere;
+  }
+
+  .executionLogHeading > b {
+    flex: 0 0 auto;
+    max-width: 42%;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .executionLogTable {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+
+  .executionLogTable::-webkit-scrollbar {
+    display: none;
+  }
+
+  .executionLogHeader {
+    display: none;
+    min-width: 0;
+  }
+
+  .executionLogBody {
+    width: 100%;
+    min-width: 0;
+    gap: 9px;
+  }
+
+  .executionLogRow {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+    align-items: start;
+    gap: 11px 14px;
+    padding: 12px;
+    border:
+      1px solid
+      rgba(125, 142, 197, 0.11);
+    border-radius: 12px;
+    background:
+      radial-gradient(
+        circle at 100% 0,
+        rgba(164, 67, 255, 0.08),
+        transparent 42%
+      ),
+      linear-gradient(
+        145deg,
+        rgba(29, 34, 61, 0.7),
+        rgba(16, 22, 44, 0.62)
+      );
+    font-variant-numeric:
+      tabular-nums;
+  }
+
+  .executionLogRow > span,
+  .executionLogRow > strong,
+  .executionLogRow > b {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    overflow: visible;
+    text-align: left;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .executionLogRow > span::before,
+  .executionLogRow > strong::before,
+  .executionLogRow > b::before {
+    display: block;
+    color: #717c99;
+    font-size: 7px;
+    font-weight: 650;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .executionLogRow > :nth-child(1)::before {
+    content: "Time";
+  }
+
+  .executionLogRow > :nth-child(2)::before {
+    content: "Action";
+  }
+
+  .executionLogRow > :nth-child(3)::before {
+    content: "Direction";
+  }
+
+  .executionLogRow > :nth-child(4)::before {
+    content: "Leverage";
+  }
+
+  .executionLogRow > :nth-child(5)::before {
+    content: "Price";
+  }
+
+  .executionLogRow > :nth-child(6)::before {
+    content: "Fee";
+  }
+
+  .executionLogRow > :nth-child(7) {
+    grid-column: 1 / -1;
+    padding-top: 9px;
+    border-top:
+      1px solid
+      rgba(124, 140, 195, 0.1);
+  }
+
+  .executionLogRow > :nth-child(7)::before {
+    content: "Result";
+  }
+
+  .executionLogRow > strong,
+  .executionLogRow > b {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .executionLogEmpty {
+    width: 100%;
+    min-width: 0;
+    padding: 16px 12px;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 360px) {
+  .executionLogRow {
+    gap: 10px;
+    padding: 11px;
+  }
+
+  .executionLogHeading {
+    display: block;
+  }
+
+  .executionLogHeading > b {
+    display: block;
+    max-width: none;
+    margin-top: 7px;
+    text-align: left;
+  }
+}

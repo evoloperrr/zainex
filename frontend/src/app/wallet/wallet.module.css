@@ -1,0 +1,554 @@
+/* ZAINEX_WALLET_AI_CREDITS_ROUTE_V1_3 */
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #f6f8ff;
+  background:
+    radial-gradient(
+      circle at 92% 5%,
+      rgba(191, 53, 255, 0.17),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 4% 95%,
+      rgba(33, 194, 255, 0.15),
+      transparent 31%
+    ),
+    linear-gradient(
+      145deg,
+      #050814,
+      #080b1c 50%,
+      #100720
+    );
+}
+
+.glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background-image:
+    linear-gradient(
+      rgba(85, 118, 210, 0.16) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(139, 65, 230, 0.14) 1px,
+      transparent 1px
+    );
+  background-size: 52px 52px;
+}
+
+.header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 0 clamp(22px, 4vw, 68px);
+  border-bottom:
+    1px solid rgba(111, 132, 205, 0.14);
+  background: rgba(5, 8, 21, 0.74);
+  backdrop-filter: blur(22px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.logo {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border:
+    1px solid rgba(54, 207, 255, 0.4);
+  border-radius: 14px;
+  color: #4ddcff;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(36, 160, 255, 0.2),
+      rgba(175, 62, 255, 0.2)
+    );
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.brandText strong {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+}
+
+.brandText small {
+  color: #7e8bb1;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.connected {
+  display: flex;
+  min-height: 37px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border:
+    1px solid rgba(45, 225, 176, 0.17);
+  border-radius: 999px;
+  color: #c4f8e9;
+  background: rgba(27, 164, 126, 0.07);
+  font-size: 11px;
+}
+
+.connected i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #31e2af;
+  box-shadow:
+    0 0 13px rgba(49, 226, 175, 0.8);
+}
+
+.back {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 16px;
+  border:
+    1px solid rgba(111, 132, 209, 0.2);
+  border-radius: 12px;
+  color: #e1e6fb;
+  background: rgba(21, 27, 57, 0.68);
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background:
+    linear-gradient(
+      145deg,
+      #526dff,
+      #d34cff
+    );
+  box-shadow:
+    0 0 24px rgba(139, 70, 255, 0.24);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  width: min(1480px, calc(100% - 44px));
+  margin: 0 auto;
+  padding: 56px 0 44px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) 310px;
+  align-items: end;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 17px;
+  color: #54dcff;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+}
+
+.hero h1 {
+  max-width: 850px;
+  margin: 0;
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 450;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.hero h1 span {
+  color: transparent;
+  background:
+    linear-gradient(
+      100deg,
+      #4bdcff,
+      #8b6cff 48%,
+      #dd4fff
+    );
+  background-clip: text;
+}
+
+.hero p {
+  max-width: 710px;
+  margin: 22px 0 0;
+  color: rgba(195, 204, 233, 0.77);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.identity {
+  padding: 23px;
+  border:
+    1px solid rgba(107, 138, 224, 0.18);
+  border-radius: 21px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 27, 58, 0.91),
+      rgba(10, 14, 34, 0.94)
+    );
+}
+
+.identity > span,
+.identity > strong,
+.identity > small {
+  display: block;
+}
+
+.identity > span {
+  margin-bottom: 12px;
+  color: #7e8cb5;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.identity > strong {
+  margin-bottom: 7px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.identity > small {
+  overflow: hidden;
+  color: #a9b4d7;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity > div {
+  height: 5px;
+  margin-top: 19px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #171d3a;
+}
+
+.identity > div i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      #36d8ff,
+      #a35cff
+    );
+}
+
+.message {
+  padding: 24px;
+  border:
+    1px solid rgba(105, 132, 218, 0.18);
+  border-radius: 20px;
+  color: #cbd5f5;
+  background: rgba(10, 15, 35, 0.82);
+}
+
+.error {
+  color: #ffb7cf;
+  border-color: rgba(255, 99, 146, 0.25);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.walletCard {
+  min-width: 0;
+  min-height: 225px;
+  padding: 26px;
+  border:
+    1px solid rgba(111, 130, 204, 0.17);
+  border-radius: 23px;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(57, 184, 255, 0.08),
+      transparent 37%
+    ),
+    linear-gradient(
+      160deg,
+      rgba(17, 23, 51, 0.97),
+      rgba(8, 12, 29, 0.98)
+    );
+}
+
+.creditCard {
+  border-color:
+    rgba(196, 72, 255, 0.3);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(195, 65, 255, 0.16),
+      transparent 40%
+    ),
+    linear-gradient(
+      160deg,
+      rgba(25, 19, 58, 0.98),
+      rgba(9, 11, 30, 0.98)
+    );
+}
+
+.walletCard > span {
+  display: block;
+  margin-bottom: 24px;
+  color: #7d8bb5;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.walletCard > strong {
+  display: block;
+  overflow: hidden;
+  font-size: clamp(27px, 2.6vw, 39px);
+  font-weight: 450;
+  letter-spacing: -0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.walletCard > small {
+  display: block;
+  margin-top: 14px;
+  color: #8e9ac0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  margin-top: 20px;
+  overflow: hidden;
+  border:
+    1px solid rgba(107, 129, 200, 0.14);
+  border-radius: 19px;
+  background: rgba(9, 13, 31, 0.72);
+}
+
+.metrics > div {
+  padding: 20px 23px;
+  border-right:
+    1px solid rgba(107, 129, 200, 0.12);
+}
+
+.metrics > div:last-child {
+  border-right: 0;
+}
+
+.metrics span,
+.metrics strong {
+  display: block;
+}
+
+.metrics span {
+  margin-bottom: 8px;
+  color: #7180aa;
+  font-size: 8px;
+  letter-spacing: 0.13em;
+}
+
+.metrics strong {
+  color: #e7eaff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.positive {
+  color: #5ee8bb !important;
+}
+
+.negative {
+  color: #ff729d !important;
+}
+
+.desktopContent {
+  min-width: 0;
+  padding: 0 !important;
+}
+
+.mobileContent {
+  display: block;
+  min-width: 0;
+}
+
+@media (max-width: 1250px) {
+  .cards,
+  .metrics {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .header {
+    min-height: 76px;
+    padding: 0 17px;
+  }
+
+  .connected,
+  .back,
+  .brandText small {
+    display: none;
+  }
+
+  .content {
+    width: min(100% - 28px, 620px);
+    padding: 34px 0 30px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: clamp(37px, 12vw, 55px);
+  }
+
+  .cards,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics > div {
+    border-right: 0;
+    border-bottom:
+      1px solid rgba(107, 129, 200, 0.12);
+  }
+
+  .metrics > div:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (min-width: 980px) {
+  .mobileContent {
+    display: none;
+  }
+}
+
+/* ZAINEX_WALLET_CARD_ACTIONS_V1 */
+
+.cardAction {
+  display: inline-flex;
+  min-height: 38px;
+  margin-top: 18px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid
+    rgba(83, 218, 255, 0.2);
+  border-radius: 11px;
+  color: #dcecff;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(43, 126, 239, 0.18),
+      rgba(128, 77, 239, 0.2)
+    );
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 560;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.cardAction:hover {
+  transform: translateY(-1px);
+  border-color:
+    rgba(92, 224, 255, 0.36);
+  background:
+    linear-gradient(
+      110deg,
+      rgba(43, 126, 239, 0.27),
+      rgba(152, 75, 244, 0.28)
+    );
+}
+
+.cardAction i {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border-radius: 8px;
+  color: #65e1ff;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(43, 151, 244, 0.28),
+      rgba(165, 70, 246, 0.3)
+    );
+}
+
+.cardAction svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cardAction > span {
+  color: inherit;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 760px) {
+  .cardAction {
+    width: 100%;
+  }
+}

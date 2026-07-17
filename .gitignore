@@ -1,0 +1,68 @@
+﻿# ZAINEX PRIVATE AND GENERATED FILES
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env*.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# Dependencies
+node_modules/
+**/node_modules/
+vendor/
+**/vendor/
+
+# Builds and generated output
+.next/
+**/.next/
+dist/
+build/
+out/
+coverage/
+.vercel/
+
+# ZAINEX local files
+_zainex_logs/
+_zainex_backups/
+**/_zainex_logs/
+**/_zainex_backups/
+*.log
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Laravel runtime
+backend/storage/logs/*
+!backend/storage/logs/.gitignore
+backend/storage/framework/cache/*
+!backend/storage/framework/cache/.gitignore
+backend/storage/framework/sessions/*
+!backend/storage/framework/sessions/.gitignore
+backend/storage/framework/views/*
+!backend/storage/framework/views/.gitignore
+backend/bootstrap/cache/*
+!backend/bootstrap/cache/.gitignore
+
+# Temporary and editor files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
