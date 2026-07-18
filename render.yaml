@@ -1,0 +1,95 @@
+services:
+  - type: web
+    name: zainex-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    repo: https://github.com/evoloperrr/zainex.git
+    branch: main
+    autoDeployTrigger: commit
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /api/health
+    maxShutdownDelaySeconds: 30
+
+    envVars:
+      - key: PORT
+        value: "10000"
+
+      - key: APP_NAME
+        value: ZAINEX
+
+      - key: APP_ENV
+        value: production
+
+      - key: APP_DEBUG
+        value: "false"
+
+      - key: APP_KEY
+        sync: false
+
+      - key: APP_URL
+        sync: false
+
+      - key: LOG_CHANNEL
+        value: stderr
+
+      - key: LOG_LEVEL
+        value: info
+
+      - key: DB_CONNECTION
+        value: pgsql
+
+      - key: DB_HOST
+        sync: false
+
+      - key: DB_PORT
+        value: "5432"
+
+      - key: DB_DATABASE
+        sync: false
+
+      - key: DB_USERNAME
+        sync: false
+
+      - key: DB_PASSWORD
+        sync: false
+
+      - key: DB_SSLMODE
+        value: require
+
+      - key: CACHE_STORE
+        value: database
+
+      - key: SESSION_DRIVER
+        value: database
+
+      - key: QUEUE_CONNECTION
+        value: sync
+
+      - key: FILESYSTEM_DISK
+        value: local
+
+      - key: MAIL_MAILER
+        value: log
+
+      - key: INTELIBRAIN_ENABLED
+        sync: false
+
+      - key: INTELIBRAIN_INTERNAL_TOKEN
+        sync: false
+
+      - key: INTELIBRAIN_BINANCE_FUTURES_BASE_URL
+        sync: false
+
+      - key: INTELIBRAIN_DEFAULT_TIMEFRAME
+        sync: false
+
+      - key: OPENAI_API_KEY
+        sync: false
+
+      - key: OPENAI_BASE_URL
+        sync: false
+
+      - key: OPENAI_MODEL
+        sync: false
