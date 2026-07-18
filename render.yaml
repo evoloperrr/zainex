@@ -10,7 +10,6 @@ services:
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
     healthCheckPath: /api/health
-    maxShutdownDelaySeconds: 30
 
     envVars:
       - key: PORT
