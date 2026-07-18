@@ -4857,3 +4857,891 @@ body[data-public-reveal="ready"]
       rgba(177, 70, 255, 0.18)
     ) !important;
 }
+
+/* ZAINEX_ROOT_HOME_NEURAL_REACTOR_CSS_ONLY_V3 */
+
+.heroVisual_home .orbitStage {
+  display: none;
+}
+
+.heroVisual_home .homeNetworkVisual {
+  z-index: 5;
+  top: 86px;
+  right: 26px;
+  bottom: 120px;
+  left: 26px;
+  overflow: hidden;
+  opacity: 1;
+  border:
+    1px solid
+    rgba(76, 196, 255, 0.17);
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      rgba(77, 169, 255, 0.04)
+      1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(77, 169, 255, 0.04)
+      1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(55, 205, 255, 0.15),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 68% 35%,
+      rgba(187, 66, 255, 0.12),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(3, 13, 31, 0.94),
+      rgba(9, 5, 30, 0.92)
+    );
+  background-size:
+    34px 34px,
+    34px 34px,
+    auto,
+    auto,
+    auto;
+  box-shadow:
+    inset 0 0 75px
+      rgba(47, 132, 255, 0.07),
+    0 22px 55px
+      rgba(0, 0, 0, 0.22);
+  animation:
+    zainexReactorGrid
+    13s linear infinite;
+}
+
+.heroVisual_home
+.homeNetworkVisual::before {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: min(76%, 400px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg 24deg,
+      #52e6ff 36deg,
+      transparent 51deg 112deg,
+      #7667ff 130deg,
+      transparent 147deg 214deg,
+      #d550ff 233deg,
+      transparent 251deg 325deg,
+      #52e6ff 342deg,
+      transparent 360deg
+    );
+  filter:
+    drop-shadow(
+      0 0 10px
+      rgba(61, 220, 255, 0.42)
+    );
+  content: "";
+  opacity: 0.78;
+  transform:
+    translate(-50%, -50%);
+  -webkit-mask:
+    radial-gradient(
+      circle,
+      transparent 0 66%,
+      #000 67% 69%,
+      transparent 70%
+    );
+  mask:
+    radial-gradient(
+      circle,
+      transparent 0 66%,
+      #000 67% 69%,
+      transparent 70%
+    );
+  animation:
+    zainexReactorOrbit
+    12s linear infinite;
+  pointer-events: none;
+}
+
+.heroVisual_home
+.homeNetworkVisual::after {
+  position: absolute;
+  z-index: 8;
+  top: -25%;
+  right: 3%;
+  left: 3%;
+  height: 31%;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(70, 227, 255, 0.04) 42%,
+      rgba(70, 227, 255, 0.38) 50%,
+      rgba(158, 75, 255, 0.1) 54%,
+      transparent
+    );
+  filter:
+    drop-shadow(
+      0 0 11px
+      rgba(62, 220, 255, 0.33)
+    );
+  content: "";
+  opacity: 0;
+  animation:
+    zainexReactorScan
+    5.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.heroVisual_home .homeNodeOne,
+.heroVisual_home .homeNodeTwo {
+  z-index: 6;
+  display: flex;
+  width: 137px;
+  min-width: 137px;
+  min-height: 58px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 15px 11px 20px 31px;
+  border:
+    1px solid
+    rgba(80, 196, 255, 0.26);
+  border-radius: 14px;
+  color: #e8f9ff;
+  background:
+    radial-gradient(
+      circle at 13% 48%,
+      rgba(66, 221, 255, 0.15),
+      transparent 27%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(6, 21, 46, 0.97),
+      rgba(10, 7, 31, 0.95)
+    );
+  box-shadow:
+    0 16px 38px
+      rgba(0, 0, 0, 0.29),
+    0 0 30px
+      rgba(52, 183, 255, 0.07),
+    inset 0 1px
+      rgba(255, 255, 255, 0.05);
+  font-size: 10px;
+  font-weight: 680;
+  letter-spacing: 0.15em;
+  line-height: 1;
+  animation:
+    zainexReactorFloat
+    4.6s ease-in-out infinite;
+}
+
+.heroVisual_home .homeNodeOne {
+  top: 13%;
+  left: 4%;
+  animation-delay: -0.7s;
+}
+
+.heroVisual_home .homeNodeTwo {
+  top: 13%;
+  right: 4%;
+  animation-delay: -2s;
+}
+
+.heroVisual_home
+.homeNodeOne::before,
+.heroVisual_home
+.homeNodeTwo::before {
+  position: absolute;
+  top: 19px;
+  left: 13px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #55eaff;
+  box-shadow:
+    0 0 0 4px
+      rgba(70, 225, 255, 0.08),
+    0 0 15px
+      rgba(70, 225, 255, 0.92);
+  content: "";
+  animation:
+    zainexReactorPulse
+    1.6s ease-in-out infinite;
+}
+
+.heroVisual_home
+.homeNodeTwo::before {
+  background: #c15cff;
+  box-shadow:
+    0 0 0 4px
+      rgba(189, 75, 255, 0.08),
+    0 0 15px
+      rgba(189, 75, 255, 0.92);
+}
+
+.heroVisual_home
+.homeNodeOne::after {
+  position: absolute;
+  bottom: 8px;
+  left: 31px;
+  color: #718dab;
+  content: "LIVE MARKET STREAM";
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.heroVisual_home
+.homeNodeTwo::after {
+  position: absolute;
+  right: 11px;
+  bottom: 8px;
+  color: #8b78ad;
+  content: "DETERMINISTIC GATE";
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+}
+
+.heroVisual_home .homeNodeThree {
+  z-index: 7;
+  top: 50%;
+  bottom: auto;
+  left: 50%;
+  display: grid;
+  width: 184px;
+  min-width: 184px;
+  height: 184px;
+  min-height: 184px;
+  place-items: center;
+  padding: 0;
+  border:
+    1px solid
+    rgba(87, 220, 255, 0.5);
+  border-radius: 50%;
+  outline:
+    1px dashed
+    rgba(143, 86, 255, 0.28);
+  outline-offset: 16px;
+  color: #f3fcff;
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      rgba(78, 230, 255, 0.28),
+      transparent 36%
+    ),
+    radial-gradient(
+      circle at 70% 72%,
+      rgba(182, 64, 255, 0.27),
+      transparent 44%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(17, 66, 109, 0.98),
+      rgba(22, 12, 72, 0.98)
+    );
+  box-shadow:
+    0 0 0 29px
+      rgba(55, 135, 255, 0.045),
+    0 0 0 57px
+      rgba(128, 69, 255, 0.027),
+    0 0 78px
+      rgba(53, 198, 255, 0.33),
+    inset 0 0 42px
+      rgba(77, 225, 255, 0.16);
+  font-size: 34px;
+  font-weight: 680;
+  letter-spacing: -0.04em;
+  transform:
+    translate(-50%, -50%);
+  animation:
+    zainexReactorCore
+    3.2s ease-in-out infinite;
+}
+
+.heroVisual_home
+.homeNodeThree::before {
+  position: absolute;
+  inset: -31px;
+  border:
+    1px solid
+    rgba(78, 218, 255, 0.17);
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      transparent 0 38deg,
+      rgba(72, 229, 255, 0.8) 43deg,
+      transparent 49deg 153deg,
+      rgba(195, 79, 255, 0.75) 160deg,
+      transparent 167deg 278deg,
+      rgba(105, 101, 255, 0.74) 286deg,
+      transparent 294deg
+    );
+  content: "";
+  -webkit-mask:
+    radial-gradient(
+      circle,
+      transparent 0 94%,
+      #000 95%
+    );
+  mask:
+    radial-gradient(
+      circle,
+      transparent 0 94%,
+      #000 95%
+    );
+  animation:
+    zainexReactorCounterOrbit
+    8s linear infinite;
+}
+
+.heroVisual_home
+.homeNodeThree::after {
+  position: absolute;
+  bottom: 42px;
+  left: 50%;
+  color: #8deaff;
+  content: "INTELIBRAIN • LIVE CORE";
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  transform:
+    translateX(-50%);
+  white-space: nowrap;
+}
+
+.heroVisual_home .homeLinkOne,
+.heroVisual_home .homeLinkTwo {
+  z-index: 4;
+  top: 31%;
+  height: 2px;
+  overflow: visible;
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(72, 225, 255, 0.25),
+      rgba(72, 225, 255, 0.98),
+      rgba(134, 84, 255, 0.43),
+      transparent
+    );
+  background-size: 230% 100%;
+  box-shadow:
+    0 0 9px
+      rgba(70, 221, 255, 0.24);
+  animation:
+    zainexReactorBeam
+    2.3s linear infinite;
+}
+
+.heroVisual_home .homeLinkOne {
+  left: 23%;
+  width: 29%;
+  transform:
+    rotate(18deg);
+  transform-origin: left center;
+}
+
+.heroVisual_home .homeLinkTwo {
+  right: 23%;
+  bottom: auto;
+  width: 29%;
+  transform:
+    rotate(-18deg);
+  transform-origin: right center;
+}
+
+.heroVisual_home
+.homeLinkOne::after,
+.heroVisual_home
+.homeLinkTwo::after {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #66ecff;
+  box-shadow:
+    0 0 14px
+      rgba(72, 229, 255, 1);
+  content: "";
+  transform:
+    translate(-50%, -50%);
+  animation:
+    zainexReactorPacket
+    2.6s ease-in-out infinite;
+}
+
+.heroVisual_home
+.homeLinkTwo::after {
+  background: #c15dff;
+  box-shadow:
+    0 0 14px
+      rgba(191, 76, 255, 1);
+  animation-delay: -1.15s;
+}
+
+.heroVisual_home .homeLinkThree {
+  z-index: 4;
+  top: 63%;
+  bottom: auto;
+  left: 50%;
+  width: 2px;
+  height: 27%;
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(90, 227, 255, 0.85),
+      rgba(132, 88, 255, 0.5),
+      transparent
+    );
+  box-shadow:
+    0 0 10px
+      rgba(72, 221, 255, 0.22);
+  transform:
+    translateX(-50%);
+  animation:
+    zainexReactorOutput
+    2.1s ease-in-out infinite;
+}
+
+.heroVisual_home
+.homeLinkThree::after {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #76eeff;
+  box-shadow:
+    0 0 14px
+      rgba(78, 229, 255, 1);
+  content: "";
+  transform:
+    translateX(-50%);
+  animation:
+    zainexReactorOutputPacket
+    2.5s ease-in-out infinite;
+}
+
+.heroVisual_home .visualGrid {
+  opacity: 0.38;
+  animation:
+    zainexReactorVisualGrid
+    15s linear infinite;
+}
+
+.heroVisual_home
+.visualTopline strong i {
+  box-shadow:
+    0 0 15px
+      rgba(76, 235, 181, 0.95);
+  animation:
+    zainexReactorPulse
+    1.6s ease-in-out infinite;
+}
+
+.heroVisual_home .signalPanel {
+  border-color:
+    rgba(87, 190, 255, 0.23);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(6, 18, 40, 0.92),
+      rgba(13, 8, 34, 0.93)
+    );
+  box-shadow:
+    0 18px 46px
+      rgba(0, 0, 0, 0.24),
+    0 0 34px
+      rgba(82, 118, 255, 0.07),
+    inset 0 1px
+      rgba(255, 255, 255, 0.04);
+}
+
+.heroVisual_home
+.signalBars i {
+  animation:
+    zainexReactorSignal
+    1.2s ease-in-out
+    infinite alternate;
+}
+
+.heroVisual_home
+.signalBars i:nth-child(2) {
+  animation-delay: -0.15s;
+}
+
+.heroVisual_home
+.signalBars i:nth-child(3) {
+  animation-delay: -0.3s;
+}
+
+.heroVisual_home
+.signalBars i:nth-child(4) {
+  animation-delay: -0.45s;
+}
+
+.heroVisual_home
+.signalBars i:nth-child(5) {
+  animation-delay: -0.6s;
+}
+
+.heroVisual_home
+.signalBars i:nth-child(6) {
+  animation-delay: -0.75s;
+}
+
+.heroVisual_home
+.signalBars i:nth-child(7) {
+  animation-delay: -0.9s;
+}
+
+@keyframes zainexReactorGrid {
+  from {
+    background-position:
+      0 0,
+      0 0,
+      center,
+      center,
+      center;
+  }
+
+  to {
+    background-position:
+      34px 34px,
+      34px 34px,
+      center,
+      center,
+      center;
+  }
+}
+
+@keyframes zainexReactorOrbit {
+  from {
+    transform:
+      translate(-50%, -50%)
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
+  }
+}
+
+@keyframes zainexReactorCounterOrbit {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes zainexReactorScan {
+  0%,
+  14% {
+    opacity: 0;
+    transform:
+      translateY(-15%);
+  }
+
+  31% {
+    opacity: 0.88;
+  }
+
+  76% {
+    opacity: 0.44;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translateY(430%);
+  }
+}
+
+@keyframes zainexReactorFloat {
+  0%,
+  100% {
+    transform:
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateY(-8px);
+  }
+}
+
+@keyframes zainexReactorPulse {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform:
+      scale(0.78);
+  }
+
+  50% {
+    opacity: 1;
+    transform:
+      scale(1.1);
+  }
+}
+
+@keyframes zainexReactorCore {
+  0%,
+  100% {
+    filter:
+      brightness(0.94)
+      saturate(0.96);
+    transform:
+      translate(-50%, -50%)
+      scale(0.98);
+  }
+
+  50% {
+    filter:
+      brightness(1.14)
+      saturate(1.16);
+    transform:
+      translate(-50%, -50%)
+      scale(1.04);
+  }
+}
+
+@keyframes zainexReactorBeam {
+  from {
+    background-position:
+      120% 0;
+  }
+
+  to {
+    background-position:
+      -120% 0;
+  }
+}
+
+@keyframes zainexReactorPacket {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+
+  12%,
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes zainexReactorOutput {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes zainexReactorOutputPacket {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes zainexReactorVisualGrid {
+  from {
+    background-position:
+      0 0;
+  }
+
+  to {
+    background-position:
+      42px 42px;
+  }
+}
+
+@keyframes zainexReactorSignal {
+  from {
+    opacity: 0.4;
+    transform:
+      scaleY(0.45);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      scaleY(1);
+  }
+}
+
+@media (max-width: 720px) {
+  .heroVisual_home
+  .homeNetworkVisual {
+    top: 72px;
+    right: 14px;
+    bottom: 95px;
+    left: 14px;
+    border-radius: 17px;
+  }
+
+  .heroVisual_home
+  .homeNetworkVisual::before {
+    width:
+      min(86%, 305px);
+  }
+
+  .heroVisual_home
+  .homeNodeOne,
+  .heroVisual_home
+  .homeNodeTwo {
+    width: 104px;
+    min-width: 104px;
+    min-height: 45px;
+    padding:
+      11px 7px 16px 25px;
+    border-radius: 11px;
+    font-size: 8px;
+  }
+
+  .heroVisual_home
+  .homeNodeOne {
+    top: 7%;
+    left: 2%;
+  }
+
+  .heroVisual_home
+  .homeNodeTwo {
+    top: 7%;
+    right: 2%;
+  }
+
+  .heroVisual_home
+  .homeNodeOne::before,
+  .heroVisual_home
+  .homeNodeTwo::before {
+    top: 15px;
+    left: 10px;
+    width: 7px;
+    height: 7px;
+  }
+
+  .heroVisual_home
+  .homeNodeOne::after,
+  .heroVisual_home
+  .homeNodeTwo::after {
+    bottom: 6px;
+    font-size: 5px;
+  }
+
+  .heroVisual_home
+  .homeNodeThree {
+    width: 134px;
+    min-width: 134px;
+    height: 134px;
+    min-height: 134px;
+    outline-offset: 10px;
+    font-size: 25px;
+  }
+
+  .heroVisual_home
+  .homeNodeThree::before {
+    inset: -21px;
+  }
+
+  .heroVisual_home
+  .homeNodeThree::after {
+    bottom: 30px;
+    font-size: 5px;
+  }
+
+  .heroVisual_home
+  .homeLinkOne {
+    left: 20%;
+    width: 32%;
+  }
+
+  .heroVisual_home
+  .homeLinkTwo {
+    right: 20%;
+    width: 32%;
+  }
+}
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .heroVisual_home
+  .homeNetworkVisual,
+  .heroVisual_home
+  .homeNetworkVisual::before,
+  .heroVisual_home
+  .homeNetworkVisual::after,
+  .heroVisual_home
+  .homeNodeOne,
+  .heroVisual_home
+  .homeNodeTwo,
+  .heroVisual_home
+  .homeNodeThree,
+  .heroVisual_home
+  .homeNodeThree::before,
+  .heroVisual_home
+  .homeNodeOne::before,
+  .heroVisual_home
+  .homeNodeTwo::before,
+  .heroVisual_home
+  .homeLinkOne,
+  .heroVisual_home
+  .homeLinkTwo,
+  .heroVisual_home
+  .homeLinkThree,
+  .heroVisual_home
+  .homeLinkOne::after,
+  .heroVisual_home
+  .homeLinkTwo::after,
+  .heroVisual_home
+  .homeLinkThree::after,
+  .heroVisual_home
+  .visualGrid,
+  .heroVisual_home
+  .visualTopline strong i,
+  .heroVisual_home
+  .signalBars i {
+    animation: none;
+  }
+}
+
+/* ZAINEX_ROOT_HOME_NEURAL_REACTOR_CSS_ONLY_V3_END */
