@@ -18,6 +18,8 @@ export interface ValidatedOrderRequest {
   side: OrderSide;
   type: OrderType;
   quantity: number;
+  stopLoss?: number;
+  takeProfit?: number;
   clientOrderId?: string;
 }
 
@@ -49,6 +51,11 @@ export interface TradingOrder {
   createdAt: string;
 }
 
+export type TradeReason =
+  | "USER"
+  | "STOP_LOSS"
+  | "TAKE_PROFIT";
+
 export interface TradeRecord {
   id: string;
   orderId: string;
@@ -60,6 +67,7 @@ export interface TradeRecord {
   notional: number;
   fee: number;
   realizedPnl: number;
+  reason: TradeReason;
   executedAt: string;
 }
 
@@ -72,6 +80,8 @@ export interface Position {
   lastPrice: number;
   marketValue: number;
   unrealizedPnl: number;
+  stopLoss?: number;
+  takeProfit?: number;
   openedAt: string;
   updatedAt: string;
 }

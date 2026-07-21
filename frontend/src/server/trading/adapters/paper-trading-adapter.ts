@@ -158,6 +158,28 @@ export class PaperTradingAdapter implements ExchangeAdapter {
             );
           }
 
+          if (
+            request.stopLoss !== undefined &&
+            request.stopLoss >= quote.price
+          ) {
+            throw new TradingError(
+              "INVALID_STOP_LOSS",
+              "Stop loss must be below the execution price for a BUY order.",
+              400,
+            );
+          }
+
+          if (
+            request.takeProfit !== undefined &&
+            request.takeProfit <= quote.price
+          ) {
+            throw new TradingError(
+              "INVALID_TAKE_PROFIT",
+              "Take profit must be above the execution price for a BUY order.",
+              400,
+            );
+          }
+
           const existingQuantity =
             currentPosition?.quantity ?? 0;
 
@@ -195,6 +217,12 @@ export class PaperTradingAdapter implements ExchangeAdapter {
               (quote.price - averageEntryPrice) *
                 newQuantity,
             ),
+            stopLoss:
+              request.stopLoss ??
+              currentPosition?.stopLoss,
+            takeProfit:
+              request.takeProfit ??
+              currentPosition?.takeProfit,
             openedAt: currentPosition?.openedAt ?? now,
             updatedAt: now,
           };
@@ -286,6 +314,7 @@ export class PaperTradingAdapter implements ExchangeAdapter {
           notional,
           fee,
           realizedPnl,
+          reason: "USER",
           executedAt: now,
         };
 
@@ -395,6 +424,24 @@ export class PaperTradingAdapter implements ExchangeAdapter {
                 position.symbol,
               );
 
+              const triggeredReason =
+                this.crossedExitLevel(
+                  position,
+                  quote.price,
+                );
+
+              if (triggeredReason) {
+                this.autoClosePosition(
+                  account,
+                  key,
+                  position,
+                  quote.price,
+                  triggeredReason,
+                );
+
+                return;
+              }
+
               account.positions[key] = {
                 ...position,
                 lastPrice: quote.price,
@@ -421,6 +468,94 @@ export class PaperTradingAdapter implements ExchangeAdapter {
         return this.buildSnapshot(account);
       },
     );
+  }
+
+  private crossedExitLevel(
+    position: Position,
+    markPrice: number,
+  ): "STOP_LOSS" | "TAKE_PROFIT" | null {
+    if (
+      position.stopLoss !== undefined &&
+      markPrice <= position.stopLoss
+    ) {
+      return "STOP_LOSS";
+    }
+
+    if (
+      position.takeProfit !== undefined &&
+      markPrice >= position.takeProfit
+    ) {
+      return "TAKE_PROFIT";
+    }
+
+    return null;
+  }
+
+  private autoClosePosition(
+    account: PaperAccountState,
+    key: string,
+    position: Position,
+    markPrice: number,
+    reason: "STOP_LOSS" | "TAKE_PROFIT",
+  ): void {
+    const now = new Date().toISOString();
+    const notional = roundNumber(position.quantity * markPrice);
+    const fee = roundNumber(notional * PAPER_SPOT_FEE_RATE);
+    const netProceeds = roundNumber(notional - fee);
+
+    const realizedPnl = roundNumber(
+      (markPrice - position.averageEntryPrice) *
+        position.quantity -
+        fee,
+    );
+
+    account.cashBalance = roundNumber(
+      account.cashBalance + netProceeds,
+    );
+
+    account.realizedPnl = roundNumber(
+      account.realizedPnl + realizedPnl,
+    );
+
+    const order: TradingOrder = {
+      id: randomUUID(),
+      clientOrderId: `auto-${reason.toLowerCase()}-${randomUUID()}`,
+      adapter: this.id,
+      assetClass: position.assetClass,
+      symbol: position.symbol,
+      side: "SELL",
+      type: "MARKET",
+      status: "FILLED",
+      quantity: position.quantity,
+      executedPrice: markPrice,
+      notional,
+      fee,
+      feeRate: PAPER_SPOT_FEE_RATE,
+      createdAt: now,
+    };
+
+    const trade: TradeRecord = {
+      id: randomUUID(),
+      orderId: order.id,
+      assetClass: position.assetClass,
+      symbol: position.symbol,
+      side: "SELL",
+      quantity: position.quantity,
+      price: markPrice,
+      notional,
+      fee,
+      realizedPnl,
+      reason,
+      executedAt: now,
+    };
+
+    account.orders.unshift(order);
+    account.trades.unshift(trade);
+
+    account.orders = account.orders.slice(0, MAX_HISTORY_ITEMS);
+    account.trades = account.trades.slice(0, MAX_HISTORY_ITEMS);
+
+    delete account.positions[key];
   }
 
   private buildSnapshot(

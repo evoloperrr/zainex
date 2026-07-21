@@ -263,6 +263,8 @@ type PaperTradeModalRequest = {
   market: MarketData;
   symbol: string;
   quantity: number;
+  stopLoss?: number;
+  takeProfit?: number;
 };
 
 type PaperTradeModalResult = {
@@ -366,6 +368,9 @@ function submitPaperTrade(
   side: PaperTradeSide,
   activeMarket: MarketKey,
   market: MarketData,
+  quantity: number,
+  stopLoss?: number,
+  takeProfit?: number,
 ): void {
   const request: PaperTradeModalRequest = {
     side,
@@ -374,7 +379,9 @@ function submitPaperTrade(
     symbol: market.symbol
       .replace(/[^A-Za-z0-9]/g, "")
       .toUpperCase(),
-    quantity: 0.0001,
+    quantity,
+    stopLoss,
+    takeProfit,
   };
 
   window.dispatchEvent(
@@ -422,6 +429,14 @@ async function executePaperTrade(
           side: request.side,
           type: "MARKET",
           quantity: request.quantity,
+          ...(request.side === "BUY" &&
+          request.stopLoss !== undefined
+            ? { stopLoss: request.stopLoss }
+            : {}),
+          ...(request.side === "BUY" &&
+          request.takeProfit !== undefined
+            ? { takeProfit: request.takeProfit }
+            : {}),
           clientOrderId:
             "ui-" +
             request.side.toLowerCase() +
@@ -746,6 +761,30 @@ function PaperTradeModalHost() {
                 <span>Trading mode</span>
                 <strong>PAPER DEMO</strong>
               </div>
+
+              {request.side === "BUY" &&
+              request.stopLoss !== undefined ? (
+                <div>
+                  <span>Stop loss</span>
+                  <strong>
+                    {formatPaperUsd(
+                      request.stopLoss,
+                    )}
+                  </strong>
+                </div>
+              ) : null}
+
+              {request.side === "BUY" &&
+              request.takeProfit !== undefined ? (
+                <div>
+                  <span>Take profit</span>
+                  <strong>
+                    {formatPaperUsd(
+                      request.takeProfit,
+                    )}
+                  </strong>
+                </div>
+              ) : null}
             </div>
 
             <p className="zainex-trade-modal-note">
@@ -2497,7 +2536,7 @@ function DesktopAssetColumn({
           <button
             className="desktop-trade-button desktop-buy-action"
             type="button"
-            onClick={() => void submitPaperTrade("BUY", activeMarket, market)}
+            onClick={() => void submitPaperTrade("BUY", activeMarket, market, 0.0001)}
           >
             <span>BUY LOW</span>
             <strong>{market.price}</strong>
@@ -2507,7 +2546,7 @@ function DesktopAssetColumn({
           <button
             className="desktop-trade-button desktop-sell-action"
             type="button"
-            onClick={() => void submitPaperTrade("SELL", activeMarket, market)}
+            onClick={() => void submitPaperTrade("SELL", activeMarket, market, 0.0001)}
           >
             <span>SELL HIGH</span>
             <strong>{market.price}</strong>
@@ -2737,18 +2776,26 @@ function DesktopMarketColumn({
           variant="desktop"
           activeMarket={activeMarket}
           displayPrice={market.price}
-          onSpotSell={() => {
+          onSpotSell={(quantity) => {
             submitPaperTrade(
               "SELL",
               activeMarket,
               market,
+              quantity,
             );
           }}
-          onSpotBuy={() => {
+          onSpotBuy={(
+            quantity,
+            stopLoss,
+            takeProfit,
+          ) => {
             submitPaperTrade(
               "BUY",
               activeMarket,
               market,
+              quantity,
+              stopLoss,
+              takeProfit,
             );
           }}
           onModeChange={(
@@ -3286,18 +3333,26 @@ function MobileDashboard({
         variant="mobile"
         activeMarket={activeMarket}
         displayPrice={market.price}
-        onSpotSell={() => {
+        onSpotSell={(quantity) => {
           submitPaperTrade(
             "SELL",
             activeMarket,
             market,
+            quantity,
           );
         }}
-        onSpotBuy={() => {
+        onSpotBuy={(
+          quantity,
+          stopLoss,
+          takeProfit,
+        ) => {
           submitPaperTrade(
             "BUY",
             activeMarket,
             market,
+            quantity,
+            stopLoss,
+            takeProfit,
           );
         }}
       />

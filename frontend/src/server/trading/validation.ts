@@ -57,6 +57,36 @@ function parseQuantity(value: unknown): number {
   return quantity;
 }
 
+function parseOptionalPrice(
+  value: unknown,
+  fieldName: string,
+): number | undefined {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return undefined;
+  }
+
+  const parsed =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : Number.NaN;
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new TradingError(
+      "INVALID_PRICE_LEVEL",
+      `${fieldName} must be a positive finite number.`,
+      400,
+    );
+  }
+
+  return parsed;
+}
+
 export function parseOrderRequest(
   input: unknown,
 ): ValidatedOrderRequest {
@@ -155,6 +185,17 @@ export function parseOrderRequest(
 
   const type = typeValue as OrderType;
   const quantity = parseQuantity(input.quantity);
+
+  const stopLoss = parseOptionalPrice(
+    input.stopLoss,
+    "stopLoss",
+  );
+
+  const takeProfit = parseOptionalPrice(
+    input.takeProfit,
+    "takeProfit",
+  );
+
   const clientOrderId = readString(input, "clientOrderId");
 
   if (
@@ -175,6 +216,8 @@ export function parseOrderRequest(
     side,
     type,
     quantity,
+    ...(stopLoss !== undefined ? { stopLoss } : {}),
+    ...(takeProfit !== undefined ? { takeProfit } : {}),
     ...(clientOrderId ? { clientOrderId } : {}),
   };
 }

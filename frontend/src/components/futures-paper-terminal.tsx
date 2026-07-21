@@ -171,8 +171,14 @@ type Props = {
     | "mobile";
   activeMarket: MarketKey;
   displayPrice: string;
-  onSpotSell: () => void;
-  onSpotBuy: () => void;
+  onSpotSell: (
+    quantity: number,
+  ) => void;
+  onSpotBuy: (
+    quantity: number,
+    stopLoss?: number,
+    takeProfit?: number,
+  ) => void;
   onModeChange?: (
     mode: TradingMode,
   ) => void;
@@ -445,6 +451,21 @@ export function FuturesPaperTerminal({
   );
 
   const [
+    spotQuantityInput,
+    setSpotQuantityInput,
+  ] = useState("0.0001");
+
+  const [
+    spotStopLossInput,
+    setSpotStopLossInput,
+  ] = useState("");
+
+  const [
+    spotTakeProfitInput,
+    setSpotTakeProfitInput,
+  ] = useState("");
+
+  const [
     modal,
     setModal,
   ] = useState<ModalState | null>(
@@ -569,6 +590,38 @@ export function FuturesPaperTerminal({
     Number.isFinite(margin) &&
     margin >= 1 &&
     margin <= 5000;
+
+  const spotQuantity =
+    Number(spotQuantityInput);
+
+  const validSpotQuantity =
+    Number.isFinite(spotQuantity) &&
+    spotQuantity > 0;
+
+  const spotStopLoss =
+    spotStopLossInput.trim() === ""
+      ? undefined
+      : Number(spotStopLossInput);
+
+  const spotTakeProfit =
+    spotTakeProfitInput.trim() === ""
+      ? undefined
+      : Number(spotTakeProfitInput);
+
+  const spotStopLossValid =
+    spotStopLoss === undefined ||
+    (
+      Number.isFinite(spotStopLoss) &&
+      spotStopLoss > 0 &&
+      spotStopLoss < displayedPrice
+    );
+
+  const spotTakeProfitValid =
+    spotTakeProfit === undefined ||
+    (
+      Number.isFinite(spotTakeProfit) &&
+      spotTakeProfit > displayedPrice
+    );
 
   const feeRate =
     account?.feeRate ??
@@ -1690,9 +1743,14 @@ export function FuturesPaperTerminal({
                   : "mobile-trade-button mobile-sell-button"
               }
               type="button"
-              onClick={
-                onSpotSell
+              disabled={
+                !validSpotQuantity
               }
+              onClick={() => {
+                onSpotSell(
+                  spotQuantity,
+                );
+              }}
             >
               <span>SELL</span>
 
@@ -1715,9 +1773,18 @@ export function FuturesPaperTerminal({
                   : "mobile-trade-button mobile-buy-button"
               }
               type="button"
-              onClick={
-                onSpotBuy
+              disabled={
+                !validSpotQuantity ||
+                !spotStopLossValid ||
+                !spotTakeProfitValid
               }
+              onClick={() => {
+                onSpotBuy(
+                  spotQuantity,
+                  spotStopLoss,
+                  spotTakeProfit,
+                );
+              }}
             >
               <span>BUY</span>
 
@@ -1741,6 +1808,146 @@ export function FuturesPaperTerminal({
               styles.panel
             }
           >
+            <div
+              className={
+                styles.inputGrid
+              }
+            >
+              <label>
+                <span>
+                  Quantity
+                </span>
+
+                <div>
+                  <input
+                    type="number"
+                    min="0.0001"
+                    step="0.0001"
+                    inputMode="decimal"
+                    value={
+                      spotQuantityInput
+                    }
+                    onChange={(
+                      event,
+                    ) => {
+                      setSpotQuantityInput(
+                        event.target
+                          .value,
+                      );
+                    }}
+                  />
+
+                  <b>
+                    {activeMarket ===
+                    "crypto"
+                      ? "BTC"
+                      : activeMarket ===
+                          "forex"
+                        ? "LOT"
+                        : "SHARES"}
+                  </b>
+                </div>
+              </label>
+            </div>
+
+            <div
+              className={
+                styles.inputGrid
+              }
+            >
+              <label>
+                <span>
+                  STOP LOSS
+                  (optional)
+                </span>
+
+                <div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={
+                      spotStopLossInput
+                    }
+                    placeholder="Enter stop price"
+                    onChange={(
+                      event,
+                    ) => {
+                      setSpotStopLossInput(
+                        event.target
+                          .value,
+                      );
+                    }}
+                  />
+
+                  <b>USD</b>
+                </div>
+              </label>
+
+              <label>
+                <span>
+                  TAKE PROFIT
+                  (optional)
+                </span>
+
+                <div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputMode="decimal"
+                    value={
+                      spotTakeProfitInput
+                    }
+                    placeholder="Enter target price"
+                    onChange={(
+                      event,
+                    ) => {
+                      setSpotTakeProfitInput(
+                        event.target
+                          .value,
+                      );
+                    }}
+                  />
+
+                  <b>USD</b>
+                </div>
+              </label>
+            </div>
+
+            {!validSpotQuantity ? (
+              <div
+                className={
+                  styles.warning
+                }
+              >
+                Enter a quantity
+                greater than 0.
+              </div>
+            ) : !spotStopLossValid ? (
+              <div
+                className={
+                  styles.warning
+                }
+              >
+                Stop loss must be a
+                positive price below
+                the current market
+                price.
+              </div>
+            ) : !spotTakeProfitValid ? (
+              <div
+                className={
+                  styles.warning
+                }
+              >
+                Take profit must be
+                a price above the
+                current market price.
+              </div>
+            ) : null}
+
             <SpotAiSignalPanel
               assetClass={
                 activeMarket
