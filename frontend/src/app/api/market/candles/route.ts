@@ -7,6 +7,14 @@ import {
   isSupportedCryptoSymbol,
 } from "@/lib/crypto-symbols";
 
+import {
+  FOREX_PAIR_LABELS,
+  type ForexPair,
+  isSupportedForexPair,
+  toStooqForexSymbol,
+  toYahooForexSymbol,
+} from "@/lib/forex-symbols";
+
 export const dynamic = "force-dynamic";
 
 type MarketKey =
@@ -200,7 +208,7 @@ function decimalPlaces(
   value: number,
 ): number {
   if (market === "forex") {
-    return 5;
+    return value >= 20 ? 3 : 5;
   }
 
   if (value < 1) {
@@ -366,6 +374,19 @@ function normalizeCryptoSymbol(
   return isSupportedCryptoSymbol(candidate)
     ? candidate
     : "BTCUSDT";
+}
+
+function normalizeForexPair(
+  value: string | null,
+): ForexPair {
+  const candidate =
+    (value ?? "EURUSD")
+      .trim()
+      .toUpperCase();
+
+  return isSupportedForexPair(candidate)
+    ? candidate
+    : "EURUSD";
 }
 
 async function loadBinance(
@@ -576,12 +597,15 @@ async function loadYahoo(
     MarketKey,
     "crypto"
   >,
+  forexPair: ForexPair,
   interval: IntervalKey,
   limit: number,
 ): Promise<MarketResult> {
   const symbol =
     market === "forex"
-      ? "EURUSD=X"
+      ? toYahooForexSymbol(
+          forexPair,
+        )
       : "NVDA";
 
   const intervalConfig =
@@ -855,7 +879,9 @@ async function loadYahoo(
           ),
 
         secondaryValue:
-          "EUR / USD",
+          FOREX_PAIR_LABELS[
+            forexPair
+          ],
 
         liquidityLabel:
           "Previous close",
@@ -988,11 +1014,14 @@ async function loadStooqDaily(
     MarketKey,
     "crypto"
   >,
+  forexPair: ForexPair,
   limit: number,
 ): Promise<MarketResult> {
   const symbol =
     market === "forex"
-      ? "eurusd"
+      ? toStooqForexSymbol(
+          forexPair,
+        )
       : "nvda.us";
 
   const endpoint = new URL(
@@ -1230,7 +1259,9 @@ async function loadStooqDaily(
           ),
 
         secondaryValue:
-          "EUR / USD",
+          FOREX_PAIR_LABELS[
+            forexPair
+          ],
 
         liquidityLabel:
           "Previous close",
@@ -1343,12 +1374,14 @@ async function loadPublicMarket(
     MarketKey,
     "crypto"
   >,
+  forexPair: ForexPair,
   interval: IntervalKey,
   limit: number,
 ): Promise<MarketResult> {
   try {
     return await loadYahoo(
       market,
+      forexPair,
       interval,
       limit,
     );
@@ -1356,6 +1389,7 @@ async function loadPublicMarket(
   catch {
     return loadStooqDaily(
       market,
+      forexPair,
       limit,
     );
   }
@@ -1429,6 +1463,12 @@ export async function GET(
     ),
   );
 
+  const forexPair = normalizeForexPair(
+    request.nextUrl.searchParams.get(
+      "symbol",
+    ),
+  );
+
   try {
     const result =
       market === "crypto"
@@ -1439,6 +1479,7 @@ export async function GET(
           )
         : await loadPublicMarket(
             market,
+            forexPair,
             interval,
             limit,
           );
@@ -1451,7 +1492,9 @@ export async function GET(
         symbol:
           market === "crypto"
             ? symbol
-            : undefined,
+            : market === "forex"
+              ? forexPair
+              : undefined,
         provider:
           result.provider,
         data:

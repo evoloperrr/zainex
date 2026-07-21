@@ -117,7 +117,11 @@ export async function POST(
       assetClass,
     );
 
-    if (assetClass === "crypto" && symbol) {
+    if (
+      (assetClass === "crypto" ||
+        assetClass === "forex") &&
+      symbol
+    ) {
       candlesUrl.searchParams.set(
         "symbol",
         symbol,

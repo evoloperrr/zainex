@@ -19,6 +19,13 @@ import {
   type CryptoSymbol,
 } from "@/lib/crypto-symbols";
 
+import {
+  FOREX_PAIR_LABELS,
+  FOREX_PAIR_NAMES,
+  SUPPORTED_FOREX_PAIRS,
+  type ForexPair,
+} from "@/lib/forex-symbols";
+
 type MarketKey = "crypto" | "forex" | "stocks";
 
 type IconName =
@@ -2460,12 +2467,16 @@ function DesktopAssetColumn({
   setActiveMarket,
   cryptoSymbol,
   setCryptoSymbol,
+  forexPair,
+  setForexPair,
 }: {
   market: MarketData;
   activeMarket: MarketKey;
   setActiveMarket: (market: MarketKey) => void;
   cryptoSymbol: CryptoSymbol;
   setCryptoSymbol: (symbol: CryptoSymbol) => void;
+  forexPair: ForexPair;
+  setForexPair: (pair: ForexPair) => void;
 }) {
   return (
     <section className="desktop-asset-column">
@@ -2523,6 +2534,39 @@ function DesktopAssetColumn({
                     value={symbol}
                   >
                     {CRYPTO_SYMBOL_LABELS[symbol]}
+                  </option>
+                ),
+              )}
+            </select>
+          ) : activeMarket === "forex" ? (
+            <select
+              aria-label="Select forex pair"
+              value={forexPair}
+              onChange={(event) => {
+                setForexPair(
+                  event.target
+                    .value as ForexPair,
+                );
+              }}
+              style={{
+                minHeight: 38,
+                border:
+                  "1px solid rgba(145,126,255,.35)",
+                borderRadius: 9,
+                color: "#e2e5f5",
+                background: "#12182b",
+                padding: "0 10px",
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              {SUPPORTED_FOREX_PAIRS.map(
+                (pair) => (
+                  <option
+                    key={pair}
+                    value={pair}
+                  >
+                    {FOREX_PAIR_LABELS[pair]}
                   </option>
                 ),
               )}
@@ -2720,10 +2764,12 @@ function DesktopMarketColumn({
   market,
   activeMarket,
   cryptoSymbol,
+  forexPair,
 }: {
   market: MarketData;
   activeMarket: MarketKey;
   cryptoSymbol: CryptoSymbol;
+  forexPair: ForexPair;
 }) {
   const [paperAccount, setPaperAccount] =
     useState<PaperAccountSnapshot | null>(
@@ -2826,12 +2872,14 @@ function DesktopMarketColumn({
         <TradingViewChart
           market={activeMarket}
           cryptoSymbol={cryptoSymbol}
+          forexPair={forexPair}
         />
 
         <FuturesPaperTerminal
           variant="desktop"
           activeMarket={activeMarket}
           cryptoSymbol={cryptoSymbol}
+          forexPair={forexPair}
           displayPrice={market.price}
           onSpotSell={(quantity) => {
             submitPaperTrade(
@@ -3171,12 +3219,16 @@ function MobileDashboard({
   setActiveMarket,
   cryptoSymbol,
   setCryptoSymbol,
+  forexPair,
+  setForexPair,
 }: {
   market: MarketData;
   activeMarket: MarketKey;
   setActiveMarket: (market: MarketKey) => void;
   cryptoSymbol: CryptoSymbol;
   setCryptoSymbol: (symbol: CryptoSymbol) => void;
+  forexPair: ForexPair;
+  setForexPair: (pair: ForexPair) => void;
 }) {
   const router = useRouter();
 
@@ -3399,6 +3451,32 @@ function MobileDashboard({
                   </option>
                 ))}
               </select>
+            ) : activeMarket === "forex" ? (
+              <select
+                aria-label="Select forex pair"
+                value={forexPair}
+                onChange={(event) => {
+                  setForexPair(
+                    event.target.value as ForexPair,
+                  );
+                }}
+                style={{
+                  minHeight: 34,
+                  border: "1px solid rgba(145,126,255,.35)",
+                  borderRadius: 8,
+                  color: "#e2e5f5",
+                  background: "#12182b",
+                  padding: "0 8px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                {SUPPORTED_FOREX_PAIRS.map((pair) => (
+                  <option key={pair} value={pair}>
+                    {FOREX_PAIR_LABELS[pair]}
+                  </option>
+                ))}
+              </select>
             ) : (
               <strong>{market.symbol}</strong>
             )}
@@ -3414,6 +3492,7 @@ function MobileDashboard({
           <TradingViewChart
             market={activeMarket}
             cryptoSymbol={cryptoSymbol}
+            forexPair={forexPair}
             compact
           />
         </div>
@@ -3423,6 +3502,7 @@ function MobileDashboard({
         variant="mobile"
         activeMarket={activeMarket}
         cryptoSymbol={cryptoSymbol}
+        forexPair={forexPair}
         displayPrice={market.price}
         onSpotSell={(quantity) => {
           submitPaperTrade(
@@ -3931,6 +4011,11 @@ export function MarketDashboard() {
   ] = useState<CryptoSymbol>("BTCUSDT");
 
   const [
+    forexPair,
+    setForexPair,
+  ] = useState<ForexPair>("EURUSD");
+
+  const [
     marketSnapshots,
     setMarketSnapshots,
   ] = useState<
@@ -3962,6 +4047,28 @@ export function MarketDashboard() {
     }));
   };
 
+  const handleForexPairChange = (
+    pair: ForexPair,
+  ) => {
+    setForexPair(pair);
+
+    setMarketSnapshots((current) => ({
+      ...current,
+      forex: {
+        ...current.forex,
+        symbol:
+          FOREX_PAIR_LABELS[pair],
+        assetName:
+          FOREX_PAIR_NAMES[pair],
+        secondaryValue:
+          FOREX_PAIR_LABELS[pair],
+        price: "--",
+        rawPrice: "--",
+        change: "--",
+      },
+    }));
+  };
+
   useEffect(() => {
     let disposed = false;
 
@@ -3984,6 +4091,13 @@ export function MarketDashboard() {
           endpoint.searchParams.set(
             "symbol",
             cryptoSymbol,
+          );
+        }
+
+        if (activeMarket === "forex") {
+          endpoint.searchParams.set(
+            "symbol",
+            forexPair,
           );
         }
 
@@ -4071,7 +4185,7 @@ export function MarketDashboard() {
         refreshTimer,
       );
     };
-  }, [activeMarket, cryptoSymbol]);
+  }, [activeMarket, cryptoSymbol, forexPair]);
 
   return (
     <main className="zainex-app">
@@ -4090,12 +4204,15 @@ export function MarketDashboard() {
               setActiveMarket={setActiveMarket}
               cryptoSymbol={cryptoSymbol}
               setCryptoSymbol={handleCryptoSymbolChange}
+              forexPair={forexPair}
+              setForexPair={handleForexPairChange}
             />
 
             <DesktopMarketColumn
               market={market}
               activeMarket={activeMarket}
               cryptoSymbol={cryptoSymbol}
+              forexPair={forexPair}
             />
           </div>
         </section>
@@ -4107,6 +4224,8 @@ export function MarketDashboard() {
         setActiveMarket={setActiveMarket}
         cryptoSymbol={cryptoSymbol}
         setCryptoSymbol={handleCryptoSymbolChange}
+        forexPair={forexPair}
+        setForexPair={handleForexPairChange}
       />
       <PaperTradeModalHost />
 

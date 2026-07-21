@@ -21,6 +21,11 @@ import {
   type CryptoSymbol,
 } from "@/lib/crypto-symbols";
 
+import {
+  FOREX_PAIR_LABELS,
+  type ForexPair,
+} from "@/lib/forex-symbols";
+
 type MarketKey =
   | "crypto"
   | "forex"
@@ -176,6 +181,7 @@ type Props = {
     | "mobile";
   activeMarket: MarketKey;
   cryptoSymbol: CryptoSymbol;
+  forexPair: ForexPair;
   displayPrice: string;
   onSpotSell: (
     quantity: number,
@@ -406,6 +412,7 @@ export function FuturesPaperTerminal({
   variant,
   activeMarket,
   cryptoSymbol,
+  forexPair,
   displayPrice,
   onSpotSell,
   onSpotBuy,
@@ -1975,14 +1982,20 @@ export function FuturesPaperTerminal({
               symbol={
                 activeMarket === "crypto"
                   ? cryptoSymbol
-                  : undefined
+                  : activeMarket === "forex"
+                    ? forexPair
+                    : undefined
               }
               symbolLabel={
                 activeMarket === "crypto"
                   ? CRYPTO_SYMBOL_LABELS[
                       cryptoSymbol
                     ]
-                  : undefined
+                  : activeMarket === "forex"
+                    ? FOREX_PAIR_LABELS[
+                        forexPair
+                      ]
+                    : undefined
               }
               onApplyLevels={(levels) => {
                 setSpotStopLossInput(

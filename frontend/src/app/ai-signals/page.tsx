@@ -20,6 +20,12 @@ import {
   type CryptoSymbol,
 } from "@/lib/crypto-symbols";
 
+import {
+  FOREX_PAIR_LABELS,
+  SUPPORTED_FOREX_PAIRS,
+  type ForexPair,
+} from "@/lib/forex-symbols";
+
 import styles from "../billing/billing.module.css";
 import aiSignalsStyles from "./ai-signals.module.css";
 
@@ -28,6 +34,11 @@ function AiSignalsContent() {
     cryptoSymbol,
     setCryptoSymbol,
   ] = useState<CryptoSymbol>("BTCUSDT");
+
+  const [
+    forexPair,
+    setForexPair,
+  ] = useState<ForexPair>("EURUSD");
 
   return (
     <div className={styles.page}>
@@ -155,6 +166,61 @@ function AiSignalsContent() {
           </select>
         </div>
 
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 14,
+            flexWrap: "wrap",
+            marginBottom: 14,
+          }}
+        >
+          <span
+            style={{
+              color: "#9d8cff",
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: 1.2,
+            }}
+          >
+            FOREX PAIR FOR SPOT FOREX
+          </span>
+
+          <select
+            aria-label="Select forex pair"
+            value={forexPair}
+            onChange={(event) => {
+              setForexPair(
+                event.target
+                  .value as ForexPair,
+              );
+            }}
+            style={{
+              minHeight: 38,
+              border:
+                "1px solid rgba(145,126,255,.35)",
+              borderRadius: 9,
+              color: "#e2e5f5",
+              background: "#12182b",
+              padding: "0 10px",
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+          >
+            {SUPPORTED_FOREX_PAIRS.map(
+              (pair) => (
+                <option
+                  key={pair}
+                  value={pair}
+                >
+                  {FOREX_PAIR_LABELS[pair]}
+                </option>
+              ),
+            )}
+          </select>
+        </div>
+
         <section className={aiSignalsStyles.grid}>
           <FuturesAiSignalPanel
             symbol={cryptoSymbol}
@@ -173,7 +239,15 @@ function AiSignalsContent() {
               ]
             }
           />
-          <SpotAiSignalPanel assetClass="forex" />
+          <SpotAiSignalPanel
+            assetClass="forex"
+            symbol={forexPair}
+            symbolLabel={
+              FOREX_PAIR_LABELS[
+                forexPair
+              ]
+            }
+          />
           <SpotAiSignalPanel assetClass="stocks" />
         </section>
       </div>

@@ -21,6 +21,12 @@ import {
   type CryptoSymbol,
 } from "@/lib/crypto-symbols";
 
+import {
+  FOREX_PAIR_LABELS,
+  type ForexPair,
+  isJpyForexPair,
+} from "@/lib/forex-symbols";
+
 export type TradingMarket =
   | "crypto"
   | "forex"
@@ -37,6 +43,7 @@ type ChartInterval =
 type TradingViewChartProps = {
   market: TradingMarket;
   cryptoSymbol?: CryptoSymbol;
+  forexPair?: ForexPair;
   compact?: boolean;
 };
 
@@ -99,12 +106,15 @@ function normalize(
 export function TradingViewChart({
   market,
   cryptoSymbol = "BTCUSDT",
+  forexPair = "EURUSD",
   compact = false,
 }: TradingViewChartProps) {
   const displayLabel =
     market === "crypto"
       ? CRYPTO_SYMBOL_LABELS[cryptoSymbol]
-      : labels[market];
+      : market === "forex"
+        ? FOREX_PAIR_LABELS[forexPair]
+        : labels[market];
 
   const canvasRef =
     useRef<HTMLDivElement>(null);
@@ -273,7 +283,9 @@ export function TradingViewChart({
 
           precision:
             market === "forex"
-              ? 5
+              ? isJpyForexPair(forexPair)
+                ? 3
+                : 5
               : market === "crypto" &&
                 (cryptoSymbol === "XRPUSDT" ||
                   cryptoSymbol === "ADAUSDT" ||
@@ -283,7 +295,9 @@ export function TradingViewChart({
 
           minMove:
             market === "forex"
-              ? 0.00001
+              ? isJpyForexPair(forexPair)
+                ? 0.001
+                : 0.00001
               : market === "crypto" &&
                 (cryptoSymbol === "XRPUSDT" ||
                   cryptoSymbol === "ADAUSDT" ||
@@ -334,6 +348,13 @@ export function TradingViewChart({
         endpoint.searchParams.set(
           "symbol",
           cryptoSymbol,
+        );
+      }
+
+      if (market === "forex") {
+        endpoint.searchParams.set(
+          "symbol",
+          forexPair,
         );
       }
 
@@ -557,6 +578,7 @@ export function TradingViewChart({
   }, [
     market,
     cryptoSymbol,
+    forexPair,
     chartInterval,
     compact,
   ]);
