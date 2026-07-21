@@ -31,7 +31,7 @@ const plans = [
     description:
       "Starter intelligence for clearer market context and daily guidance.",
     features: [
-      "Enhanced AI market insights",
+      "GPT-5.1 InteliBrain signals",
       "Personal asset watchlist",
       "Basic strategy summaries",
       "Standard signal alerts",
@@ -47,7 +47,7 @@ const plans = [
     description:
       "Advanced intelligence for active traders requiring deeper analysis.",
     features: [
-      "Advanced AI signal filtering",
+      "GPT-5.1, Claude & Gemini InteliBrain signals",
       "Expanded market intelligence",
       "Priority strategy tools",
       "Faster signal notifications",
@@ -63,7 +63,7 @@ const plans = [
     description:
       "Elite AI Intelitrade access with maximum limits and priority service.",
     features: [
-      "Elite AI trade intelligence",
+      "5 AI models + arbitrage scanner",
       "Complete strategy access",
       "Maximum signal limits",
       "Premium support priority",
@@ -79,7 +79,7 @@ const plans = [
     description:
       "Our highest tier, above VIP 3 — dedicated support and first access to every new market.",
     features: [
-      "Everything in VIP 3",
+      "All 8 AI models + arbitrage scanner",
       "Dedicated account manager",
       "Early access to new markets",
       "Unlimited strategy slots",

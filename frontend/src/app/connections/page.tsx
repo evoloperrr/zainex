@@ -107,6 +107,14 @@ const connections: Array<{
     gradient: "linear-gradient(145deg, #17c3b2, #0b7a70)",
     status: "pending",
   },
+  {
+    name: "Arbitrage Scanner",
+    description:
+      "Compares live prices across Binance, OKX and Bybit to surface cross-exchange arbitrage opportunities.",
+    mark: "A",
+    gradient: "linear-gradient(145deg, #5af1be, #1a9c6d)",
+    status: "pending",
+  },
 ];
 
 function ConnectionsContent() {

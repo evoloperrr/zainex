@@ -103,6 +103,14 @@ const featureRows: FeatureRow[] = [
     premium: true,
   },
   {
+    label: "Cross-exchange arbitrage scanner",
+    free: false,
+    vip1: false,
+    vip2: false,
+    vip3: true,
+    premium: true,
+  },
+  {
     label: "Spot markets covered",
     free: "Crypto only",
     vip1: "Crypto + Forex",
