@@ -40,12 +40,14 @@ export async function POST(
 ) {
   let assetClass: AssetClass = "crypto";
   let timeframe = "1h";
+  let symbol: string | undefined;
 
   try {
     const body =
       (await request.json()) as {
         assetClass?: unknown;
         timeframe?: unknown;
+        symbol?: unknown;
       };
 
     if (
@@ -63,6 +65,13 @@ export async function POST(
       TIMEFRAMES.has(body.timeframe)
     ) {
       timeframe = body.timeframe;
+    }
+
+    if (
+      typeof body.symbol === "string" &&
+      body.symbol.trim().length > 0
+    ) {
+      symbol = body.symbol.trim().toUpperCase();
     }
   }
   catch {
@@ -107,6 +116,13 @@ export async function POST(
       "market",
       assetClass,
     );
+
+    if (assetClass === "crypto" && symbol) {
+      candlesUrl.searchParams.set(
+        "symbol",
+        symbol,
+      );
+    }
 
     candlesUrl.searchParams.set(
       "interval",
@@ -193,6 +209,7 @@ export async function POST(
           assetClass,
           timeframe,
           candles,
+          symbol,
         }),
       },
     );

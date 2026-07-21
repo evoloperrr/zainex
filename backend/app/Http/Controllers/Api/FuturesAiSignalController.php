@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\Trading\FuturesMarketPriceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -61,6 +62,10 @@ final class FuturesAiSignalController extends Controller
                 'string',
                 'in:1m,5m,15m,1h,4h,1d',
             ],
+            'symbol' => [
+                'nullable',
+                'string',
+            ],
         ]);
 
         $timeframe = (string) (
@@ -68,15 +73,38 @@ final class FuturesAiSignalController extends Controller
             config('intelibrain.default_timeframe', '15m')
         );
 
+        $symbol = strtoupper(
+            trim(
+                (string) (
+                    $validated['symbol'] ?? 'BTCUSDT'
+                ),
+            ),
+        );
+
+        if (
+            ! in_array(
+                $symbol,
+                FuturesMarketPriceService::SUPPORTED_SYMBOLS,
+                true,
+            )
+        ) {
+            return $this->error(
+                'FUTURES_SYMBOL_NOT_AVAILABLE',
+                'The requested Futures symbol is not supported.',
+                400,
+            );
+        }
+
         try {
             $candles = $this->fetchClosedCandles(
-                'BTCUSDT',
+                $symbol,
                 $timeframe,
             );
 
             $snapshot = $this->calculateSnapshot(
                 $candles,
                 $timeframe,
+                $symbol,
             );
 
             $ai = $this->requestOpenAI(
@@ -90,7 +118,7 @@ final class FuturesAiSignalController extends Controller
             return response()->json([
                 'ok' => true,
                 'analysis' => [
-                    'symbol' => 'BTCUSDT',
+                    'symbol' => $symbol,
                     'marketType' => 'FUTURES',
                     'product' => 'USDT-M-PERPETUAL',
                     'timeframe' => $timeframe,
@@ -250,6 +278,7 @@ final class FuturesAiSignalController extends Controller
     private function calculateSnapshot(
         array $candles,
         string $timeframe,
+        string $symbol,
     ): array {
         $closes = array_map(
             static fn (array $candle): float =>
@@ -465,7 +494,7 @@ final class FuturesAiSignalController extends Controller
         );
 
         return [
-            'symbol' => 'BTCUSDT',
+            'symbol' => $symbol,
             'marketType' => 'FUTURES',
             'timeframe' => $timeframe,
             'price' => round($price, 2),
@@ -678,7 +707,7 @@ final class FuturesAiSignalController extends Controller
                             'content' => implode(
                                 "\n",
                                 [
-                                    'You are InteliBrain V1, a conservative BTCUSDT USDT-M Futures analyst.',
+                                    'You are InteliBrain V1, a conservative '.$snapshot['symbol'].' USDT-M Futures analyst.',
                                     'Interpret only the backend-computed indicators.',
                                     'Never calculate missing indicators.',
                                     'Never invent market facts.',

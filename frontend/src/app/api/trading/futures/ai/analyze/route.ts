@@ -18,11 +18,13 @@ export async function POST(
   request: Request,
 ) {
   let requestedTimeframe = "15m";
+  let requestedSymbol: string | undefined;
 
   try {
     const body =
       (await request.json()) as {
         timeframe?: unknown;
+        symbol?: unknown;
       };
 
     if (
@@ -31,6 +33,14 @@ export async function POST(
     ) {
       requestedTimeframe =
         body.timeframe;
+    }
+
+    if (
+      typeof body.symbol === "string" &&
+      body.symbol.trim().length > 0
+    ) {
+      requestedSymbol =
+        body.symbol.trim().toUpperCase();
     }
   }
   catch {
@@ -90,6 +100,7 @@ export async function POST(
         body: JSON.stringify({
           timeframe:
             requestedTimeframe,
+          symbol: requestedSymbol,
         }),
       },
     );

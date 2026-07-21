@@ -24,7 +24,6 @@ use Throwable;
 
 final class FuturesPaperTradingService
 {
-    private const SYMBOL = 'BTCUSDT';
     private const CURRENCY = 'USDT';
     private const INITIAL_BALANCE = '10000.00000000';
     private const FEE_RATE = '0.00050000';
@@ -80,7 +79,7 @@ final class FuturesPaperTradingService
     ): array {
         $this->assertSessionId($sessionId);
         $request = $this->normalizeOpenRequest($input);
-        $quote = $this->prices->btcUsdt();
+        $quote = $this->prices->price($request['symbol']);
 
         return DB::transaction(function () use (
             $sessionId,
@@ -107,7 +106,7 @@ final class FuturesPaperTradingService
 
             $existingPosition = FuturesPosition::query()
                 ->where('trading_account_id', $account->id)
-                ->where('symbol', self::SYMBOL)
+                ->where('symbol', $request['symbol'])
                 ->where('status', 'OPEN')
                 ->lockForUpdate()
                 ->first();
@@ -115,7 +114,7 @@ final class FuturesPaperTradingService
             if ($existingPosition !== null) {
                 throw new FuturesTradingException(
                     'FUTURES_POSITION_EXISTS',
-                    'A BTCUSDT futures position is already open. Close it before opening another one.',
+                    "A {$request['symbol']} futures position is already open. Close it before opening another one.",
                     409,
                     [
                         'positionMode' => 'ONE_WAY',
@@ -191,7 +190,7 @@ final class FuturesPaperTradingService
             $position = FuturesPosition::query()->create([
                 'id' => $positionId,
                 'trading_account_id' => $account->id,
-                'symbol' => self::SYMBOL,
+                'symbol' => $request['symbol'],
                 'direction' => $request['direction'],
                 'status' => 'OPEN',
                 'open_slot' => 1,
@@ -225,7 +224,7 @@ final class FuturesPaperTradingService
                 'id' => $orderId,
                 'trading_account_id' => $account->id,
                 'client_order_id' => $request['clientOrderId'],
-                'symbol' => self::SYMBOL,
+                'symbol' => $request['symbol'],
                 'direction' => $request['direction'],
                 'action' => 'OPEN',
                 'order_type' => 'MARKET',
@@ -255,7 +254,7 @@ final class FuturesPaperTradingService
                 'order_id' => $order->id,
                 'position_id' => $position->id,
                 'market_type' => 'FUTURES',
-                'symbol' => self::SYMBOL,
+                'symbol' => $request['symbol'],
                 'direction' => $request['direction'],
                 'action' => 'OPEN',
                 'execution_type' => 'MARKET',
@@ -318,7 +317,7 @@ final class FuturesPaperTradingService
                 [
                     'positionId' => $position->id,
                     'orderId' => $order->id,
-                    'symbol' => self::SYMBOL,
+                    'symbol' => $request['symbol'],
                     'direction' => $request['direction'],
                     'margin' => (string) $margin,
                     'leverage' => $leverage,
@@ -348,13 +347,11 @@ final class FuturesPaperTradingService
     ): array {
         $this->assertSessionId($sessionId);
         $request = $this->normalizeCloseRequest($input);
-        $quote = $this->prices->btcUsdt();
 
         return DB::transaction(function () use (
             $sessionId,
             $requestId,
             $request,
-            $quote,
             $ipAddress,
             $userAgent,
         ): array {
@@ -388,6 +385,8 @@ final class FuturesPaperTradingService
                     ['positionId' => $request['positionId']],
                 );
             }
+
+            $quote = $this->prices->price($position->symbol);
 
             $result = $this->finalizePosition(
                 $account,
@@ -429,27 +428,50 @@ final class FuturesPaperTradingService
             return;
         }
 
-        $hasOpenPosition = FuturesPosition::query()
+        $openSymbols = FuturesPosition::query()
             ->where('trading_account_id', $account->id)
             ->where('status', 'OPEN')
-            ->exists();
+            ->pluck('symbol')
+            ->unique()
+            ->values();
 
-        if (! $hasOpenPosition) {
+        if ($openSymbols->isEmpty()) {
             return;
         }
 
-        $quote = $this->prices->btcUsdt();
+        foreach ($openSymbols as $symbol) {
+            $this->refreshOpenPositionForSymbol(
+                $sessionId,
+                $requestId,
+                $symbol,
+            );
+        }
+    }
+
+    private function refreshOpenPositionForSymbol(
+        string $sessionId,
+        string $requestId,
+        string $symbol,
+    ): void {
+        try {
+            $quote = $this->prices->price($symbol);
+        } catch (Throwable) {
+            // A stale mark is retained if this symbol's price
+            // providers are temporarily unavailable.
+            return;
+        }
 
         DB::transaction(function () use (
             $sessionId,
             $requestId,
+            $symbol,
             $quote,
         ): void {
             [$account, $balance] = $this->lockedAccountAndBalance($sessionId);
 
             $position = FuturesPosition::query()
                 ->where('trading_account_id', $account->id)
-                ->where('symbol', self::SYMBOL)
+                ->where('symbol', $symbol)
                 ->where('status', 'OPEN')
                 ->lockForUpdate()
                 ->first();
@@ -584,7 +606,7 @@ final class FuturesPaperTradingService
             'id' => (string) Str::uuid(),
             'trading_account_id' => $account->id,
             'client_order_id' => $clientOrderId,
-            'symbol' => self::SYMBOL,
+            'symbol' => $position->symbol,
             'direction' => $position->direction,
             'action' => $action,
             'order_type' => 'MARKET',
@@ -614,7 +636,7 @@ final class FuturesPaperTradingService
             'order_id' => $order->id,
             'position_id' => $position->id,
             'market_type' => 'FUTURES',
-            'symbol' => self::SYMBOL,
+            'symbol' => $position->symbol,
             'direction' => $position->direction,
             'action' => $action,
             'execution_type' => 'MARKET',
@@ -700,7 +722,7 @@ final class FuturesPaperTradingService
             [
                 'positionId' => $position->id,
                 'orderId' => $order->id,
-                'symbol' => self::SYMBOL,
+                'symbol' => $position->symbol,
                 'direction' => $position->direction,
                 'leverage' => (int) $position->leverage,
                 'entryPrice' => (string) $entryPrice,
@@ -891,7 +913,7 @@ final class FuturesPaperTradingService
 
         return [
             'id' => $position->id,
-            'symbol' => self::SYMBOL,
+            'symbol' => $position->symbol,
             'direction' => $position->direction,
             'marginMode' => 'ISOLATED',
             'leverage' => (int) $position->leverage,
@@ -941,7 +963,7 @@ final class FuturesPaperTradingService
             'clientOrderId' => $order->client_order_id,
             'action' => $order->action,
             'direction' => $order->direction,
-            'symbol' => self::SYMBOL,
+            'symbol' => $order->symbol,
             'status' => $order->status,
             'marginMode' => 'ISOLATED',
             'leverage' => (int) $order->leverage,
@@ -981,7 +1003,7 @@ final class FuturesPaperTradingService
             'orderId' => $execution->order_id,
             'action' => $execution->action,
             'direction' => $execution->direction,
-            'symbol' => self::SYMBOL,
+            'symbol' => $execution->symbol,
             'leverage' => (int) $order->leverage,
             'margin' => $this->number(
                 $this->decimal($order->margin, 8),
@@ -1077,18 +1099,24 @@ final class FuturesPaperTradingService
             preg_replace(
                 '/[\s\-_:\/.]+/',
                 '',
-                trim((string) ($input['symbol'] ?? self::SYMBOL)),
+                trim((string) ($input['symbol'] ?? 'BTCUSDT')),
             ) ?? '',
         );
 
-        if ($symbol !== self::SYMBOL) {
+        if (
+            ! in_array(
+                $symbol,
+                FuturesMarketPriceService::SUPPORTED_SYMBOLS,
+                true,
+            )
+        ) {
             throw new FuturesTradingException(
                 'FUTURES_SYMBOL_NOT_AVAILABLE',
-                'Paper Futures V1 currently supports BTCUSDT only.',
+                'The requested Futures symbol is not supported.',
                 400,
                 [
                     'requestedSymbol' => $symbol,
-                    'supportedSymbols' => [self::SYMBOL],
+                    'supportedSymbols' => FuturesMarketPriceService::SUPPORTED_SYMBOLS,
                 ],
             );
         }
@@ -1144,7 +1172,7 @@ final class FuturesPaperTradingService
         }
 
         return [
-            'symbol' => self::SYMBOL,
+            'symbol' => $symbol,
             'direction' => $direction,
             'margin' => (string) $margin,
             'leverage' => $leverage,

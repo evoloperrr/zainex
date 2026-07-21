@@ -1,6 +1,7 @@
 <?php
 
 // ZAINEX_DB_PHASE2B1_LARAVEL_FUTURES_ENGINE_V1_1
+// ZAINEX_MULTI_SYMBOL_TRADING_V1
 
 namespace App\Services\Trading;
 
@@ -15,15 +16,37 @@ final class FuturesMarketPriceService
 {
     private const TIMEOUT_SECONDS = 7;
 
+    /** @var list<string> */
+    public const SUPPORTED_SYMBOLS = [
+        'BTCUSDT',
+        'ETHUSDT',
+        'SOLUSDT',
+        'BNBUSDT',
+        'XRPUSDT',
+        'ADAUSDT',
+        'DOGEUSDT',
+    ];
+
     /**
      * @return array{price: string, provider: string}
      */
-    public function btcUsdt(): array
+    public function price(string $symbol): array
     {
+        $symbol = strtoupper(trim($symbol));
+
+        if (! in_array($symbol, self::SUPPORTED_SYMBOLS, true)) {
+            throw new FuturesTradingException(
+                'SYMBOL_NOT_SUPPORTED',
+                "{$symbol} is not a supported trading symbol.",
+                400,
+                ['supportedSymbols' => self::SUPPORTED_SYMBOLS],
+            );
+        }
+
         $providers = [
-            fn (): array => $this->fromBinance(),
-            fn (): array => $this->fromOkx(),
-            fn (): array => $this->fromBybit(),
+            fn (): array => $this->fromBinance($symbol),
+            fn (): array => $this->fromOkx($symbol),
+            fn (): array => $this->fromBybit($symbol),
         ];
 
         $failures = [];
@@ -38,21 +61,46 @@ final class FuturesMarketPriceService
 
         throw new FuturesTradingException(
             'PRICE_PROVIDER_UNAVAILABLE',
-            'All configured BTCUSDT market-price providers are unavailable.',
+            "All configured {$symbol} market-price providers are unavailable.",
             502,
             ['providersTried' => 3, 'failures' => $failures],
         );
     }
 
     /**
+     * @deprecated Use price('BTCUSDT') instead.
      * @return array{price: string, provider: string}
      */
-    private function fromBinance(): array
+    public function btcUsdt(): array
+    {
+        return $this->price('BTCUSDT');
+    }
+
+    private function toOkxInstrumentId(string $symbol): string
+    {
+        foreach (['USDT', 'USDC', 'USD', 'BTC', 'ETH'] as $quote) {
+            if (
+                str_ends_with($symbol, $quote) &&
+                strlen($symbol) > strlen($quote)
+            ) {
+                $base = substr($symbol, 0, -strlen($quote));
+
+                return "{$base}-{$quote}";
+            }
+        }
+
+        return $symbol;
+    }
+
+    /**
+     * @return array{price: string, provider: string}
+     */
+    private function fromBinance(string $symbol): array
     {
         $payload = $this->client()
             ->get(
                 'https://data-api.binance.vision/api/v3/ticker/price',
-                ['symbol' => 'BTCUSDT'],
+                ['symbol' => $symbol],
             )
             ->throw()
             ->json();
@@ -61,6 +109,7 @@ final class FuturesMarketPriceService
             'price' => $this->normalizePrice(
                 is_array($payload) ? ($payload['price'] ?? null) : null,
                 'Binance',
+                $symbol,
             ),
             'provider' => 'binance-public',
         ];
@@ -69,12 +118,12 @@ final class FuturesMarketPriceService
     /**
      * @return array{price: string, provider: string}
      */
-    private function fromOkx(): array
+    private function fromOkx(string $symbol): array
     {
         $payload = $this->client()
             ->get(
                 'https://www.okx.com/api/v5/market/ticker',
-                ['instId' => 'BTC-USDT'],
+                ['instId' => $this->toOkxInstrumentId($symbol)],
             )
             ->throw()
             ->json();
@@ -84,7 +133,7 @@ final class FuturesMarketPriceService
             : null;
 
         return [
-            'price' => $this->normalizePrice($price, 'OKX'),
+            'price' => $this->normalizePrice($price, 'OKX', $symbol),
             'provider' => 'okx-public',
         ];
     }
@@ -92,14 +141,14 @@ final class FuturesMarketPriceService
     /**
      * @return array{price: string, provider: string}
      */
-    private function fromBybit(): array
+    private function fromBybit(string $symbol): array
     {
         $payload = $this->client()
             ->get(
                 'https://api.bybit.com/v5/market/tickers',
                 [
                     'category' => 'spot',
-                    'symbol' => 'BTCUSDT',
+                    'symbol' => $symbol,
                 ],
             )
             ->throw()
@@ -110,7 +159,7 @@ final class FuturesMarketPriceService
             : null;
 
         return [
-            'price' => $this->normalizePrice($price, 'Bybit'),
+            'price' => $this->normalizePrice($price, 'Bybit', $symbol),
             'provider' => 'bybit-public',
         ];
     }
@@ -125,12 +174,12 @@ final class FuturesMarketPriceService
             ->retry(1, 150, throw: false);
     }
 
-    private function normalizePrice(mixed $value, string $provider): string
+    private function normalizePrice(mixed $value, string $provider, string $symbol): string
     {
         if (! is_string($value) && ! is_int($value) && ! is_float($value)) {
             throw new FuturesTradingException(
                 'INVALID_MARKET_PRICE',
-                "{$provider} returned an invalid BTCUSDT market price.",
+                "{$provider} returned an invalid {$symbol} market price.",
                 502,
                 ['provider' => $provider],
             );
@@ -142,7 +191,7 @@ final class FuturesMarketPriceService
         } catch (Throwable) {
             throw new FuturesTradingException(
                 'INVALID_MARKET_PRICE',
-                "{$provider} returned an invalid BTCUSDT market price.",
+                "{$provider} returned an invalid {$symbol} market price.",
                 502,
                 ['provider' => $provider],
             );
@@ -151,7 +200,7 @@ final class FuturesMarketPriceService
         if ($price->isLessThanOrEqualTo(BigDecimal::of('0'))) {
             throw new FuturesTradingException(
                 'INVALID_MARKET_PRICE',
-                "{$provider} returned a non-positive BTCUSDT market price.",
+                "{$provider} returned a non-positive {$symbol} market price.",
                 502,
                 ['provider' => $provider],
             );

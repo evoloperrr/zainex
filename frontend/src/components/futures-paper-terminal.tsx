@@ -16,6 +16,11 @@ import styles from "./futures-paper-terminal.module.css";
 import { FuturesAiSignalPanel } from "./futures-ai-signal-panel";
 import { SpotAiSignalPanel } from "./spot-ai-signal-panel";
 
+import {
+  CRYPTO_SYMBOL_LABELS,
+  type CryptoSymbol,
+} from "@/lib/crypto-symbols";
+
 type MarketKey =
   | "crypto"
   | "forex"
@@ -37,7 +42,7 @@ type FuturesLeverage =
 
 type FuturesPosition = {
   id: string;
-  symbol: "BTCUSDT";
+  symbol: string;
   direction: FuturesDirection;
   marginMode: "ISOLATED";
   leverage: FuturesLeverage;
@@ -62,7 +67,7 @@ type FuturesTrade = {
     | "CLOSE"
     | "LIQUIDATE";
   direction: FuturesDirection;
-  symbol: "BTCUSDT";
+  symbol: string;
   leverage: FuturesLeverage;
   quantity: number;
   price: number;
@@ -102,7 +107,7 @@ type FuturesExecutionResult = {
       | "CLOSE"
       | "LIQUIDATE";
     direction: FuturesDirection;
-    symbol: "BTCUSDT";
+    symbol: string;
     leverage: FuturesLeverage;
     margin: number;
     quantity: number;
@@ -170,6 +175,7 @@ type Props = {
     | "desktop"
     | "mobile";
   activeMarket: MarketKey;
+  cryptoSymbol: CryptoSymbol;
   displayPrice: string;
   onSpotSell: (
     quantity: number,
@@ -399,6 +405,7 @@ async function postOrder(
 export function FuturesPaperTerminal({
   variant,
   activeMarket,
+  cryptoSymbol,
   displayPrice,
   onSpotSell,
   onSpotBuy,
@@ -765,8 +772,10 @@ export function FuturesPaperTerminal({
         shortEstimatedMaxLoss
       : 0;
 
-  const position =
-    account?.positions[0];
+  const position = account?.positions.find(
+    (candidate) =>
+      candidate.symbol === cryptoSymbol,
+  );
 
   const modalClosePosition =
     modal?.action.kind === "CLOSE"
@@ -924,7 +933,7 @@ export function FuturesPaperTerminal({
             ? await postOrder(
                 "/api/trading/futures/orders",
                 {
-                  symbol: "BTCUSDT",
+                  symbol: cryptoSymbol,
                   direction:
                     action.direction,
                   margin,
@@ -1098,7 +1107,13 @@ export function FuturesPaperTerminal({
 
                     <div>
                       <strong>
-                        BTCUSDT
+                        {modal.action
+                          .kind ===
+                        "OPEN"
+                          ? cryptoSymbol
+                          : modal.action
+                              .position
+                              .symbol}
                       </strong>
 
                       <span>
@@ -1371,7 +1386,12 @@ export function FuturesPaperTerminal({
                       </strong>
 
                       <span>
-                        BTCUSDT |{" "}
+                        {
+                          modal.result
+                            .order
+                            .symbol
+                        }
+                        {" |"}{" "}
                         {
                           modal.result
                             .order
@@ -1952,6 +1972,18 @@ export function FuturesPaperTerminal({
               assetClass={
                 activeMarket
               }
+              symbol={
+                activeMarket === "crypto"
+                  ? cryptoSymbol
+                  : undefined
+              }
+              symbolLabel={
+                activeMarket === "crypto"
+                  ? CRYPTO_SYMBOL_LABELS[
+                      cryptoSymbol
+                    ]
+                  : undefined
+              }
             />
           </section>
         ) : (
@@ -1969,12 +2001,19 @@ export function FuturesPaperTerminal({
                   }
                 >
                   Futures V1 supports
-                  BTCUSDT only. Select
-                  Crypto.
+                  Crypto pairs only.
+                  Select Crypto.
                 </div>
               ) : (
                 <>
-                  <FuturesAiSignalPanel />
+                  <FuturesAiSignalPanel
+                    symbol={cryptoSymbol}
+                    symbolLabel={
+                      CRYPTO_SYMBOL_LABELS[
+                        cryptoSymbol
+                      ]
+                    }
+                  />
 
                   <div
                     className={
@@ -2223,7 +2262,10 @@ export function FuturesPaperTerminal({
                             {
                               position.direction
                             }{" "}
-                            BTCUSDT |{" "}
+                            {
+                              position.symbol
+                            }
+                            {" |"}{" "}
                             {
                               position.leverage
                             }

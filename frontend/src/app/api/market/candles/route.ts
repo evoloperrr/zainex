@@ -3,6 +3,10 @@ import {
   NextResponse,
 } from "next/server";
 
+import {
+  isSupportedCryptoSymbol,
+} from "@/lib/crypto-symbols";
+
 export const dynamic = "force-dynamic";
 
 type MarketKey =
@@ -351,17 +355,36 @@ async function fetchJson(
   return response.json();
 }
 
+function normalizeCryptoSymbol(
+  value: string | null,
+): string {
+  const candidate =
+    (value ?? "BTCUSDT")
+      .trim()
+      .toUpperCase();
+
+  return isSupportedCryptoSymbol(candidate)
+    ? candidate
+    : "BTCUSDT";
+}
+
 async function loadBinance(
+  symbol: string,
   interval: IntervalKey,
   limit: number,
 ): Promise<MarketResult> {
+  const baseAsset = symbol.replace(
+    /USDT$/,
+    "",
+  );
+
   const klineUrl = new URL(
     "https://data-api.binance.vision/api/v3/klines",
   );
 
   klineUrl.searchParams.set(
     "symbol",
-    "BTCUSDT",
+    symbol,
   );
 
   klineUrl.searchParams.set(
@@ -380,7 +403,7 @@ async function loadBinance(
 
   tickerUrl.searchParams.set(
     "symbol",
-    "BTCUSDT",
+    symbol,
   );
 
   const [
@@ -503,7 +526,7 @@ async function loadBinance(
         ),
 
       secondaryValue:
-        "BTC / USDT",
+        `${baseAsset} / USDT`,
 
       liquidityLabel:
         "24H quote volume",
@@ -523,7 +546,7 @@ async function loadBinance(
         formatCompact(
           baseVolume,
           {
-            suffix: " BTC",
+            suffix: ` ${baseAsset}`,
           },
         ),
 
@@ -1400,10 +1423,17 @@ export async function GET(
       ),
     );
 
+  const symbol = normalizeCryptoSymbol(
+    request.nextUrl.searchParams.get(
+      "symbol",
+    ),
+  );
+
   try {
     const result =
       market === "crypto"
         ? await loadBinance(
+            symbol,
             interval,
             limit,
           )
@@ -1418,6 +1448,10 @@ export async function GET(
         ok: true,
         market,
         interval,
+        symbol:
+          market === "crypto"
+            ? symbol
+            : undefined,
         provider:
           result.provider,
         data:

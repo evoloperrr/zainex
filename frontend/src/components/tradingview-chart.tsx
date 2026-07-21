@@ -16,6 +16,11 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 
+import {
+  CRYPTO_SYMBOL_LABELS,
+  type CryptoSymbol,
+} from "@/lib/crypto-symbols";
+
 export type TradingMarket =
   | "crypto"
   | "forex"
@@ -31,6 +36,7 @@ type ChartInterval =
 
 type TradingViewChartProps = {
   market: TradingMarket;
+  cryptoSymbol?: CryptoSymbol;
   compact?: boolean;
 };
 
@@ -92,8 +98,14 @@ function normalize(
 
 export function TradingViewChart({
   market,
+  cryptoSymbol = "BTCUSDT",
   compact = false,
 }: TradingViewChartProps) {
+  const displayLabel =
+    market === "crypto"
+      ? CRYPTO_SYMBOL_LABELS[cryptoSymbol]
+      : labels[market];
+
   const canvasRef =
     useRef<HTMLDivElement>(null);
 
@@ -262,12 +274,22 @@ export function TradingViewChart({
           precision:
             market === "forex"
               ? 5
-              : 2,
+              : market === "crypto" &&
+                (cryptoSymbol === "XRPUSDT" ||
+                  cryptoSymbol === "ADAUSDT" ||
+                  cryptoSymbol === "DOGEUSDT")
+                ? 4
+                : 2,
 
           minMove:
             market === "forex"
               ? 0.00001
-              : 0.01,
+              : market === "crypto" &&
+                (cryptoSymbol === "XRPUSDT" ||
+                  cryptoSymbol === "ADAUSDT" ||
+                  cryptoSymbol === "DOGEUSDT")
+                ? 0.0001
+                : 0.01,
         },
       },
     );
@@ -307,6 +329,13 @@ export function TradingViewChart({
         "market",
         market,
       );
+
+      if (market === "crypto") {
+        endpoint.searchParams.set(
+          "symbol",
+          cryptoSymbol,
+        );
+      }
 
       endpoint.searchParams.set(
         "interval",
@@ -388,7 +417,7 @@ export function TradingViewChart({
 
       socket = new WebSocket(
         "wss://stream.binance.com:9443/ws/" +
-          `btcusdt@kline_${chartInterval}`,
+          `${cryptoSymbol.toLowerCase()}@kline_${chartInterval}`,
       );
 
       socket.onopen = () => {
@@ -527,6 +556,7 @@ export function TradingViewChart({
     };
   }, [
     market,
+    cryptoSymbol,
     chartInterval,
     compact,
   ]);
@@ -542,7 +572,7 @@ export function TradingViewChart({
       <header className="zainex-chart-toolbar">
         <div className="zainex-chart-symbol">
           <span className="zainex-chart-live-dot" />
-          <strong>{labels[market]}</strong>
+          <strong>{displayLabel}</strong>
         </div>
 
         <div className="zainex-chart-timeframes">

@@ -42,6 +42,7 @@ final class SpotAiSignalController extends Controller
 
         $validated = $request->validate([
             'assetClass' => ['required', 'string', 'in:crypto,forex,stocks'],
+            'symbol' => ['nullable', 'string'],
             'timeframe' => ['nullable', 'string'],
             'candles' => ['required', 'array', 'min:100'],
             'candles.*.time' => ['required', 'numeric'],
@@ -53,7 +54,10 @@ final class SpotAiSignalController extends Controller
 
         $assetClass = (string) $validated['assetClass'];
         $timeframe = (string) ($validated['timeframe'] ?? '1h');
-        $label = self::ASSET_LABELS[$assetClass] ?? $assetClass;
+        $requestedSymbol = trim((string) ($validated['symbol'] ?? ''));
+        $label = $requestedSymbol !== ''
+            ? $requestedSymbol
+            : (self::ASSET_LABELS[$assetClass] ?? $assetClass);
 
         try {
             $candles = array_map(

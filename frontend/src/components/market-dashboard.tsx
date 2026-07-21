@@ -12,6 +12,13 @@ import {
   useState,
 } from "react";
 
+import {
+  CRYPTO_ASSET_NAMES,
+  CRYPTO_SYMBOL_LABELS,
+  SUPPORTED_CRYPTO_SYMBOLS,
+  type CryptoSymbol,
+} from "@/lib/crypto-symbols";
+
 type MarketKey = "crypto" | "forex" | "stocks";
 
 type IconName =
@@ -2451,10 +2458,14 @@ function DesktopAssetColumn({
   market,
   activeMarket,
   setActiveMarket,
+  cryptoSymbol,
+  setCryptoSymbol,
 }: {
   market: MarketData;
   activeMarket: MarketKey;
   setActiveMarket: (market: MarketKey) => void;
+  cryptoSymbol: CryptoSymbol;
+  setCryptoSymbol: (symbol: CryptoSymbol) => void;
 }) {
   return (
     <section className="desktop-asset-column">
@@ -2483,13 +2494,48 @@ function DesktopAssetColumn({
             </div>
           </div>
 
-          <button
-            className="asset-add-button"
-            type="button"
-            aria-label="Add asset"
-          >
-            +
-          </button>
+          {activeMarket === "crypto" ? (
+            <select
+              aria-label="Select crypto pair"
+              value={cryptoSymbol}
+              onChange={(event) => {
+                setCryptoSymbol(
+                  event.target
+                    .value as CryptoSymbol,
+                );
+              }}
+              style={{
+                minHeight: 38,
+                border:
+                  "1px solid rgba(145,126,255,.35)",
+                borderRadius: 9,
+                color: "#e2e5f5",
+                background: "#12182b",
+                padding: "0 10px",
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              {SUPPORTED_CRYPTO_SYMBOLS.map(
+                (symbol) => (
+                  <option
+                    key={symbol}
+                    value={symbol}
+                  >
+                    {CRYPTO_SYMBOL_LABELS[symbol]}
+                  </option>
+                ),
+              )}
+            </select>
+          ) : (
+            <button
+              className="asset-add-button"
+              type="button"
+              aria-label="Add asset"
+            >
+              +
+            </button>
+          )}
         </div>
 
         <div className="asset-quick-actions">
@@ -2673,9 +2719,11 @@ function DesktopAssetColumn({
 function DesktopMarketColumn({
   market,
   activeMarket,
+  cryptoSymbol,
 }: {
   market: MarketData;
   activeMarket: MarketKey;
+  cryptoSymbol: CryptoSymbol;
 }) {
   const [paperAccount, setPaperAccount] =
     useState<PaperAccountSnapshot | null>(
@@ -2775,11 +2823,15 @@ function DesktopMarketColumn({
   return (
     <section className="desktop-market-column">
       <article className="desktop-chart-card desktop-live-chart-card">
-        <TradingViewChart market={activeMarket} />
+        <TradingViewChart
+          market={activeMarket}
+          cryptoSymbol={cryptoSymbol}
+        />
 
         <FuturesPaperTerminal
           variant="desktop"
           activeMarket={activeMarket}
+          cryptoSymbol={cryptoSymbol}
           displayPrice={market.price}
           onSpotSell={(quantity) => {
             submitPaperTrade(
@@ -3117,10 +3169,14 @@ function MobileDashboard({
   market,
   activeMarket,
   setActiveMarket,
+  cryptoSymbol,
+  setCryptoSymbol,
 }: {
   market: MarketData;
   activeMarket: MarketKey;
   setActiveMarket: (market: MarketKey) => void;
+  cryptoSymbol: CryptoSymbol;
+  setCryptoSymbol: (symbol: CryptoSymbol) => void;
 }) {
   const router = useRouter();
 
@@ -3317,7 +3373,35 @@ function MobileDashboard({
         <div className="mobile-chart-heading">
           <div>
             <span>{market.network}</span>
-            <strong>{market.symbol}</strong>
+            {activeMarket === "crypto" ? (
+              <select
+                aria-label="Select crypto pair"
+                value={cryptoSymbol}
+                onChange={(event) => {
+                  setCryptoSymbol(
+                    event.target.value as CryptoSymbol,
+                  );
+                }}
+                style={{
+                  minHeight: 34,
+                  border: "1px solid rgba(145,126,255,.35)",
+                  borderRadius: 8,
+                  color: "#e2e5f5",
+                  background: "#12182b",
+                  padding: "0 8px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                {SUPPORTED_CRYPTO_SYMBOLS.map((symbol) => (
+                  <option key={symbol} value={symbol}>
+                    {CRYPTO_SYMBOL_LABELS[symbol]}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <strong>{market.symbol}</strong>
+            )}
           </div>
 
           <div>
@@ -3329,6 +3413,7 @@ function MobileDashboard({
         <div className="mobile-chart-area mobile-live-chart-area">
           <TradingViewChart
             market={activeMarket}
+            cryptoSymbol={cryptoSymbol}
             compact
           />
         </div>
@@ -3337,6 +3422,7 @@ function MobileDashboard({
       <FuturesPaperTerminal
         variant="mobile"
         activeMarket={activeMarket}
+        cryptoSymbol={cryptoSymbol}
         displayPrice={market.price}
         onSpotSell={(quantity) => {
           submitPaperTrade(
@@ -3840,6 +3926,11 @@ export function MarketDashboard() {
     useState<MarketKey>("crypto");
 
   const [
+    cryptoSymbol,
+    setCryptoSymbol,
+  ] = useState<CryptoSymbol>("BTCUSDT");
+
+  const [
     marketSnapshots,
     setMarketSnapshots,
   ] = useState<
@@ -3848,6 +3939,28 @@ export function MarketDashboard() {
 
   const market =
     marketSnapshots[activeMarket];
+
+  const handleCryptoSymbolChange = (
+    symbol: CryptoSymbol,
+  ) => {
+    setCryptoSymbol(symbol);
+
+    setMarketSnapshots((current) => ({
+      ...current,
+      crypto: {
+        ...current.crypto,
+        symbol:
+          CRYPTO_SYMBOL_LABELS[symbol],
+        assetName:
+          CRYPTO_ASSET_NAMES[symbol],
+        secondaryValue:
+          CRYPTO_SYMBOL_LABELS[symbol],
+        price: "--",
+        rawPrice: "--",
+        change: "--",
+      },
+    }));
+  };
 
   useEffect(() => {
     let disposed = false;
@@ -3866,6 +3979,13 @@ export function MarketDashboard() {
           "market",
           activeMarket,
         );
+
+        if (activeMarket === "crypto") {
+          endpoint.searchParams.set(
+            "symbol",
+            cryptoSymbol,
+          );
+        }
 
         endpoint.searchParams.set(
           "interval",
@@ -3951,7 +4071,7 @@ export function MarketDashboard() {
         refreshTimer,
       );
     };
-  }, [activeMarket]);
+  }, [activeMarket, cryptoSymbol]);
 
   return (
     <main className="zainex-app">
@@ -3968,9 +4088,15 @@ export function MarketDashboard() {
               market={market}
               activeMarket={activeMarket}
               setActiveMarket={setActiveMarket}
+              cryptoSymbol={cryptoSymbol}
+              setCryptoSymbol={handleCryptoSymbolChange}
             />
 
-            <DesktopMarketColumn market={market}  activeMarket={activeMarket} />
+            <DesktopMarketColumn
+              market={market}
+              activeMarket={activeMarket}
+              cryptoSymbol={cryptoSymbol}
+            />
           </div>
         </section>
       </div>
@@ -3979,6 +4105,8 @@ export function MarketDashboard() {
         market={market}
         activeMarket={activeMarket}
         setActiveMarket={setActiveMarket}
+        cryptoSymbol={cryptoSymbol}
+        setCryptoSymbol={handleCryptoSymbolChange}
       />
       <PaperTradeModalHost />
 

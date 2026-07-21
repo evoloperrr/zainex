@@ -22,7 +22,6 @@ use Throwable;
 final class SpotPaperTradingService
 {
     private const ASSET_CLASS = 'crypto';
-    private const SYMBOL = 'BTCUSDT';
     private const CASH_ASSET = 'USD';
     private const INITIAL_CASH = '10000.00000000';
     private const FEE_RATE = '0.00100000';
@@ -74,7 +73,7 @@ final class SpotPaperTradingService
     ): array {
         $this->assertSessionId($sessionId);
         $request = $this->normalizeBuyRequest($input);
-        $quote = $this->prices->btcUsdt();
+        $quote = $this->prices->price($request['symbol']);
 
         return DB::transaction(function () use (
             $sessionId,
@@ -101,7 +100,7 @@ final class SpotPaperTradingService
 
             $existingPosition = SpotPosition::query()
                 ->where('trading_account_id', $account->id)
-                ->where('symbol', self::SYMBOL)
+                ->where('symbol', $request['symbol'])
                 ->where('status', 'OPEN')
                 ->lockForUpdate()
                 ->first();
@@ -204,7 +203,7 @@ final class SpotPaperTradingService
                     'id' => (string) Str::uuid(),
                     'trading_account_id' => $account->id,
                     'asset_class' => self::ASSET_CLASS,
-                    'symbol' => self::SYMBOL,
+                    'symbol' => $request['symbol'],
                     'status' => 'OPEN',
                     'open_slot' => 1,
                     'quantity' => (string) $newQuantity,
@@ -241,7 +240,7 @@ final class SpotPaperTradingService
                 'trading_account_id' => $account->id,
                 'client_order_id' => $request['clientOrderId'],
                 'asset_class' => self::ASSET_CLASS,
-                'symbol' => self::SYMBOL,
+                'symbol' => $request['symbol'],
                 'side' => 'BUY',
                 'order_type' => 'MARKET',
                 'quantity' => (string) $quantity,
@@ -262,7 +261,7 @@ final class SpotPaperTradingService
                 'order_id' => $order->id,
                 'position_id' => $position->id,
                 'asset_class' => self::ASSET_CLASS,
-                'symbol' => self::SYMBOL,
+                'symbol' => $request['symbol'],
                 'side' => 'BUY',
                 'quantity' => (string) $quantity,
                 'price' => (string) $executionPrice,
@@ -310,7 +309,7 @@ final class SpotPaperTradingService
                 [
                     'positionId' => $position->id,
                     'orderId' => $order->id,
-                    'symbol' => self::SYMBOL,
+                    'symbol' => $request['symbol'],
                     'quantity' => (string) $quantity,
                     'executedPrice' => (string) $executionPrice,
                     'quoteProvider' => $quote['provider'],
@@ -336,13 +335,11 @@ final class SpotPaperTradingService
     ): array {
         $this->assertSessionId($sessionId);
         $request = $this->normalizeSellRequest($input);
-        $quote = $this->prices->btcUsdt();
 
         return DB::transaction(function () use (
             $sessionId,
             $requestId,
             $request,
-            $quote,
             $ipAddress,
             $userAgent,
         ): array {
@@ -363,7 +360,7 @@ final class SpotPaperTradingService
 
             $position = SpotPosition::query()
                 ->where('trading_account_id', $account->id)
-                ->where('symbol', self::SYMBOL)
+                ->where('symbol', $request['symbol'])
                 ->where('status', 'OPEN')
                 ->lockForUpdate()
                 ->first();
@@ -391,6 +388,7 @@ final class SpotPaperTradingService
                 );
             }
 
+            $quote = $this->prices->price($position->symbol);
             $executionPrice = $this->decimal($quote['price'], 8);
 
             $result = $this->executeSell(
@@ -433,28 +431,50 @@ final class SpotPaperTradingService
             return;
         }
 
-        $hasOpenPosition = SpotPosition::query()
+        $openSymbols = SpotPosition::query()
             ->where('trading_account_id', $account->id)
-            ->where('symbol', self::SYMBOL)
             ->where('status', 'OPEN')
-            ->exists();
+            ->pluck('symbol')
+            ->unique()
+            ->values();
 
-        if (! $hasOpenPosition) {
+        if ($openSymbols->isEmpty()) {
             return;
         }
 
-        $quote = $this->prices->btcUsdt();
+        foreach ($openSymbols as $symbol) {
+            $this->refreshOpenPositionForSymbol(
+                $sessionId,
+                $requestId,
+                $symbol,
+            );
+        }
+    }
+
+    private function refreshOpenPositionForSymbol(
+        string $sessionId,
+        string $requestId,
+        string $symbol,
+    ): void {
+        try {
+            $quote = $this->prices->price($symbol);
+        } catch (Throwable) {
+            // A stale mark is retained if this symbol's price
+            // providers are temporarily unavailable.
+            return;
+        }
 
         DB::transaction(function () use (
             $sessionId,
             $requestId,
+            $symbol,
             $quote,
         ): void {
             [$account, $balance] = $this->lockedAccountAndBalance($sessionId);
 
             $position = SpotPosition::query()
                 ->where('trading_account_id', $account->id)
-                ->where('symbol', self::SYMBOL)
+                ->where('symbol', $symbol)
                 ->where('status', 'OPEN')
                 ->lockForUpdate()
                 ->first();
@@ -573,7 +593,7 @@ final class SpotPaperTradingService
             'trading_account_id' => $account->id,
             'client_order_id' => $clientOrderId,
             'asset_class' => self::ASSET_CLASS,
-            'symbol' => self::SYMBOL,
+            'symbol' => $position->symbol,
             'side' => 'SELL',
             'order_type' => 'MARKET',
             'quantity' => (string) $quantity,
@@ -594,7 +614,7 @@ final class SpotPaperTradingService
             'order_id' => $order->id,
             'position_id' => $position->id,
             'asset_class' => self::ASSET_CLASS,
-            'symbol' => self::SYMBOL,
+            'symbol' => $position->symbol,
             'side' => 'SELL',
             'quantity' => (string) $quantity,
             'price' => (string) $exitPrice,
@@ -662,7 +682,7 @@ final class SpotPaperTradingService
             [
                 'positionId' => $position->id,
                 'orderId' => $order->id,
-                'symbol' => self::SYMBOL,
+                'symbol' => $position->symbol,
                 'quantity' => (string) $quantity,
                 'exitPrice' => (string) $exitPrice,
                 'realizedPnl' => (string) $realizedPnl,
@@ -940,12 +960,14 @@ final class SpotPaperTradingService
      */
     private function normalizeBuyRequest(array $input): array
     {
+        $symbol = $this->resolveSymbol($input['symbol'] ?? null);
         $quantity = $this->inputDecimal($input['quantity'] ?? null, 'quantity', 12);
 
         $stopLoss = $input['stopLoss'] ?? null;
         $takeProfit = $input['takeProfit'] ?? null;
 
         return [
+            'symbol' => $symbol,
             'quantity' => (string) $quantity,
             'stopLoss' => $stopLoss === null || $stopLoss === ''
                 ? null
@@ -962,19 +984,49 @@ final class SpotPaperTradingService
 
     /**
      * @param array<string, mixed> $input
-     * @return array{quantity: string, clientOrderId: string}
+     * @return array{symbol: string, quantity: string, clientOrderId: string}
      */
     private function normalizeSellRequest(array $input): array
     {
+        $symbol = $this->resolveSymbol($input['symbol'] ?? null);
         $quantity = $this->inputDecimal($input['quantity'] ?? null, 'quantity', 12);
 
         return [
+            'symbol' => $symbol,
             'quantity' => (string) $quantity,
             'clientOrderId' => $this->clientOrderId(
                 $input['clientOrderId'] ?? null,
                 'spot-sell-',
             ),
         ];
+    }
+
+    private function resolveSymbol(mixed $value): string
+    {
+        $symbol = strtoupper(
+            preg_replace(
+                '/[\s\-_:\/.]+/',
+                '',
+                trim((string) ($value ?? 'BTCUSDT')),
+            ) ?? '',
+        );
+
+        if (
+            ! in_array(
+                $symbol,
+                FuturesMarketPriceService::SUPPORTED_SYMBOLS,
+                true,
+            )
+        ) {
+            throw new SpotTradingException(
+                'SYMBOL_NOT_SUPPORTED',
+                "{$symbol} is not a supported trading symbol.",
+                400,
+                ['supportedSymbols' => FuturesMarketPriceService::SUPPORTED_SYMBOLS],
+            );
+        }
+
+        return $symbol;
     }
 
     private function clientOrderId(mixed $value, string $prefix): string

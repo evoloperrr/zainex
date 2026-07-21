@@ -115,8 +115,12 @@ function price(
 
 export function SpotAiSignalPanel({
   assetClass,
+  symbol,
+  symbolLabel,
 }: {
   assetClass: AssetClass;
+  symbol?: string;
+  symbolLabel?: string;
 }) {
   const [
     timeframe,
@@ -163,6 +167,7 @@ export function SpotAiSignalPanel({
           body: JSON.stringify({
             assetClass,
             timeframe,
+            symbol,
           }),
         },
       );
@@ -263,7 +268,9 @@ export function SpotAiSignalPanel({
               lineHeight: 1.5,
             }}
           >
-            {ASSET_LABELS[assetClass]}
+            {assetClass === "crypto" && symbolLabel
+              ? symbolLabel
+              : ASSET_LABELS[assetClass]}
             {" · "}
             MANUAL SPOT SIGNAL
           </small>

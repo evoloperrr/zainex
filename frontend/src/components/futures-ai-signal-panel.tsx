@@ -148,7 +148,13 @@ function toPositionBias(
   return "WAIT";
 }
 
-export function FuturesAiSignalPanel() {
+export function FuturesAiSignalPanel({
+  symbol = "BTCUSDT",
+  symbolLabel = "BTCUSDT",
+}: {
+  symbol?: string;
+  symbolLabel?: string;
+}) {
   const [
     timeframe,
     setTimeframe,
@@ -193,6 +199,7 @@ export function FuturesAiSignalPanel() {
           },
           body: JSON.stringify({
             timeframe,
+            symbol,
           }),
         },
       );
@@ -303,7 +310,7 @@ export function FuturesAiSignalPanel() {
               lineHeight: 1.5,
             }}
           >
-            BTCUSDT · USDT-M
+            {symbolLabel} · USDT-M
             PERPETUAL · MANUAL
             FUTURES SIGNAL
           </small>
@@ -650,7 +657,7 @@ export function FuturesAiSignalPanel() {
           >
             <span>
               {analysis.provider} ·{" "}
-              BTCUSDT USDT-M
+              {symbolLabel} USDT-M
               PERPETUAL ·{" "}
               {analysis.timeframe} ·{" "}
               {analysis.candleCount}{" "}
