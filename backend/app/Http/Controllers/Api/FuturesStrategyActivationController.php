@@ -179,8 +179,6 @@ final class FuturesStrategyActivationController extends Controller
                                 'STRATEGY_ACTIVATION_ERROR',
                             'message' =>
                                 'The strategy activation could not be completed.',
-                            'debug' =>
-                                $exception::class . ': ' . $exception->getMessage(),
                         ],
                     ],
                     500,
@@ -472,7 +470,6 @@ final class FuturesStrategyActivationController extends Controller
                         $account->id,
                     )
                     ->where('status', 'OPEN')
-                    ->lockForUpdate()
                     ->count();
 
                 $pendingOrderCount = DB::table(
@@ -491,7 +488,6 @@ final class FuturesStrategyActivationController extends Controller
                             'PARTIALLY_FILLED',
                         ],
                     )
-                    ->lockForUpdate()
                     ->count();
 
                 if (
