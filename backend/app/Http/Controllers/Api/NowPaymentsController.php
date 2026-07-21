@@ -406,7 +406,7 @@ final class NowPaymentsController extends Controller
         }
 
         $amount = BigDecimal::of((string) $payment->price_amount)
-            ->toScale(8, RoundingMode::DOWN);
+            ->toScale(8, RoundingMode::Down);
 
         if ($payment->purpose === 'subscription') {
             $expires = now()->addMonth();
@@ -433,15 +433,15 @@ final class NowPaymentsController extends Controller
         }
 
         $walletBefore = BigDecimal::of((string) $user->wallet_balance)
-            ->toScale(8, RoundingMode::DOWN);
-        $walletAfter = $walletBefore->plus($amount)->toScale(8, RoundingMode::DOWN);
+            ->toScale(8, RoundingMode::Down);
+        $walletAfter = $walletBefore->plus($amount)->toScale(8, RoundingMode::Down);
 
         $availableBefore = BigDecimal::of((string) $balance->available_balance)
-            ->toScale(8, RoundingMode::DOWN);
-        $availableAfter = $availableBefore->plus($amount)->toScale(8, RoundingMode::DOWN);
+            ->toScale(8, RoundingMode::Down);
+        $availableAfter = $availableBefore->plus($amount)->toScale(8, RoundingMode::Down);
 
         $strategyLocked = BigDecimal::of((string) ($balance->strategy_locked_balance ?? '0'))
-            ->toScale(8, RoundingMode::DOWN);
+            ->toScale(8, RoundingMode::Down);
 
         $occurredAt = now();
 
