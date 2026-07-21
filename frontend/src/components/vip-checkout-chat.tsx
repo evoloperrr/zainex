@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
@@ -147,7 +148,11 @@ export function VipCheckoutChat({
   const hasQr =
     GOTYME_QR_IMAGE_SRC.trim() !== "";
 
-  return (
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  return createPortal(
     <div
       className={styles.backdrop}
       role="presentation"
@@ -386,6 +391,7 @@ export function VipCheckoutChat({
           </div>
         ) : null}
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }
