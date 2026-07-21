@@ -15,9 +15,12 @@ import styles from "./vip-checkout-chat.module.css";
 // ZAINEX_GOTYME_PAYMENT_DETAILS
 // Fill these in once the real GoTyme QR + account details are provided,
 // then this component needs no other changes.
-const GOTYME_QR_IMAGE_SRC = "";
-const GOTYME_ACCOUNT_NAME = "";
-const GOTYME_ACCOUNT_NUMBER = "";
+const GOTYME_QR_IMAGE_SRC =
+  "/gotyme-qr.png";
+const GOTYME_ACCOUNT_NAME =
+  "JOEY GOLDBERG";
+const GOTYME_ACCOUNT_NUMBER =
+  "016682392474";
 
 type VipPlan = {
   name: string;
@@ -224,6 +227,16 @@ export function VipCheckoutChat({
                     SCAN TO PAY · GOTYME
                   </span>
 
+                  <span
+                    className={
+                      styles.merchantBadge
+                    }
+                  >
+                    Merchant account —
+                    not a ZAINEX company
+                    account
+                  </span>
+
                   {hasQr ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -268,6 +281,16 @@ export function VipCheckoutChat({
                       <strong>
                         {GOTYME_ACCOUNT_NUMBER ||
                           "To be added"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Account type
+                      </span>
+                      <strong>
+                        Merchant
+                        (individual)
                       </strong>
                     </div>
 
