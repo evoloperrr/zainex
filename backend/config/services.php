@@ -35,7 +35,7 @@ return [
         ],
     ],
 
-    // ZAINEX_NOWPAYMENTS_CONFIG_V1
+    // ZAINEX_NOWPAYMENTS_CONFIG_V1_1
     'nowpayments' => [
         'api_key' => env('NOWPAYMENTS_API_KEY', ''),
         'ipn_secret' => env('NOWPAYMENTS_IPN_SECRET', ''),
