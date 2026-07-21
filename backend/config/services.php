@@ -35,4 +35,19 @@ return [
         ],
     ],
 
+    // ZAINEX_NOWPAYMENTS_CONFIG_V1
+    'nowpayments' => [
+        'api_key' => env('NOWPAYMENTS_API_KEY', ''),
+        'ipn_secret' => env('NOWPAYMENTS_IPN_SECRET', ''),
+        'base_url' => rtrim(
+            env('NOWPAYMENTS_BASE_URL', 'https://api.nowpayments.io/v1'),
+            '/',
+        ),
+        'pay_currency' => env('NOWPAYMENTS_PAY_CURRENCY', 'usdttrc20'),
+        // Public URL NOWPayments calls with payment status updates. Must be
+        // reachable from the internet — point it at the Laravel backend's
+        // own public URL (e.g. the Render deployment), not the Next.js app.
+        'ipn_callback_url' => env('NOWPAYMENTS_IPN_CALLBACK_URL', ''),
+    ],
+
 ];

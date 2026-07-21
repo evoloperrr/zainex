@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import QRCode from "qrcode";
 
 import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
@@ -23,18 +24,8 @@ const GOTYME_ACCOUNT_NAME =
 const GOTYME_ACCOUNT_NUMBER =
   "016682392474";
 
-// ZAINEX_CRYPTO_WALLET_PAYMENT_DETAILS
-// Fill these in once a real crypto wallet (coin, network, address, and
-// optionally a QR image under /public) is provided — this component
-// needs no other changes once they're set.
-const CRYPTO_WALLET_COIN =
-  "";
-const CRYPTO_WALLET_NETWORK =
-  "";
-const CRYPTO_WALLET_ADDRESS =
-  "";
-const CRYPTO_WALLET_QR_IMAGE_SRC =
-  "";
+const MIN_WALLET_FUNDING_USD = 1;
+const MAX_WALLET_FUNDING_USD = 10_000;
 
 type VipPlan = {
   name: string;
@@ -66,6 +57,64 @@ type ScriptStep =
       forWallet: boolean;
     };
 
+type CryptoInvoice = {
+  paymentId: string;
+  payAddress: string;
+  payAmount: string | null;
+  payCurrency: string;
+  priceAmount: number;
+};
+
+type CryptoInvoiceState =
+  | {
+      phase: "idle";
+    }
+  | {
+      phase: "creating";
+    }
+  | {
+      phase: "error";
+      message: string;
+    }
+  | {
+      phase: "ready";
+      invoice: CryptoInvoice;
+      status: string;
+    };
+
+function parsePlanPriceUsd(
+  price: string,
+): number {
+  const numeric = Number(
+    price.replace(/[^0-9.]/g, ""),
+  );
+
+  return Number.isFinite(numeric)
+    ? numeric
+    : 0;
+}
+
+function cryptoStatusLabel(
+  status: string,
+): string {
+  switch (status) {
+    case "waiting":
+      return "Waiting for your transfer…";
+    case "confirming":
+      return "Confirming on the blockchain…";
+    case "sending":
+      return "Confirmed — finishing up…";
+    case "finished":
+    case "confirmed":
+      return "Confirmed!";
+    case "failed":
+    case "expired":
+      return "This payment expired — close and try again.";
+    default:
+      return "Checking status…";
+  }
+}
+
 function buildIntro(
   plan: VipPlan,
 ): ScriptStep[] {
@@ -89,10 +138,19 @@ function buildMethodSteps(
   method: PaymentMethod,
   context: PaymentContext,
 ): ScriptStep[] {
-  const intro =
-    method === "merchant"
-      ? "Got it — the fastest way is a manual GoTyme transfer. Here's how:"
-      : "Got it — here's our wallet for a manual crypto transfer:";
+  if (method === "crypto") {
+    return [
+      {
+        kind: "message",
+        text: "Got it — here's your one-time crypto payment. It confirms automatically once the transfer lands on-chain:",
+      },
+      {
+        kind: "payment",
+        method: "crypto",
+        forWallet: context === "wallet",
+      },
+    ];
+  }
 
   const outro =
     context === "wallet"
@@ -102,11 +160,11 @@ function buildMethodSteps(
   return [
     {
       kind: "message",
-      text: intro,
+      text: "Got it — the fastest way is a manual GoTyme transfer. Here's how:",
     },
     {
       kind: "payment",
-      method,
+      method: "merchant",
       forWallet: context === "wallet",
     },
     {
@@ -166,6 +224,220 @@ function useProofUpload() {
   };
 }
 
+function useCryptoInvoice(
+  active: boolean,
+  purpose: PaymentContext,
+  planName: string | null,
+  amount: number | null,
+  onConfirmed: () => void,
+): CryptoInvoiceState {
+  const [state, setState] =
+    useState<CryptoInvoiceState>({
+      phase: "idle",
+    });
+
+  const onConfirmedRef = useRef(
+    onConfirmed,
+  );
+
+  useEffect(() => {
+    onConfirmedRef.current =
+      onConfirmed;
+  }, [onConfirmed]);
+
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    let cancelled = false;
+    setState({ phase: "creating" });
+
+    fetch(
+      "/api/trading/futures/wallet/crypto/invoice",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          purpose,
+          planName:
+            planName ?? undefined,
+          amount:
+            amount ?? undefined,
+        }),
+      },
+    )
+      .then(async (response) => {
+        const data =
+          await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (
+          !response.ok ||
+          !data?.ok
+        ) {
+          setState({
+            phase: "error",
+            message:
+              data?.error
+                ?.message ??
+              "Could not create the crypto payment.",
+          });
+          return;
+        }
+
+        setState({
+          phase: "ready",
+          invoice: {
+            paymentId:
+              data.paymentId,
+            payAddress:
+              data.payAddress,
+            payAmount:
+              data.payAmount ??
+              null,
+            payCurrency:
+              data.payCurrency,
+            priceAmount:
+              data.priceAmount,
+          },
+          status: data.status,
+        });
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setState({
+            phase: "error",
+            message:
+              "Could not reach the crypto payment service.",
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [active, purpose, planName, amount]);
+
+  const readyPaymentId =
+    state.phase === "ready"
+      ? state.invoice.paymentId
+      : null;
+
+  useEffect(() => {
+    if (readyPaymentId === null) {
+      return;
+    }
+
+    const interval =
+      window.setInterval(() => {
+        fetch(
+          `/api/trading/futures/wallet/crypto/status/${readyPaymentId}`,
+        )
+          .then(
+            async (response) => {
+              const data =
+                await response.json();
+
+              if (
+                !response.ok ||
+                !data?.ok
+              ) {
+                return;
+              }
+
+              setState(
+                (previous) =>
+                  previous.phase ===
+                  "ready"
+                    ? {
+                        ...previous,
+                        status:
+                          data.status,
+                      }
+                    : previous,
+              );
+
+              if (
+                data.status ===
+                  "finished" ||
+                data.status ===
+                  "confirmed"
+              ) {
+                window.clearInterval(
+                  interval,
+                );
+                onConfirmedRef.current();
+              }
+            },
+          )
+          .catch(() => {});
+      }, 6000);
+
+    return () =>
+      window.clearInterval(
+        interval,
+      );
+  }, [readyPaymentId]);
+
+  return state;
+}
+
+function AddressQr({
+  value,
+}: {
+  value: string;
+}) {
+  const [dataUrl, setDataUrl] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    QRCode.toDataURL(value, {
+      margin: 1,
+      width: 200,
+    })
+      .then((url) => {
+        if (!cancelled) {
+          setDataUrl(url);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [value]);
+
+  if (!dataUrl) {
+    return (
+      <div
+        className={
+          styles.qrPlaceholder
+        }
+      >
+        Generating QR code…
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={dataUrl}
+      alt="Crypto payment address QR code"
+      className={styles.qrImage}
+    />
+  );
+}
+
 function MethodChoiceButtons({
   onPick,
 }: {
@@ -201,6 +473,74 @@ function MethodChoiceButtons({
         Pay via Crypto Wallet
       </button>
     </div>
+  );
+}
+
+function WalletAmountForm({
+  onSubmit,
+}: {
+  onSubmit: (
+    amount: number,
+  ) => void;
+}) {
+  const [value, setValue] =
+    useState("");
+
+  const parsed = Number(value);
+
+  const valid =
+    value.trim() !== "" &&
+    Number.isFinite(parsed) &&
+    parsed >=
+      MIN_WALLET_FUNDING_USD &&
+    parsed <=
+      MAX_WALLET_FUNDING_USD;
+
+  return (
+    <form
+      className={
+        styles.amountForm
+      }
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        if (valid) {
+          onSubmit(parsed);
+        }
+      }}
+    >
+      <input
+        type="number"
+        inputMode="decimal"
+        min={
+          MIN_WALLET_FUNDING_USD
+        }
+        max={
+          MAX_WALLET_FUNDING_USD
+        }
+        step="0.01"
+        placeholder="Amount in USD"
+        className={
+          styles.amountInput
+        }
+        value={value}
+        onChange={(event) => {
+          setValue(
+            event.target.value,
+          );
+        }}
+      />
+
+      <button
+        type="submit"
+        className={
+          styles.primaryAction
+        }
+        disabled={!valid}
+      >
+        Continue
+      </button>
+    </form>
   );
 }
 
@@ -331,23 +671,6 @@ export function VipCheckoutChat({
     ),
   }));
 
-  const [walletMethodSteps] =
-    useState<
-      Record<
-        PaymentMethod,
-        ScriptStep[]
-      >
-    >(() => ({
-      merchant: buildMethodSteps(
-        "merchant",
-        "wallet",
-      ),
-      crypto: buildMethodSteps(
-        "crypto",
-        "wallet",
-      ),
-    }));
-
   const [
     sent,
     setSent,
@@ -368,9 +691,58 @@ export function VipCheckoutChat({
   );
 
   const [
+    walletFundAmount,
+    setWalletFundAmount,
+  ] = useState<number | null>(
+    null,
+  );
+
+  const [walletMethodSteps] =
+    useState<
+      Record<
+        PaymentMethod,
+        ScriptStep[]
+      >
+    >(() => ({
+      merchant: buildMethodSteps(
+        "merchant",
+        "wallet",
+      ),
+      crypto: buildMethodSteps(
+        "crypto",
+        "wallet",
+      ),
+    }));
+
+  const [
     walletSent,
     setWalletSent,
   ] = useState(false);
+
+  const vipCryptoState =
+    useCryptoInvoice(
+      method === "crypto",
+      "subscription",
+      plan.name,
+      parsePlanPriceUsd(
+        plan.price,
+      ),
+      () => {
+        setSent(true);
+      },
+    );
+
+  const walletCryptoState =
+    useCryptoInvoice(
+      walletMethod === "crypto" &&
+        walletFundAmount !== null,
+      "wallet",
+      null,
+      walletFundAmount,
+      () => {
+        setWalletSent(true);
+      },
+    );
 
   let script: ScriptStep[] =
     introScript;
@@ -415,12 +787,18 @@ export function VipCheckoutChat({
       },
     ];
 
-    if (walletMethod) {
+    if (walletMethod === "merchant") {
       script = [
         ...script,
-        ...walletMethodSteps[
-          walletMethod
-        ],
+        ...walletMethodSteps.merchant,
+      ];
+    } else if (
+      walletMethod === "crypto" &&
+      walletFundAmount !== null
+    ) {
+      script = [
+        ...script,
+        ...walletMethodSteps.crypto,
       ];
     }
 
@@ -491,6 +869,8 @@ export function VipCheckoutChat({
     walletUpsellAnswer,
     walletMethod,
     walletSent,
+    vipCryptoState,
+    walletCryptoState,
   ]);
 
   useEffect(() => {
@@ -517,12 +897,6 @@ export function VipCheckoutChat({
 
   const hasGotymeQr =
     GOTYME_QR_IMAGE_SRC.trim() !==
-    "";
-  const hasCryptoAddress =
-    CRYPTO_WALLET_ADDRESS.trim() !==
-    "";
-  const hasCryptoQr =
-    CRYPTO_WALLET_QR_IMAGE_SRC.trim() !==
     "";
 
   if (typeof document === "undefined") {
@@ -600,15 +974,15 @@ export function VipCheckoutChat({
                 );
               }
 
-              const amountLabel =
-                step.forWallet
-                  ? "Any amount you choose"
-                  : `${plan.price} ${plan.period}`;
-
               if (
                 step.method ===
-                "merchant"
+                "crypto"
               ) {
+                const cryptoState =
+                  step.forWallet
+                    ? walletCryptoState
+                    : vipCryptoState;
+
                 return (
                   <div
                     key={index}
@@ -622,91 +996,112 @@ export function VipCheckoutChat({
                       }
                     >
                       SCAN TO PAY ·
-                      GOTYME
+                      CRYPTO WALLET
                     </span>
 
-                    <span
-                      className={
-                        styles.merchantBadge
-                      }
-                    >
-                      Merchant account
-                      — not a ZAINEX
-                      company account
-                    </span>
+                    {cryptoState.phase ===
+                    "ready" ? (
+                      <>
+                        <AddressQr
+                          value={
+                            cryptoState
+                              .invoice
+                              .payAddress
+                          }
+                        />
 
-                    {hasGotymeQr ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={
-                          GOTYME_QR_IMAGE_SRC
-                        }
-                        alt="GoTyme QR code"
+                        <div
+                          className={
+                            styles.paymentDetails
+                          }
+                        >
+                          <div>
+                            <span>
+                              Wallet
+                              address
+                            </span>
+                            <strong
+                              className={
+                                styles.walletAddress
+                              }
+                            >
+                              {
+                                cryptoState
+                                  .invoice
+                                  .payAddress
+                              }
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>
+                              Amount
+                              to send
+                            </span>
+                            <strong>
+                              {cryptoState
+                                .invoice
+                                .payAmount ??
+                                "—"}{" "}
+                              {cryptoState.invoice.payCurrency.toUpperCase()}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>
+                              USD
+                              value
+                            </span>
+                            <strong>
+                              $
+                              {cryptoState.invoice.priceAmount.toFixed(
+                                2,
+                              )}
+                            </strong>
+                          </div>
+
+                          <div>
+                            <span>
+                              Status
+                            </span>
+                            <strong>
+                              {cryptoStatusLabel(
+                                cryptoState.status,
+                              )}
+                            </strong>
+                          </div>
+                        </div>
+                      </>
+                    ) : cryptoState.phase ===
+                      "error" ? (
+                      <div
                         className={
-                          styles.qrImage
+                          styles.qrPlaceholder
                         }
-                      />
+                      >
+                        {
+                          cryptoState.message
+                        }
+                      </div>
                     ) : (
                       <div
                         className={
                           styles.qrPlaceholder
                         }
                       >
-                        QR code coming
-                        soon
+                        Preparing your
+                        crypto
+                        invoice…
                       </div>
                     )}
-
-                    <div
-                      className={
-                        styles.paymentDetails
-                      }
-                    >
-                      <div>
-                        <span>
-                          Account name
-                        </span>
-                        <strong>
-                          {GOTYME_ACCOUNT_NAME ||
-                            "To be added"}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>
-                          Account
-                          number
-                        </span>
-                        <strong>
-                          {GOTYME_ACCOUNT_NUMBER ||
-                            "To be added"}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>
-                          Account type
-                        </span>
-                        <strong>
-                          Merchant
-                          (individual)
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>
-                          Amount
-                        </span>
-                        <strong>
-                          {
-                            amountLabel
-                          }
-                        </strong>
-                      </div>
-                    </div>
                   </div>
                 );
               }
+
+              const amountLabel =
+                step.forWallet
+                  ? "Any amount you choose"
+                  : `${plan.price} ${plan.period}`;
 
               return (
                 <div
@@ -721,91 +1116,88 @@ export function VipCheckoutChat({
                     }
                   >
                     SCAN TO PAY ·
-                    CRYPTO WALLET
+                    GOTYME
                   </span>
 
-                  {hasCryptoAddress ? (
-                    <>
-                      {hasCryptoQr ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={
-                            CRYPTO_WALLET_QR_IMAGE_SRC
-                          }
-                          alt="Crypto wallet QR code"
-                          className={
-                            styles.qrImage
-                          }
-                        />
-                      ) : null}
+                  <span
+                    className={
+                      styles.merchantBadge
+                    }
+                  >
+                    Merchant account —
+                    not a ZAINEX
+                    company account
+                  </span>
 
-                      <div
-                        className={
-                          styles.paymentDetails
-                        }
-                      >
-                        <div>
-                          <span>
-                            Coin
-                          </span>
-                          <strong>
-                            {
-                              CRYPTO_WALLET_COIN
-                            }
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>
-                            Network
-                          </span>
-                          <strong>
-                            {
-                              CRYPTO_WALLET_NETWORK
-                            }
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>
-                            Wallet
-                            address
-                          </span>
-                          <strong
-                            className={
-                              styles.walletAddress
-                            }
-                          >
-                            {
-                              CRYPTO_WALLET_ADDRESS
-                            }
-                          </strong>
-                        </div>
-
-                        <div>
-                          <span>
-                            Amount
-                          </span>
-                          <strong>
-                            {
-                              amountLabel
-                            }
-                          </strong>
-                        </div>
-                      </div>
-                    </>
+                  {hasGotymeQr ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={
+                        GOTYME_QR_IMAGE_SRC
+                      }
+                      alt="GoTyme QR code"
+                      className={
+                        styles.qrImage
+                      }
+                    />
                   ) : (
                     <div
                       className={
                         styles.qrPlaceholder
                       }
                     >
-                      Crypto wallet
-                      details coming
-                      soon — pay via
-                      Merchant for now
+                      QR code coming
+                      soon
                     </div>
                   )}
+
+                  <div
+                    className={
+                      styles.paymentDetails
+                    }
+                  >
+                    <div>
+                      <span>
+                        Account name
+                      </span>
+                      <strong>
+                        {GOTYME_ACCOUNT_NAME ||
+                          "To be added"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Account
+                        number
+                      </span>
+                      <strong>
+                        {GOTYME_ACCOUNT_NUMBER ||
+                          "To be added"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Account type
+                      </span>
+                      <strong>
+                        Merchant
+                        (individual)
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Amount
+                      </span>
+                      <strong>
+                        {
+                          amountLabel
+                        }
+                      </strong>
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -879,10 +1271,22 @@ export function VipCheckoutChat({
               }
             />
           ) : null}
+
+          {!typing &&
+          walletMethod ===
+            "crypto" &&
+          walletFundAmount ===
+            null ? (
+            <WalletAmountForm
+              onSubmit={
+                setWalletFundAmount
+              }
+            />
+          ) : null}
         </div>
 
         {!typing &&
-        method !== null &&
+        method === "merchant" &&
         !sent ? (
           <AttachAndActions
             proofFile={
@@ -903,9 +1307,30 @@ export function VipCheckoutChat({
         ) : null}
 
         {!typing &&
+        method === "crypto" &&
+        !sent ? (
+          <div
+            className={
+              styles.actions
+            }
+          >
+            <button
+              type="button"
+              className={
+                styles.secondaryAction
+              }
+              onClick={onClose}
+            >
+              Not now
+            </button>
+          </div>
+        ) : null}
+
+        {!typing &&
         walletUpsellAnswer ===
           "yes" &&
-        walletMethod !== null &&
+        walletMethod ===
+          "merchant" &&
         !walletSent ? (
           <AttachAndActions
             proofFile={
@@ -923,6 +1348,29 @@ export function VipCheckoutChat({
             }}
             sendLabel="I’ve added it"
           />
+        ) : null}
+
+        {!typing &&
+        walletUpsellAnswer ===
+          "yes" &&
+        walletMethod === "crypto" &&
+        walletFundAmount !== null &&
+        !walletSent ? (
+          <div
+            className={
+              styles.actions
+            }
+          >
+            <button
+              type="button"
+              className={
+                styles.secondaryAction
+              }
+              onClick={onClose}
+            >
+              Not now
+            </button>
+          </div>
         ) : null}
 
         {!typing &&

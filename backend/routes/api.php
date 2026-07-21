@@ -141,3 +141,31 @@ Route::post(
     '/trading/spot/ai/analyze',
     \App\Http\Controllers\Api\SpotAiSignalController::class,
 )->middleware('throttle:20,1');
+
+// ZAINEX_NOWPAYMENTS_CRYPTO_CHECKOUT_V1
+Route::post(
+    '/trading/futures/wallet/crypto/invoice',
+    [
+        \App\Http\Controllers\Api\NowPaymentsController::class,
+        'store',
+    ],
+)->middleware('throttle:20,1');
+
+Route::get(
+    '/trading/futures/wallet/crypto/status/{paymentId}',
+    [
+        \App\Http\Controllers\Api\NowPaymentsController::class,
+        'status',
+    ],
+)->middleware('throttle:60,1');
+
+// Public IPN endpoint — NOWPayments calls this directly, authenticated by
+// HMAC signature (see NowPaymentsController::webhook), not the internal
+// token every other route here requires.
+Route::post(
+    '/webhooks/nowpayments',
+    [
+        \App\Http\Controllers\Api\NowPaymentsController::class,
+        'webhook',
+    ],
+)->middleware('throttle:30,1');

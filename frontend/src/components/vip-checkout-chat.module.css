@@ -248,6 +248,32 @@
   gap: 10px;
 }
 
+.amountForm {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+.amountInput {
+  flex: 1;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(111, 132, 209, 0.28);
+  border-radius: 12px;
+  background: rgba(13, 19, 40, 0.86);
+  color: #f7f8ff;
+  font-size: 14px;
+}
+
+.amountInput::placeholder {
+  color: #7e8bb1;
+}
+
+.amountInput:focus {
+  outline: none;
+  border-color: rgba(101, 182, 255, 0.55);
+}
+
 .attachRow {
   display: flex;
   flex-shrink: 0;
