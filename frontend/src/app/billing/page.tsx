@@ -1,9 +1,13 @@
+"use client";
+
 /* ZAINEX_BILLING_PRICES_STRATEGY_TIERS_V2_1 */
 /* ZAINEX DEDICATED BILLING V4 */
 
+import { useState } from "react";
 import Link from "next/link";
 import { DesktopSidebar } from "../../components/market-dashboard";
 import { SharedProfileMenu } from "@/components/shared-profile-menu";
+import { VipCheckoutChat } from "@/components/vip-checkout-chat";
 
 import styles from "./billing.module.css";
 
@@ -86,6 +90,15 @@ function CardIcon() {
 }
 
 function BillingContent() {
+  const [
+    checkoutPlan,
+    setCheckoutPlan,
+  ] = useState<{
+    name: string;
+    price: string;
+    period: string;
+  } | null>(null);
+
   return (
     <div className={styles.page}>
       <div className={styles.glow} aria-hidden="true" />
@@ -190,6 +203,13 @@ function BillingContent() {
                 className={
                   plan.current ? styles.currentButton : ""
                 }
+                onClick={() => {
+                  setCheckoutPlan({
+                    name: plan.name,
+                    price: plan.price,
+                    period: plan.period,
+                  });
+                }}
               >
                 {plan.action}
               </button>
@@ -215,10 +235,19 @@ function BillingContent() {
 
           <div>
             <span>UPGRADE ACCESS</span>
-            <strong>Instant after payment</strong>
+            <strong>Manual verification</strong>
           </div>
         </section>
       </div>
+
+      {checkoutPlan ? (
+        <VipCheckoutChat
+          plan={checkoutPlan}
+          onClose={() => {
+            setCheckoutPlan(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
