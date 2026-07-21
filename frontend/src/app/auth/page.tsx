@@ -79,7 +79,7 @@ export default async function AuthPage({
       ?.trim()
       .toLowerCase() ?? "";
 
-  if (email !== "") {
+  if (email !== "" && !provisioningFailed) {
     redirect(linkTarget);
   }
 

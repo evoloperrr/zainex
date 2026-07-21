@@ -81,4 +81,4 @@ RUN rm -f bootstrap/cache/*.php \
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "php artisan package:discover --ansi && php artisan config:cache && exec apache2-foreground"]
+CMD ["sh", "-c", "php artisan package:discover --ansi && php artisan migrate --force && php artisan config:cache && exec apache2-foreground"]
