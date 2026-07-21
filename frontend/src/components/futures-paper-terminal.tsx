@@ -1984,6 +1984,18 @@ export function FuturesPaperTerminal({
                     ]
                   : undefined
               }
+              onApplyLevels={(levels) => {
+                setSpotStopLossInput(
+                  String(
+                    levels.stopLoss,
+                  ),
+                );
+                setSpotTakeProfitInput(
+                  String(
+                    levels.takeProfit,
+                  ),
+                );
+              }}
             />
           </section>
         ) : (
@@ -2013,6 +2025,20 @@ export function FuturesPaperTerminal({
                         cryptoSymbol
                       ]
                     }
+                    onApplyLevels={(
+                      levels,
+                    ) => {
+                      setStopLossInput(
+                        String(
+                          levels.stopLoss,
+                        ),
+                      );
+                      setTakeProfitInput(
+                        String(
+                          levels.takeProfit,
+                        ),
+                      );
+                    }}
                   />
 
                   <div

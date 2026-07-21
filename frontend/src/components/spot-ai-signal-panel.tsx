@@ -117,10 +117,15 @@ export function SpotAiSignalPanel({
   assetClass,
   symbol,
   symbolLabel,
+  onApplyLevels,
 }: {
   assetClass: AssetClass;
   symbol?: string;
   symbolLabel?: string;
+  onApplyLevels?: (levels: {
+    stopLoss: number;
+    takeProfit: number;
+  }) => void;
 }) {
   const [
     timeframe,
@@ -188,6 +193,21 @@ export function SpotAiSignalPanel({
       }
 
       setAnalysis(payload.analysis);
+
+      if (
+        onApplyLevels &&
+        payload.analysis.recommendation !==
+          "WAIT" &&
+        payload.analysis.stopLoss > 0 &&
+        payload.analysis.takeProfit > 0
+      ) {
+        onApplyLevels({
+          stopLoss:
+            payload.analysis.stopLoss,
+          takeProfit:
+            payload.analysis.takeProfit,
+        });
+      }
     }
     catch (currentError) {
       setError(
@@ -633,6 +653,23 @@ export function SpotAiSignalPanel({
                 ? `${analysis.model} GPT ANALYSIS`
                 : "SAFE WAIT FALLBACK"}
             </span>
+
+            {onApplyLevels &&
+            analysis.recommendation !==
+              "WAIT" &&
+            analysis.stopLoss > 0 &&
+            analysis.takeProfit > 0 ? (
+              <span
+                style={{
+                  color: "#6ce5b5",
+                }}
+              >
+                Stop loss and take
+                profit were auto-filled
+                into your order form
+                below.
+              </span>
+            ) : null}
 
             <strong
               style={{
