@@ -1,0 +1,123 @@
+.zone {
+  position: relative;
+  display: flex;
+  min-height: 260px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(112, 83, 255, 0.22),
+    rgba(41, 166, 255, 0.08) 38%,
+    transparent 69%
+  );
+  filter: blur(8px);
+}
+
+.frame {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  width: min(60%, 210px);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgba(126, 116, 255, 0.24);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(16, 20, 42, 0.92),
+    rgba(8, 10, 24, 0.96)
+  );
+}
+
+.ring {
+  position: absolute;
+  width: 126%;
+  height: 46%;
+  border: 1px solid rgba(188, 75, 255, 0.25);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+  box-shadow: 0 0 22px rgba(177, 70, 255, 0.08);
+}
+
+.ring::before,
+.ring::after {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  content: "";
+}
+
+.ring::before {
+  top: 2px;
+  left: 17%;
+  background: #55e2ff;
+  box-shadow: 0 0 16px #55e2ff;
+}
+
+.ring::after {
+  right: 12%;
+  bottom: 4px;
+  background: #d451ff;
+  box-shadow: 0 0 16px #d451ff;
+}
+
+.core {
+  position: relative;
+  z-index: 3;
+  max-width: 78%;
+  text-align: center;
+}
+
+.core span,
+.core strong,
+.core small {
+  display: block;
+}
+
+.core span {
+  color: #5ce1ff;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+}
+
+.core strong {
+  margin-top: 9px;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+  font-size: clamp(19px, 2.2vw, 32px);
+  font-weight: 460;
+  line-height: 1;
+}
+
+.core small {
+  margin-top: 9px;
+  color: #a9b4d7;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ring {
+    animation: zainexNeuralOrbit 12s linear infinite;
+  }
+}
+
+@keyframes zainexNeuralOrbit {
+  from {
+    transform: rotate(-14deg);
+  }
+
+  to {
+    transform: rotate(346deg);
+  }
+}

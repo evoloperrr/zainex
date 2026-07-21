@@ -1451,6 +1451,11 @@ export function DesktopSidebar({
                 return;
               }
 
+              if (item.label === "Portfolios") {
+                router.push("/portfolio");
+                return;
+              }
+
               // ZAINEX_WALLET_AI_CREDITS_ROUTE_V1_3
               if (item.label === "Wallets") {
                 router.push("/wallet");
@@ -1486,6 +1491,21 @@ export function DesktopSidebar({
 
               if (item.label === "Billing") {
                 router.push("/billing");
+                return;
+              }
+
+              if (item.label === "Connections") {
+                router.push("/connections");
+                return;
+              }
+
+              if (item.label === "Analytics") {
+                router.push("/analytics");
+                return;
+              }
+
+              if (item.label === "Premium") {
+                router.push("/premium");
                 return;
               }
 

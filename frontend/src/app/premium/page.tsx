@@ -1,0 +1,209 @@
+/* ZAINEX PREMIUM FEATURE COMPARISON V1 */
+
+import Link from "next/link";
+
+import {
+  DesktopSidebar,
+} from "../../components/market-dashboard";
+
+import { SharedProfileMenu } from "@/components/shared-profile-menu";
+import { NeuralOrbit } from "@/components/neural-orbit";
+
+import styles from "../billing/billing.module.css";
+import premiumStyles from "./premium.module.css";
+
+type FeatureRow = {
+  label: string;
+  free: boolean | string;
+  vip1: boolean | string;
+  vip2: boolean | string;
+  vip3: boolean | string;
+};
+
+const featureRows: FeatureRow[] = [
+  {
+    label: "Core trading dashboard",
+    free: true,
+    vip1: true,
+    vip2: true,
+    vip3: true,
+  },
+  {
+    label: "InteliBrain AI signal previews",
+    free: "Limited",
+    vip1: "Full access",
+    vip2: "Full access",
+    vip3: "Full access",
+  },
+  {
+    label: "Spot markets covered",
+    free: "Crypto only",
+    vip1: "Crypto + Forex",
+    vip2: "All 3 markets",
+    vip3: "All 3 markets",
+  },
+  {
+    label: "Personal asset watchlist",
+    free: false,
+    vip1: true,
+    vip2: true,
+    vip3: true,
+  },
+  {
+    label: "Strategy activation slots",
+    free: "0",
+    vip1: "1",
+    vip2: "3",
+    vip3: "Unlimited",
+  },
+  {
+    label: "Priority signal refresh",
+    free: false,
+    vip1: false,
+    vip2: true,
+    vip3: true,
+  },
+  {
+    label: "Priority support",
+    free: false,
+    vip1: false,
+    vip2: false,
+    vip3: true,
+  },
+];
+
+function renderCell(value: boolean | string) {
+  if (value === true) {
+    return <span className={premiumStyles.check}>{"✓"}</span>;
+  }
+
+  if (value === false) {
+    return <span className={premiumStyles.dash}>{"—"}</span>;
+  }
+
+  return value;
+}
+
+function PremiumContent() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.glow} aria-hidden="true" />
+
+      <header className={styles.header}>
+        <Link href="/dashboard" className={styles.brand}>
+          <span className={styles.logo}>Z</span>
+
+          <span className={styles.brandText}>
+            <strong className="zainex-wordmark"><span className="zainex-wordmark-silver">Z</span><span className="zainex-wordmark-ai">AI</span><span className="zainex-wordmark-silver">NEX</span></strong>
+            <small>AI INTELITRADE</small>
+          </span>
+        </Link>
+
+        <div className={styles.headerRight}>
+          <span className={styles.secure}>
+            <i />
+            Premium features
+          </span>
+
+          <Link href="/market" className={styles.back}>
+            Back to terminal
+          </Link>
+
+          <SharedProfileMenu />
+        </div>
+      </header>
+
+      <div className={styles.content}>
+        <section className={styles.hero}>
+          <div>
+            <span className={styles.eyebrow}>
+              WHAT VIP UNLOCKS
+            </span>
+
+            <h1>
+              See what
+              <span> Premium adds.</span>
+            </h1>
+
+            <p>
+              A side-by-side look at what each tier
+              unlocks across markets, AI signals, and
+              strategy access. Upgrade any time from
+              Billing.
+            </p>
+          </div>
+        </section>
+
+        <section className={premiumStyles.stage}>
+          <div className={premiumStyles.tableCard}>
+            <table className={premiumStyles.table}>
+              <thead>
+                <tr>
+                  <th scope="col">FEATURE</th>
+                  <th scope="col">FREE</th>
+                  <th scope="col">VIP 1</th>
+                  <th scope="col">VIP 2</th>
+                  <th scope="col">VIP 3</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {featureRows.map((row) => (
+                  <tr key={row.label}>
+                    <th scope="row">{row.label}</th>
+                    <td>{renderCell(row.free)}</td>
+                    <td>{renderCell(row.vip1)}</td>
+                    <td>{renderCell(row.vip2)}</td>
+                    <td>{renderCell(row.vip3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className={premiumStyles.orbitCard}>
+            <NeuralOrbit
+              label="TOP TIER"
+              value="VIP 3"
+              caption="Unlimited strategies + priority support"
+            />
+          </div>
+        </section>
+
+        <div className={premiumStyles.cta}>
+          <div>
+            <strong>Ready to upgrade?</strong>
+            <span>
+              Pick a tier on the Billing page — access
+              unlocks instantly.
+            </span>
+          </div>
+
+          <Link href="/billing">
+            View plans
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function PremiumPage() {
+  return (
+    <main className="zainex-app">
+      <div className="desktop-app-frame">
+        <DesktopSidebar activeLabel="Premium" />
+
+        <section
+          className={`desktop-shell ${styles.desktopContent}`}
+        >
+          <PremiumContent />
+        </section>
+      </div>
+
+      <div className={styles.mobileContent}>
+        <PremiumContent />
+      </div>
+    </main>
+  );
+}
