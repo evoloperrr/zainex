@@ -109,6 +109,7 @@ final class FuturesStrategyActivationController extends Controller
                 $sessionId,
                 $requestId,
                 $this->jsonBody($request),
+                $request->header('X-Zainex-User-Email'),
             );
 
             return response()
@@ -197,6 +198,7 @@ final class FuturesStrategyActivationController extends Controller
         string $sessionId,
         string $requestId,
         array $body,
+        ?string $email = null,
     ): array {
         $tier = strtoupper(
             trim(
@@ -302,20 +304,62 @@ final class FuturesStrategyActivationController extends Controller
                 $tier,
                 $strategy,
                 $amount,
+                $email,
             ): array {
-                $account = DB::table(
-                    'trading_accounts',
-                )
-                    ->where(
-                        'external_session_id',
-                        $sessionId,
+                // Prefer the user's existing linked account (found via
+                // their verified email) over the current session's
+                // account. The active browser session can end up
+                // pointing at a fresh, unlinked account (e.g. if the
+                // demo-session cookie was lost while the sign-in
+                // persisted) while the user's real wallet-linked
+                // account already exists under a different session.
+                // Strategy activation touches real wallet/credit
+                // balances, so it must resolve to that canonical
+                // account rather than the incidental session one.
+                $account = null;
+                $trimmedEmail = trim((string) $email);
+
+                if ($trimmedEmail !== '') {
+                    $user = DB::table('users')
+                        ->whereRaw(
+                            'LOWER(email) = ?',
+                            [strtolower($trimmedEmail)],
+                        )
+                        ->first();
+
+                    if ($user !== null) {
+                        $account = DB::table(
+                            'trading_accounts',
+                        )
+                            ->where(
+                                'user_id',
+                                $user->id,
+                            )
+                            ->where(
+                                'status',
+                                'ACTIVE',
+                            )
+                            ->orderBy('id')
+                            ->lockForUpdate()
+                            ->first();
+                    }
+                }
+
+                if ($account === null) {
+                    $account = DB::table(
+                        'trading_accounts',
                     )
-                    ->where(
-                        'status',
-                        'ACTIVE',
-                    )
-                    ->lockForUpdate()
-                    ->first();
+                        ->where(
+                            'external_session_id',
+                            $sessionId,
+                        )
+                        ->where(
+                            'status',
+                            'ACTIVE',
+                        )
+                        ->lockForUpdate()
+                        ->first();
+                }
 
                 if ($account === null) {
                     throw new FuturesTradingException(
