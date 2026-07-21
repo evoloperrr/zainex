@@ -33,7 +33,7 @@
 .heading span {
   display: block;
   color: #53ddff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.14em;
 }
@@ -60,7 +60,7 @@
   max-width: 680px;
   margin: 12px 0 0;
   color: #8793b7;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.65;
 }
 
@@ -73,7 +73,7 @@
   color: #58dfff;
   background:
     rgba(44, 202, 255, 0.06);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.09em;
 }
@@ -99,7 +99,7 @@
   display: block;
   margin-bottom: 9px;
   color: #8b97ba;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .inputRow {
@@ -141,7 +141,7 @@
 
 .inputRow small {
   color: #7f8bad;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -163,7 +163,7 @@
     rgba(255, 255, 255, 0.025);
   cursor: pointer;
   font: inherit;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .quickAmounts button:hover {
@@ -205,13 +205,13 @@
 
 .preview span {
   color: #7480a1;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .preview strong {
   margin-top: 6px;
   color: #e5e9fb;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 550;
 }
 
@@ -221,7 +221,7 @@
   margin: 12px 0 0;
   padding: 10px 12px;
   border-radius: 10px;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -263,7 +263,7 @@
       rgba(91, 86, 244, 0.2);
   cursor: pointer;
   font: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 550;
 }
 
@@ -276,7 +276,7 @@
 .rules > span {
   display: block;
   color: #55dfff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
 }
@@ -298,14 +298,14 @@
 
 .rules strong {
   color: #e3e8fa;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 540;
 }
 
 .rules small {
   margin-top: 5px;
   color: #707c9e;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -325,7 +325,7 @@
 
 .logs > header span {
   color: #52dcff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.13em;
 }
@@ -339,7 +339,7 @@
 
 .logs > header small {
   color: #727f9f;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .logList {
@@ -373,7 +373,7 @@
   color: #5ee4ff;
   background:
     rgba(50, 203, 255, 0.05);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
 }
@@ -391,7 +391,7 @@
 
 .logMain strong {
   color: #e7ebfb;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 540;
 }
 
@@ -400,7 +400,7 @@
   margin-top: 5px;
   overflow: hidden;
   color: #7682a3;
-  font-size: 9px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -411,13 +411,13 @@
 
 .logCredits strong {
   color: #73ebc3;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 560;
 }
 
 .logList time {
   color: #7783a4;
-  font-size: 9px;
+  font-size: 12px;
   text-align: right;
 }
 
@@ -428,7 +428,7 @@
     rgba(104, 129, 198, 0.15);
   border-radius: 13px;
   color: #7581a3;
-  font-size: 10px;
+  font-size: 12px;
   text-align: center;
 }
 

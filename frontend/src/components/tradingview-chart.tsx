@@ -159,6 +159,15 @@ export function TradingViewChart({
     const abortController =
       new AbortController();
 
+    const resolvedFontFamily =
+      getComputedStyle(
+        document.documentElement,
+      )
+        .getPropertyValue(
+          "--font-inter",
+        )
+        .trim() || "Inter";
+
     const chart = createChart(
       container,
       {
@@ -181,7 +190,7 @@ export function TradingViewChart({
           textColor: "#8994b6",
 
           fontFamily:
-            "Inter, Arial, Helvetica, sans-serif",
+            `${resolvedFontFamily}, Arial, Helvetica, sans-serif`,
 
           attributionLogo: false,
         },

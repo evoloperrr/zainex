@@ -41,7 +41,7 @@
 .body strong {
   display: block;
   color: #f0f2ff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -49,7 +49,7 @@
   display: block;
   margin-top: 4px;
   color: #9aa4bd;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -59,7 +59,7 @@
   gap: 6px;
   margin-top: 10px;
   color: #c4f8e9;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
 }

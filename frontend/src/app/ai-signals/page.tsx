@@ -124,7 +124,7 @@ function AiSignalsContent() {
           <span
             style={{
               color: "#9d8cff",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 600,
               letterSpacing: 1.2,
             }}
@@ -149,7 +149,7 @@ function AiSignalsContent() {
               color: "#e2e5f5",
               background: "#12182b",
               padding: "0 10px",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
             }}
           >
@@ -179,7 +179,7 @@ function AiSignalsContent() {
           <span
             style={{
               color: "#9d8cff",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 600,
               letterSpacing: 1.2,
             }}
@@ -204,7 +204,7 @@ function AiSignalsContent() {
               color: "#e2e5f5",
               background: "#12182b",
               padding: "0 10px",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
             }}
           >

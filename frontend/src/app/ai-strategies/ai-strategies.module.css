@@ -36,7 +36,7 @@
       rgba(31, 72, 122, 0.35),
       rgba(60, 35, 108, 0.38)
     );
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -55,7 +55,7 @@
   display: block;
   margin-top: 2px;
   color: #8994b6;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.15em;
 }
@@ -87,7 +87,7 @@
   box-shadow:
     0 13px 30px rgba(75, 76, 214, 0.18);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -188,7 +188,7 @@
 
 .modalTier {
   color: #59dcff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.15em;
 }
@@ -211,7 +211,7 @@
 .modalCopy {
   margin: 18px 0 22px;
   color: #9ba8ce;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.65;
 }
 
@@ -245,7 +245,7 @@
 .walletSnapshot span {
   margin-bottom: 7px;
   color: #7483ad;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -253,7 +253,7 @@
 .walletSnapshot strong {
   overflow: hidden;
   color: #e7eaff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -267,7 +267,7 @@
   display: block;
   margin-bottom: 9px;
   color: #aeb9db;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -338,7 +338,7 @@
 .summaryGrid span {
   margin-bottom: 6px;
   color: #7381a9;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -346,7 +346,7 @@
 .summaryGrid strong {
   overflow: hidden;
   color: #e7eaff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -358,7 +358,7 @@
   margin: 14px 0 0;
   padding: 12px 14px;
   border-radius: 11px;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.55;
 }
 
@@ -394,7 +394,7 @@
   min-height: 50px;
   border-radius: 13px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
 }
@@ -478,7 +478,7 @@
 
 .logsHeader span {
   color: #55dfff;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.15em;
 }
 
@@ -491,7 +491,7 @@
 
 .logsHeader small {
   color: #7180aa;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .logsList {
@@ -529,14 +529,14 @@
   display: inline-flex;
   margin-bottom: 5px;
   color: #55ddff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
 }
 
 .logMain strong {
   color: #e9edff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -544,13 +544,13 @@
 .logMetric span {
   margin-top: 4px;
   color: #7381aa;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .logMetric strong {
   margin-top: 4px;
   color: #dfe5ff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -560,7 +560,7 @@
   border-radius: 999px;
   color: #83edcc;
   background: rgba(28, 150, 116, 0.1);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -571,7 +571,7 @@
   padding: 22px;
   border-radius: 12px;
   text-align: center;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .logsEmpty {
@@ -631,13 +631,13 @@
 .exposureNotice strong {
   flex: 0 0 auto;
   color: #f4f6ff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .exposureNotice span {
   color: rgba(228, 233, 255, 0.76);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   text-align: right;
 }
@@ -689,7 +689,7 @@
   margin-top: 7px;
   overflow: hidden;
   color: #eef2ff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -700,7 +700,7 @@
   margin-top: 4px;
   overflow: hidden;
   color: #7180aa;
-  font-size: 10px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -713,7 +713,7 @@
   border: 1px solid rgba(91, 181, 255, 0.19);
   border-radius: 7px;
   color: #8cdfff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -746,7 +746,7 @@
 .combinedLogAmount strong {
   display: block;
   color: #f3f5ff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -754,13 +754,13 @@
   display: block;
   margin-top: 4px;
   color: #7180aa;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.07em;
 }
 
 .combinedLogTime {
   color: #8490b6;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.4;
   text-align: right;
 }
@@ -770,7 +770,7 @@
   border: 1px dashed rgba(103, 130, 205, 0.18);
   border-radius: 12px;
   color: #8490b6;
-  font-size: 12px;
+  font-size: 13px;
   text-align: center;
 }
 

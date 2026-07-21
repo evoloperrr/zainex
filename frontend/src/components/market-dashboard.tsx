@@ -2523,7 +2523,7 @@ function DesktopAssetColumn({
                 color: "#e2e5f5",
                 background: "#12182b",
                 padding: "0 10px",
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 600,
               }}
             >
@@ -2556,7 +2556,7 @@ function DesktopAssetColumn({
                 color: "#e2e5f5",
                 background: "#12182b",
                 padding: "0 10px",
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 600,
               }}
             >
@@ -2611,7 +2611,7 @@ function DesktopAssetColumn({
         <div
             className="asset-sub-price"
             style={{
-              fontSize: 14,
+              fontSize: 15,
               lineHeight: 1.5,
             }}
           >
@@ -2620,7 +2620,7 @@ function DesktopAssetColumn({
           <span
               className="asset-change"
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 lineHeight: 1.5,
               }}
             >
@@ -2656,7 +2656,7 @@ function DesktopAssetColumn({
             <Icon name="diamond" size={18} />
           </div>
           <div>
-            <span style={{ fontSize: 14, lineHeight: 1.45, fontWeight: 400 }}>{market.liquidityLabel}</span>
+            <span style={{ fontSize: 15, lineHeight: 1.45, fontWeight: 400 }}>{market.liquidityLabel}</span>
             <strong>{market.liquidity}</strong>
           </div>
         </article>
@@ -2666,7 +2666,7 @@ function DesktopAssetColumn({
             <Icon name="chart" size={18} />
           </div>
           <div>
-            <span style={{ fontSize: 14, lineHeight: 1.45, fontWeight: 400 }}>{market.volumeLabel}</span>
+            <span style={{ fontSize: 15, lineHeight: 1.45, fontWeight: 400 }}>{market.volumeLabel}</span>
             <strong>{market.volume}</strong>
           </div>
         </article>
@@ -2676,7 +2676,7 @@ function DesktopAssetColumn({
             <Icon name="layers" size={18} />
           </div>
           <div>
-            <span style={{ fontSize: 14, lineHeight: 1.45, fontWeight: 400 }}>{market.pooledPrimaryLabel}</span>
+            <span style={{ fontSize: 15, lineHeight: 1.45, fontWeight: 400 }}>{market.pooledPrimaryLabel}</span>
             <strong>{market.pooledPrimary}</strong>
           </div>
         </article>
@@ -2686,7 +2686,7 @@ function DesktopAssetColumn({
             <Icon name="flow" size={18} />
           </div>
           <div>
-            <span style={{ fontSize: 14, lineHeight: 1.45, fontWeight: 400 }}>{market.pooledSecondaryLabel}</span>
+            <span style={{ fontSize: 15, lineHeight: 1.45, fontWeight: 400 }}>{market.pooledSecondaryLabel}</span>
             <strong>{market.pooledSecondary}</strong>
           </div>
         </article>
@@ -2697,7 +2697,7 @@ function DesktopAssetColumn({
           <div>
             <span
                 style={{
-                  fontSize: 14,
+                  fontSize: 15,
                   lineHeight: 1.45,
                   fontWeight: 400,
                 }}
@@ -2721,7 +2721,7 @@ function DesktopAssetColumn({
         <div className="community-row">
           <span
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 lineHeight: 1.45,
                 fontWeight: 400,
               }}
@@ -2730,7 +2730,7 @@ function DesktopAssetColumn({
             </span>
           <strong
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 lineHeight: 1.45,
                 fontWeight: 500,
               }}
@@ -2739,7 +2739,7 @@ function DesktopAssetColumn({
             </strong>
           <small
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 lineHeight: 1.45,
                 fontWeight: 400,
               }}
@@ -3441,7 +3441,7 @@ function MobileDashboard({
                   color: "#e2e5f5",
                   background: "#12182b",
                   padding: "0 8px",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: 600,
                 }}
               >
@@ -3467,7 +3467,7 @@ function MobileDashboard({
                   color: "#e2e5f5",
                   background: "#12182b",
                   padding: "0 8px",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: 600,
                 }}
               >

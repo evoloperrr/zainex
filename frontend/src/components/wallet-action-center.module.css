@@ -25,7 +25,7 @@
 .activityHeader span {
   display: block;
   color: #55dfff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.14em;
 }
@@ -40,7 +40,7 @@
 
 .activityHeader > small {
   color: #7885aa;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .balanceSummary {
@@ -71,13 +71,13 @@
 
 .balanceSummary span {
   color: #7480a2;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .balanceSummary strong {
   margin-top: 5px;
   color: #e6ebfb;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 560;
 }
 
@@ -112,14 +112,14 @@
   color: #6f7da3;
   background:
     rgba(255, 255, 255, 0.018);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.1em;
 }
 
 .tableWrap td {
   color: #8d99ba;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .tableWrap td strong,
@@ -129,14 +129,14 @@
 
 .tableWrap td strong {
   color: #e5eafb;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 540;
 }
 
 .tableWrap td small {
   margin-top: 4px;
   color: #6f7b9c;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .converted,
@@ -148,7 +148,7 @@
   justify-content: center;
   padding: 0 9px;
   border-radius: 8px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.06em;
 }
@@ -190,7 +190,7 @@
   margin: 15px 0 0;
   padding: 15px;
   border-radius: 11px;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.55;
   text-align: center;
 }

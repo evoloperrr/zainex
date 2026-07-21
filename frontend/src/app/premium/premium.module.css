@@ -24,12 +24,12 @@
   padding: 14px 10px;
   border-bottom: 1px solid rgba(111, 132, 205, 0.12);
   text-align: left;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .table thead th {
   color: #7e8cb5;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -102,7 +102,7 @@
   display: block;
   margin-top: 4px;
   color: #a9b4d7;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .cta a {
@@ -113,7 +113,7 @@
   background: linear-gradient(120deg, #2ecfff, #ba48ff);
   box-shadow: 0 12px 29px rgba(108, 59, 255, 0.25);
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
 }

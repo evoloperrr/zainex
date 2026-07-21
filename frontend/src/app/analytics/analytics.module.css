@@ -24,7 +24,7 @@
   display: block;
   margin-bottom: 8px;
   color: #7e8cb5;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
 }
@@ -72,7 +72,7 @@
 
 .panelHeader span {
   color: #a5afc8;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
@@ -87,7 +87,7 @@
 
 .breakdownRow span:first-child {
   color: #d6dbf2;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -108,13 +108,13 @@
 .breakdownRow strong {
   text-align: right;
   color: #eef1ff;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .emptyState {
   padding: 28px 14px;
   color: #7f8bb0;
-  font-size: 13px;
+  font-size: 14px;
   text-align: center;
 }
 

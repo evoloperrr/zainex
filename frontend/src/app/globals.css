@@ -34,7 +34,7 @@ body {
   color: var(--z-text);
   background: var(--z-bg);
   font-family:
-    Inter,
+    var(--font-inter),
     Arial,
     Helvetica,
     sans-serif;
@@ -210,7 +210,7 @@ button {
       rgba(55, 96, 255, 0.34)
     );
   box-shadow: 0 0 24px rgba(164, 61, 255, 0.21);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -224,14 +224,14 @@ button {
 .mobile-profile span,
 .mobile-balance span {
   color: var(--z-muted);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .mobile-profile strong {
   max-width: 140px;
   margin-top: 3px;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -273,7 +273,7 @@ button {
   border-radius: 999px;
   color: var(--z-green);
   background: rgba(90, 241, 190, 0.05);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
 }
@@ -306,7 +306,7 @@ button {
   color: var(--z-muted);
   background: transparent;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   transition:
     color 150ms ease,
@@ -373,14 +373,14 @@ button {
 
 .mobile-chart-heading > div:first-child span {
   color: var(--z-muted);
-  font-size: 8px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1.1px;
 }
 
 .mobile-chart-heading > div:first-child strong {
   margin-top: 5px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .mobile-chart-heading > div:last-child strong {
@@ -390,7 +390,7 @@ button {
 .mobile-chart-heading > div:last-child span {
   margin-top: 4px;
   color: var(--z-green);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -436,7 +436,7 @@ button {
   display: flex;
   justify-content: space-between;
   color: rgba(185, 174, 217, 0.51);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .mobile-trade-actions {
@@ -472,7 +472,7 @@ button {
 .mobile-trade-button small {
   margin-top: 4px;
   opacity: 0.65;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .mobile-sell-button {
@@ -545,7 +545,7 @@ button {
 .mobile-stat-ring strong {
   max-width: 44px;
   overflow: hidden;
-  font-size: clamp(8px, 2.5vw, 11px);
+  font-size: clamp(11px, 2.5vw, 13px);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -555,7 +555,7 @@ button {
   margin-top: 7px;
   overflow: hidden;
   color: var(--z-muted);
-  font-size: 7px;
+  font-size: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -586,12 +586,12 @@ button {
 
 .mobile-controls-heading span {
   color: var(--z-muted);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .mobile-controls-heading strong {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .mobile-controls-heading small {
@@ -600,7 +600,7 @@ button {
   border-radius: 999px;
   color: #28d9ff;
   background: rgba(34, 217, 255, 0.05);
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 1px;
 }
@@ -615,7 +615,7 @@ button {
   align-items: center;
   justify-content: space-between;
   color: var(--z-muted);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .mobile-controls label strong {
@@ -685,7 +685,7 @@ button {
   color: var(--z-muted);
   background: transparent;
   cursor: pointer;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .mobile-bottom-navigation button.active {
@@ -849,7 +849,7 @@ button {
       opacity 130ms ease,
       transform 130ms ease;
     white-space: nowrap;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .desktop-nav-button:hover::after {
@@ -944,7 +944,7 @@ button {
     margin-top: 4px;
     color: var(--z-muted);
     letter-spacing: 1px;
-    font-size: 7px;
+    font-size: 10px;
     text-transform: uppercase;
   }
 
@@ -975,7 +975,7 @@ button {
     outline: 0;
     color: white;
     background: transparent;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .desktop-search input::placeholder {
@@ -988,7 +988,7 @@ button {
     border-radius: 6px;
     color: #8e87a9;
     background: rgba(255, 255, 255, 0.025);
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .desktop-header-actions {
@@ -1014,7 +1014,7 @@ button {
         rgba(77, 57, 156, 0.18)
       );
     cursor: pointer;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
   }
 
@@ -1036,7 +1036,7 @@ button {
 
   .network-chevron {
     color: #948bad;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .desktop-profile {
@@ -1054,7 +1054,7 @@ button {
         #665aff
       );
     cursor: pointer;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     box-shadow: 0 0 21px rgba(255, 100, 178, 0.13);
   }
@@ -1080,7 +1080,7 @@ button {
 
   .market-switcher-compact .market-switch {
     min-height: 34px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .desktop-asset-summary {
@@ -1125,7 +1125,7 @@ button {
 
   .asset-token span {
     color: var(--z-muted);
-    font-size: 9px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
@@ -1140,7 +1140,7 @@ button {
     margin-top: 3px;
     overflow: hidden;
     color: #847d9e;
-    font-size: 9px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1187,7 +1187,7 @@ button {
     color: white;
     background: rgba(255, 116, 151, 0.04);
     cursor: pointer;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .7px;
@@ -1218,7 +1218,7 @@ button {
     gap: 6px;
     margin-top: 10px;
     color: #a09ab7;
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .asset-diamond {
@@ -1234,7 +1234,7 @@ button {
     margin-left: 5px;
     content: none !important;
     color: var(--z-blue);
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .desktop-stat-grid {
@@ -1299,12 +1299,12 @@ button {
 
   .desktop-stat-card span {
     color: #9e97b3;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .desktop-stat-card strong {
     margin-top: 6px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .desktop-score-card {
@@ -1328,7 +1328,7 @@ button {
   .score-card-heading span {
     color: #9089a8;
     letter-spacing: .8px;
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .score-card-heading strong {
@@ -1361,7 +1361,7 @@ button {
     gap: 16px;
     margin-top: 18px;
     color: #9e97b3;
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .community-row strong {
@@ -1461,7 +1461,7 @@ button {
     align-items: center;
     gap: 7px;
     color: #8e88a5;
-    font-size: 8px;
+    font-size: 11px;
     pointer-events: auto;
   }
 
@@ -1511,7 +1511,7 @@ button {
     flex-direction: column;
     justify-content: space-between;
     color: #827c98;
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .desktop-chart-time-scale {
@@ -1522,7 +1522,7 @@ button {
     display: flex;
     justify-content: space-between;
     color: #837d99;
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .crosshair {
@@ -1578,7 +1578,7 @@ button {
   .trade-history-heading > div:first-child > span {
     color: #847e9a;
     letter-spacing: 1px;
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .trade-history-heading h2 {
@@ -1591,7 +1591,7 @@ button {
     align-items: center;
     gap: 7px;
     color: #858098;
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .trade-history-actions button {
@@ -1629,7 +1629,7 @@ button {
     margin-top: 15px;
     padding: 0 15px 7px;
     color: #756f8b;
-    font-size: 7px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .5px;
   }
@@ -1654,18 +1654,18 @@ button {
     box-shadow:
       0 9px 22px rgba(0, 0, 0, 0.08),
       inset 0 1px rgba(255, 255, 255, 0.015);
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .trade-table-row strong {
     color: white;
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .trade-table-row i {
     margin-left: 5px;
     font-style: normal;
-    font-size: 6px;
+    font-size: 10px;
   }
 
   .trade-up {
@@ -1709,7 +1709,7 @@ button {
     color: #8c869f;
     background: transparent;
     cursor: pointer;
-    font-size: 7px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: .8px;
   }
@@ -2251,7 +2251,7 @@ button {
   }
 
   .desktop-trade-button span {
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.3px;
   }
@@ -2269,7 +2269,7 @@ button {
   .desktop-trade-button small {
     margin-top: 7px;
     color: #8994b6;
-    font-size: 7px;
+    font-size: 10px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
   }
@@ -2454,7 +2454,7 @@ body {
 
 .zainex-chart-symbol strong {
   color: #f7f9ff;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.4px;
 }
 
@@ -2484,7 +2484,7 @@ body {
   color: #8893b4;
   background: transparent;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -2518,7 +2518,7 @@ body {
   color: #2fd8ff;
   background:
     rgba(47, 216, 255, 0.055);
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.8px;
 }
@@ -2558,7 +2558,7 @@ body {
     1px solid rgba(124, 92, 255, 0.10);
   color: #6f7898;
   background: #070a14;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .zainex-chart-footer a {
@@ -2630,12 +2630,12 @@ body {
 
 .desktop-chart-trade-button strong {
   margin-top: 4px !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
 }
 
 .desktop-chart-trade-button small {
   margin-top: 6px !important;
-  font-size: 7px !important;
+  font-size: 10px !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
 }
@@ -2706,14 +2706,14 @@ body {
   }
 
   .zainex-chart-symbol strong {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .zainex-chart-timeframes button {
     min-width: 29px;
     height: 27px;
     padding: 0 5px;
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .zainex-chart-status {
@@ -2723,7 +2723,7 @@ body {
   .zainex-chart-footer {
     min-height: 25px;
     padding: 0 7px;
-    font-size: 6px;
+    font-size: 10px;
   }
 
   .zainex-chart-footer > span {
@@ -2813,17 +2813,17 @@ body {
   }
 
   .desktop-chart-trade-button span {
-    font-size: 14px !important;
+    font-size: 15px !important;
   }
 
   .desktop-chart-trade-button strong {
     margin-top: 2px !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
   }
 
   .desktop-chart-trade-button small {
     margin-top: 3px !important;
-    font-size: 6px !important;
+    font-size: 10px !important;
   }
 }
 
@@ -2832,44 +2832,44 @@ body {
 /* ZAINEX_PAPER_HISTORY_TEXT_SIZE_V1R3_START */
 
 .trade-history-card .trade-history-actions strong {
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 .trade-history-card .trade-history-actions span {
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 
 .trade-history-card .trade-table-header > span {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 .trade-history-card .trade-table-row > span,
 .trade-history-card .trade-table-row > strong {
-  font-size: 13px !important;
-}
-
-.trade-history-card .trade-table-row > strong {
   font-size: 14px !important;
 }
 
+.trade-history-card .trade-table-row > strong {
+  font-size: 15px !important;
+}
+
 .trade-history-card .trade-table-row > strong > i {
-  font-size: 9px !important;
-}
-
-.trade-history-card .trade-table-row .trade-quantity {
-  font-size: 13px !important;
-}
-
-.trade-history-card .trade-table-row > span:nth-child(5) {
   font-size: 12px !important;
 }
 
+.trade-history-card .trade-table-row .trade-quantity {
+  font-size: 14px !important;
+}
+
+.trade-history-card .trade-table-row > span:nth-child(5) {
+  font-size: 13px !important;
+}
+
 .trade-history-card .trade-table-row .wallet-cell {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 .trade-history-card .history-more-button {
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 
 /* ZAINEX_PAPER_HISTORY_TEXT_SIZE_V1R3_END */
@@ -2906,7 +2906,7 @@ body {
 
 .paper-trading-status-card > span {
   color: #777f9f;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.9px;
 }
@@ -2915,7 +2915,7 @@ body {
   overflow: hidden;
   margin-top: 5px;
   color: #f7f9ff;
-  font-size: 12px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -2924,7 +2924,7 @@ body {
   overflow: hidden;
   margin-top: 4px;
   color: #858ba6;
-  font-size: 9px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -2934,7 +2934,7 @@ body {
   margin-top: 8px;
   padding: 5px 7px;
   border-radius: 8px;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .paper-status-value.positive {
@@ -3024,7 +3024,7 @@ body {
 .zainex-trade-modal-header span {
   display: block;
   color: #7c83a4;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.4px;
 }
@@ -3062,7 +3062,7 @@ body {
   align-items: center;
   gap: 7px;
   color: #8990aa;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.7px;
 }
@@ -3097,7 +3097,7 @@ body {
   min-height: 38px;
   place-items: center;
   border-radius: 10px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.9px;
 }
 
@@ -3127,11 +3127,11 @@ body {
 .zainex-trade-modal-order div span {
   margin-top: 3px;
   color: #858ca7;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .zainex-trade-modal-order > strong {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .zainex-trade-modal-data {
@@ -3159,14 +3159,14 @@ body {
 
 .zainex-trade-modal-data span {
   color: #79809b;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .zainex-trade-modal-data strong {
   overflow: hidden;
   margin-top: 5px;
   color: #f4f7ff;
-  font-size: 12px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3180,7 +3180,7 @@ body {
   border-radius: 8px;
   color: #9ca2b7;
   background: rgba(255, 209, 104, 0.05);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -3212,7 +3212,7 @@ body {
   max-width: 350px;
   margin-top: 7px;
   color: #858ca4;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -3276,21 +3276,21 @@ body {
 
 .zainex-trade-modal-success strong,
 .zainex-trade-modal-error strong {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .zainex-trade-modal-success span,
 .zainex-trade-modal-error span {
   margin-top: 4px;
   color: #9299ae;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .zainex-trade-modal-success > b {
   flex: 0 0 auto;
   padding: 7px 9px;
   border-radius: 8px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .zainex-trade-modal-success
@@ -3334,7 +3334,7 @@ body {
   padding: 10px 16px;
   border-radius: 11px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -3452,13 +3452,13 @@ button:disabled {
 
 /* Colored PnL amount badge */
 .paper-trading-status-card > .paper-status-value {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
 }
 
 /* Keep supporting entry/current-price text readable */
 .paper-trading-status-card > small {
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 
 /* ZAINEX_PAPER_CARD_AMOUNTS_MOJIBAKE_V1R1_END */
@@ -3603,20 +3603,20 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .zainex-profile-menu-identity strong {
   color: #f3f5ff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 560;
 }
 
 .zainex-profile-menu-identity span {
   margin-top: 4px;
   color: #8791b2;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .zainex-profile-menu-identity small {
   margin-top: 5px;
   color: #4fdcff;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.11em;
 }
@@ -3643,14 +3643,14 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .zainex-profile-menu-balance span {
   color: #737f9f;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .zainex-profile-menu-balance strong {
   margin-top: 5px;
   overflow: hidden;
   color: #eff2ff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 560;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3712,7 +3712,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .zainex-profile-menu-nav button strong {
   color: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 530;
 }
 
@@ -3720,7 +3720,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin-top: 3px;
   overflow: hidden;
   color: #65708e;
-  font-size: 8px;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3745,7 +3745,7 @@ input[type="number"]::-webkit-outer-spin-button {
   background: transparent;
   cursor: pointer;
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 530;
 }
 
@@ -3884,7 +3884,7 @@ input[type="number"]::-webkit-outer-spin-button {
   .mobile-controls-note {
     margin: 11px 0 0;
     color: #777f9e;
-    font-size: 9px;
+    font-size: 12px;
     line-height: 1.55;
   }
 
@@ -3986,7 +3986,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
   .mobile-app-menu-header span {
     color: #4edcff;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 650;
     letter-spacing: 0.14em;
   }
@@ -4011,7 +4011,7 @@ input[type="number"]::-webkit-outer-spin-button {
       rgba(255, 255, 255, 0.025);
     cursor: pointer;
     font: inherit;
-    font-size: 12px;
+    font-size: 13px;
     touch-action: manipulation;
   }
 
@@ -4090,7 +4090,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
   .mobile-app-menu-grid strong {
     color: inherit;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 560;
   }
 
@@ -4098,7 +4098,7 @@ input[type="number"]::-webkit-outer-spin-button {
     margin-top: 4px;
     overflow: hidden;
     color: #717b9a;
-    font-size: 9px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -4125,7 +4125,7 @@ input[type="number"]::-webkit-outer-spin-button {
       rgba(255, 87, 130, 0.04);
     cursor: pointer;
     font: inherit;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 560;
     touch-action: manipulation;
   }
@@ -4180,7 +4180,7 @@ input[type="number"]::-webkit-outer-spin-button {
   background: none !important;
   -webkit-text-fill-color: currentColor !important;
   font-family: inherit !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-style: normal !important;
   font-weight: 500 !important;
   font-synthesis: none !important;
@@ -4217,7 +4217,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .mobile-wordmark.zainex-wordmark,
 .desktop-brand .zainex-wordmark {
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 500 !important;
   letter-spacing: 0.11em !important;
 }
@@ -4235,7 +4235,7 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-text-fill-color: #f1f3fa !important;
   filter: none !important;
   font-family: inherit !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-style: normal !important;
   font-weight: 700 !important;
   font-synthesis: none !important;
@@ -4282,7 +4282,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .mobile-wordmark.zainex-wordmark,
 .desktop-brand .zainex-wordmark,
 .brandText .zainex-wordmark {
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
 }
 

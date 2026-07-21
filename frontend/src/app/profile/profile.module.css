@@ -74,7 +74,7 @@
   border-radius: 10px;
   color: #8f9abd;
   text-decoration: none;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .layout {
@@ -141,14 +141,14 @@
 
 .identity strong {
   color: #f0f3ff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 550;
 }
 
 .identity small {
   margin-top: 5px;
   color: #707c9d;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .navigation {
@@ -163,7 +163,7 @@
   border-radius: 10px;
   color: #8994b5;
   text-decoration: none;
-  font-size: 10px;
+  font-size: 12px;
   transition:
     color 130ms ease,
     background 130ms ease;
@@ -189,7 +189,7 @@
 
 .heading > span {
   color: #47d9ff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 550;
   letter-spacing: 0.15em;
 }
@@ -212,7 +212,7 @@
   max-width: 600px;
   margin: 14px 0 0;
   color: #7884a7;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -241,7 +241,7 @@
 
 .cardHeading span {
   color: #6d789b;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.13em;
 }
 
@@ -258,7 +258,7 @@
   border-radius: 999px;
   color: #50ddff;
   background: rgba(51, 211, 255, 0.055);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
@@ -290,7 +290,7 @@
 .fields span,
 .securityRows span {
   color: #697592;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .fields strong,
@@ -298,7 +298,7 @@
   margin-top: 6px;
   overflow: hidden;
   color: #dce2f7;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 520;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -341,13 +341,13 @@
 
 .appearance span {
   color: #697592;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .appearance strong {
   margin-top: 6px;
   color: #dce2f7;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 520;
 }
 
@@ -399,14 +399,14 @@
 
 .quickLinks span {
   color: #55dfff;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.12em;
 }
 
 .quickLinks strong {
   margin-top: 8px;
   color: #dce2f7;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 520;
 }
 

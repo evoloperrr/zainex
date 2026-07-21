@@ -74,7 +74,7 @@
 
 .brandText small {
   color: #7e8bb1;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.13em;
 }
 
@@ -94,7 +94,7 @@
   border-radius: 999px;
   color: #c4f8e9;
   background: rgba(27, 164, 126, 0.07);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .secure i {
@@ -115,7 +115,7 @@
   color: #e1e6fb;
   background: rgba(21, 27, 57, 0.68);
   text-decoration: none;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .avatar {
@@ -127,7 +127,7 @@
   color: white;
   background: linear-gradient(145deg, #526dff, #d34cff);
   box-shadow: 0 0 24px rgba(139, 70, 255, 0.24);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -153,7 +153,7 @@
   gap: 9px;
   margin-bottom: 17px;
   color: #54dcff;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.16em;
 }
@@ -188,7 +188,7 @@
   max-width: 700px;
   margin: 22px 0 0;
   color: rgba(195, 204, 233, 0.77);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.75;
 }
 
@@ -213,7 +213,7 @@
 .current > span {
   margin-bottom: 12px;
   color: #7e8cb5;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.14em;
 }
 
@@ -224,7 +224,7 @@
 
 .current > small {
   color: #a9b4d7;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .current > div {
@@ -307,7 +307,7 @@
   color: white;
   background: linear-gradient(120deg, #2ecfff, #bd48ff);
   box-shadow: 0 9px 23px rgba(118, 56, 255, 0.28);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.09em;
 }
@@ -316,7 +316,7 @@
   display: block;
   margin-bottom: 21px;
   color: #61dcff;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.15em;
 }
@@ -336,14 +336,14 @@
 .price small {
   padding-bottom: 4px;
   color: #8794bc;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .card > p {
   min-height: 76px;
   margin: 20px 0;
   color: rgba(196, 204, 234, 0.77);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.65;
 }
 
@@ -371,7 +371,7 @@
   align-items: center;
   gap: 10px;
   color: #d9e1f9;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .card li span {
@@ -383,7 +383,7 @@
   border-radius: 50%;
   color: #54ddff;
   background: rgba(45, 196, 255, 0.1);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -398,7 +398,7 @@
     rgba(39, 188, 255, 0.18),
     rgba(155, 71, 255, 0.23)
   );
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -442,13 +442,13 @@
 .summary span {
   margin-bottom: 8px;
   color: #7180aa;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.13em;
 }
 
 .summary strong {
   color: #e7eaff;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 @media (max-width: 1250px) {

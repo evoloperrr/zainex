@@ -74,7 +74,7 @@
   display: block;
   margin-bottom: 17px;
   color: #54dcff;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.16em;
 }
@@ -110,7 +110,7 @@
   max-width: 730px;
   margin: 22px 0 0;
   color: rgba(195, 204, 233, 0.77);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.75;
 }
 
@@ -131,7 +131,7 @@
 
 .depth span {
   color: #687493;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.15em;
 }
 
@@ -145,7 +145,7 @@
 .depth small {
   margin-top: 7px;
   color: #78839e;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .message {
@@ -156,7 +156,7 @@
   color: #aab4cf;
   background:
     rgba(255, 255, 255, 0.025);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .error {
@@ -195,7 +195,7 @@
 
 .invite span {
   color: #59ddff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.15em;
 }
@@ -209,7 +209,7 @@
 .invite small {
   margin-top: 9px;
   color: #79839e;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -234,7 +234,7 @@
   background:
     rgba(5, 8, 24, 0.68);
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .copyArea button {
@@ -250,7 +250,7 @@
       #cf55ff
     );
   font: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 620;
   cursor: pointer;
 }
@@ -292,7 +292,7 @@
 
 .metrics span {
   color: #6c7793;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.13em;
 }
 
@@ -306,7 +306,7 @@
 .metrics small {
   margin-top: 7px;
   color: #737e99;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .network {
@@ -326,7 +326,7 @@
 
 .network > header span {
   color: #56ddff;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.15em;
 }
 
@@ -338,7 +338,7 @@
 
 .network > header b {
   color: #a997d4;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
 }
@@ -382,7 +382,7 @@
 
 .levelHead span {
   color: #5ddfff;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.14em;
 }
 
@@ -431,7 +431,7 @@
       rgba(41, 164, 243, 0.1),
       rgba(175, 61, 240, 0.1)
     );
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .member div {
@@ -447,25 +447,25 @@
 }
 
 .member strong {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 540;
 }
 
 .member small {
   margin-top: 4px;
   color: #707b97;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .member time {
   color: #626d89;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .empty {
   margin: 20px 0 0;
   color: #68728e;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .rules {
@@ -493,18 +493,18 @@
 .rules span {
   grid-row: 1 / 3;
   color: #5cdfff;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .rules strong {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 560;
 }
 
 .rules p {
   margin: 7px 0 0;
   color: #707a96;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -515,7 +515,7 @@
     1px solid
     rgba(112, 131, 195, 0.1);
   color: #707b96;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .inviter strong {

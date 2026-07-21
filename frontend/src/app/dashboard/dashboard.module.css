@@ -129,7 +129,7 @@
 .brandCopy small {
   margin-top: 4px;
   color: #697492;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.16em;
 }
 
@@ -151,7 +151,7 @@
   border-radius: 13px;
   color: #7d87a5;
   text-decoration: none;
-  font-size: 11px;
+  font-size: 13px;
   transition:
     color 150ms ease,
     border-color 150ms ease,
@@ -161,7 +161,7 @@
 
 .railLink span {
   color: #46516e;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.1em;
 }
 
@@ -209,14 +209,14 @@
 
 .railStatus strong {
   color: #cbd3e8;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 550;
 }
 
 .railStatus small {
   margin-top: 4px;
   color: #626d89;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .statusDot {
@@ -292,14 +292,14 @@
 
 .topbarStatus strong {
   color: #c6cee2;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 540;
 }
 
 .topbarStatus time {
   margin-top: 3px;
   color: #66718f;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .profileWrap {
@@ -335,7 +335,7 @@
   align-items: center;
   gap: 10px;
   color: #51dcff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 620;
   letter-spacing: 0.16em;
 }
@@ -387,7 +387,7 @@
   max-width: 720px;
   margin: 22px 0 0;
   color: #858fac;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.75;
 }
 
@@ -407,7 +407,7 @@
   padding: 0 17px;
   border-radius: 12px;
   text-decoration: none;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 560;
 }
 
@@ -491,7 +491,7 @@
 
 .sectionTag {
   color: #5edfff;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.15em;
 }
@@ -515,7 +515,7 @@
 .equityCaption {
   margin-top: 10px;
   color: #737d9a;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .equityMeta {
@@ -538,14 +538,14 @@
 
 .equityMeta span {
   color: #6f7894;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .equityMeta strong {
   min-width: 0;
   overflow-wrap: anywhere;
   color: #dbe1f1;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 560;
   text-align: right;
 }
@@ -581,7 +581,7 @@
   background:
     rgba(255, 255, 255, 0.018);
   text-decoration: none;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .orbitZone {
@@ -689,7 +689,7 @@
 
 .orbitCore span {
   color: #5ce1ff;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.13em;
 }
@@ -710,7 +710,7 @@
 
 .orbitCore small {
   margin-top: 9px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -744,7 +744,7 @@
 
 .briefHeader span {
   color: #a45dff;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.15em;
 }
@@ -771,20 +771,20 @@
 
 .briefIndex {
   color: #47536f;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.09em;
 }
 
 .briefCopy strong {
   color: #d9e0f3;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 570;
 }
 
 .briefCopy p {
   margin: 7px 0 0;
   color: #737e9c;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -795,7 +795,7 @@
     1px solid
     rgba(111, 127, 188, 0.1);
   color: #5f6985;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -830,7 +830,7 @@
 
 .riverLabel {
   color: #68738f;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.13em;
 }
 
@@ -838,7 +838,7 @@
   margin-top: 8px;
   overflow: hidden;
   color: #e4e9f8;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 540;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -878,7 +878,7 @@
 
 .sectionHeader span {
   color: #5ddfff;
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.15em;
 }
@@ -894,7 +894,7 @@
 .sectionHeader a {
   color: #8d99b8;
   text-decoration: none;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .tapeRows {
@@ -929,7 +929,7 @@
       rgba(37, 159, 242, 0.1),
       rgba(173, 60, 239, 0.09)
     );
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .tapeCopy {
@@ -943,7 +943,7 @@
 
 .tapeCopy strong {
   color: #dce3f4;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 560;
 }
 
@@ -951,7 +951,7 @@
   margin-top: 6px;
   overflow: hidden;
   color: #707b98;
-  font-size: 9px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -959,7 +959,7 @@
 .tapeRow > b {
   max-width: 150px;
   color: #aab4cd;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 570;
   text-align: right;
 }
@@ -1005,7 +1005,7 @@
   display: block;
   margin-top: 6px;
   color: #707a96;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .postureList {
@@ -1026,13 +1026,13 @@
 
 .postureRow span {
   color: #737d99;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .postureRow strong {
   overflow-wrap: anywhere;
   color: #dbe2f3;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 560;
   text-align: right;
 }
@@ -1050,7 +1050,7 @@
   background:
     rgba(159, 69, 255, 0.05);
   text-decoration: none;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .footnote {
@@ -1060,7 +1060,7 @@
     1px solid
     rgba(110, 128, 190, 0.09);
   color: #58627d;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -1143,7 +1143,7 @@
   }
 
   .mobileBrand > strong {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 590;
     letter-spacing: 0.08em;
   }
@@ -1181,7 +1181,7 @@
 
   .introText {
     margin-top: 18px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .introActions {
@@ -1193,7 +1193,7 @@
   .secondaryAction {
     min-height: 42px;
     padding: 0 14px;
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .commandStage {
@@ -1294,7 +1294,7 @@
   }
 
   .eyebrow {
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .eyebrow::before {
@@ -1475,7 +1475,7 @@ and (
 */
 
 .eyebrow {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .introText {
@@ -1484,39 +1484,39 @@ and (
 
 .primaryAction,
 .secondaryAction {
-  font-size: 12px;
-}
-
-.sectionTag {
-  font-size: 10px;
-}
-
-.equityCaption {
-  font-size: 12px;
-}
-
-.equityMeta span {
-  font-size: 11px;
-}
-
-.equityMeta strong {
   font-size: 13px;
 }
 
+.sectionTag {
+  font-size: 12px;
+}
+
+.equityCaption {
+  font-size: 13px;
+}
+
+.equityMeta span {
+  font-size: 13px;
+}
+
+.equityMeta strong {
+  font-size: 14px;
+}
+
 .actionRail a {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .orbitCore span {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .orbitCore small {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .briefHeader span {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .briefHeader strong {
@@ -1524,31 +1524,31 @@ and (
 }
 
 .briefIndex {
-  font-size: 10px;
-}
-
-.briefCopy strong {
   font-size: 12px;
 }
 
+.briefCopy strong {
+  font-size: 13px;
+}
+
 .briefCopy p {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .briefFooter {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .riverLabel {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .riverValue {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .sectionHeader span {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .sectionHeader h2 {
@@ -1556,62 +1556,62 @@ and (
 }
 
 .sectionHeader a {
-  font-size: 11px;
-}
-
-.tapeIcon {
-  font-size: 10px;
-}
-
-.tapeCopy strong {
   font-size: 13px;
 }
 
-.tapeCopy small {
-  font-size: 11px;
-}
-
-.tapeRow > b {
-  font-size: 11px;
-}
-
-.postureGauge > small {
-  font-size: 11px;
-}
-
-.postureRow span {
-  font-size: 11px;
-}
-
-.postureRow strong {
+.tapeIcon {
   font-size: 12px;
 }
 
+.tapeCopy strong {
+  font-size: 14px;
+}
+
+.tapeCopy small {
+  font-size: 13px;
+}
+
+.tapeRow > b {
+  font-size: 13px;
+}
+
+.postureGauge > small {
+  font-size: 13px;
+}
+
+.postureRow span {
+  font-size: 13px;
+}
+
+.postureRow strong {
+  font-size: 13px;
+}
+
 .postureLink {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .footnote {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 @media (max-width: 540px) {
   .eyebrow {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .introText {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .primaryAction,
   .secondaryAction {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .briefCopy p,
   .tapeCopy small,
   .postureRow span {
-    font-size: 10px;
+    font-size: 12px;
   }
 }

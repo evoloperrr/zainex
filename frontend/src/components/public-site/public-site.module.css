@@ -185,7 +185,7 @@
   position: relative;
   padding: 30px 0;
   color: #8490ad;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 520;
   letter-spacing: 0.035em;
   transition:
@@ -233,7 +233,7 @@
 .signInLink {
   padding: 11px 13px;
   color: #aab3cb;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 540;
 }
 
@@ -259,7 +259,7 @@
       rgba(69, 100, 238, 0.18),
     inset 0 1px
       rgba(255, 255, 255, 0.14);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 580;
   transition:
     transform 160ms ease,
@@ -340,7 +340,7 @@
 
 .pageIndex > span {
   color: var(--public-cyan);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 620;
   letter-spacing: 0.12em;
 }
@@ -357,7 +357,7 @@
 }
 
 .pageIndex small {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 520;
   letter-spacing: 0.14em;
 }
@@ -365,7 +365,7 @@
 .eyebrow,
 .sectionEyebrow {
   color: var(--public-cyan);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 610;
   letter-spacing: 0.19em;
 }
@@ -440,7 +440,7 @@
   gap: 10px;
   padding: 0 19px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 580;
   transition:
     transform 160ms ease,
@@ -524,7 +524,7 @@
 .metrics span {
   margin-top: 6px;
   color: #66738f;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -606,7 +606,7 @@
 
 .visualTopline > span {
   color: #64718d;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 570;
   letter-spacing: 0.15em;
 }
@@ -616,7 +616,7 @@
   align-items: center;
   gap: 8px;
   color: var(--public-green);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 610;
   letter-spacing: 0.09em;
 }
@@ -741,7 +741,7 @@
   position: absolute;
   bottom: 22px;
   color: var(--public-cyan);
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.18em;
 }
@@ -764,7 +764,7 @@
     0 12px 31px
       rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(12px);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 610;
   letter-spacing: 0.09em;
 }
@@ -839,7 +839,7 @@
 
 .signalPanel span {
   color: #596681;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 590;
   letter-spacing: 0.13em;
 }
@@ -847,7 +847,7 @@
 .signalPanel strong {
   margin-top: 7px;
   color: #dbe4f7;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 590;
 }
 
@@ -952,7 +952,7 @@
 .workflowHeading > p {
   margin: 0;
   color: #8793ad;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -1012,7 +1012,7 @@
 
 .cardTop > small {
   color: #3f4c68;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 610;
   letter-spacing: 0.1em;
 }
@@ -1045,7 +1045,7 @@
   display: inline-block;
   margin-top: 53px;
   color: #6f7d9a;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 620;
   letter-spacing: 0.17em;
 }
@@ -1062,7 +1062,7 @@
 .featureCard p {
   margin: 16px 0 0;
   color: #818da8;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.75;
 }
 
@@ -1140,7 +1140,7 @@
 
 .workflowNumber span {
   color: var(--public-cyan);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.14em;
 }
@@ -1166,7 +1166,7 @@
 .workflow p {
   margin: 12px 0 0;
   color: #74809b;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.7;
 }
 
@@ -1255,7 +1255,7 @@
   color: #e7f8ff;
   background:
     rgba(47, 143, 242, 0.08);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 580;
   white-space: nowrap;
 }
@@ -1284,7 +1284,7 @@
 .footerTop > div:first-child p {
   margin: 20px 0 0;
   color: #75809a;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.7;
 }
 
@@ -1305,14 +1305,14 @@
 .footerLinks span {
   margin-bottom: 4px;
   color: var(--public-cyan);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 630;
   letter-spacing: 0.17em;
 }
 
 .footerLinks a {
   color: #8994ae;
-  font-size: 10px;
+  font-size: 12px;
   transition:
     color 150ms ease;
 }
@@ -1331,7 +1331,7 @@
   border-top: 1px solid
     rgba(121, 151, 220, 0.08);
   color: #56617a;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 @keyframes publicOrbit {
@@ -1358,7 +1358,7 @@
   }
 
   .desktopNav a {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .hero {
@@ -1435,7 +1435,7 @@
       transparent;
     border-radius: 12px;
     color: #96a2bd;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .mobileNav > a.activeMobileNav {
@@ -1467,7 +1467,7 @@
     color: #d6dff2;
     background:
       rgba(255, 255, 255, 0.025);
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .mobileActions a:last-child {
@@ -1554,7 +1554,7 @@
   }
 
   .brandText {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .brandMark {
@@ -1582,7 +1582,7 @@
 
   .heroDescription {
     margin-top: 24px;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .heroActions {
@@ -1609,11 +1609,11 @@
   }
 
   .metrics strong {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .metrics span {
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .heroVisual {
@@ -1647,7 +1647,7 @@
   .satellite {
     min-height: 31px;
     padding: 0 9px;
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .signalPanel {
@@ -1670,7 +1670,7 @@
 
   .intro > p,
   .workflowHeading > p {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .cardGrid {
@@ -1834,12 +1834,12 @@
 /* Enlarge previously tiny typography */
 
 .desktopNav a {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .signInLink,
 .launchButton {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .launchButton {
@@ -1849,16 +1849,16 @@
 }
 
 .pageIndex > span {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .pageIndex small {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .eyebrow,
 .sectionEyebrow {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .heroDescription {
@@ -1868,43 +1868,43 @@
 
 .primaryCta,
 .secondaryCta {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .metrics span {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .visualTopline > span,
 .visualTopline > strong {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .satellite {
   min-height: 38px;
   padding-right: 12px;
   padding-left: 12px;
-  font-size: 10px;
-}
-
-.signalPanel span {
-  font-size: 10px;
-}
-
-.signalPanel strong {
   font-size: 12px;
 }
 
+.signalPanel span {
+  font-size: 12px;
+}
+
+.signalPanel strong {
+  font-size: 13px;
+}
+
 .cardTop > small {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .cardTag {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .featureCard p {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .intro > p,
@@ -1913,31 +1913,31 @@
 }
 
 .workflowNumber span {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .workflow p {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .statement > a {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .footerTop > div:first-child p {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .footerLinks span {
-  font-size: 10px;
-}
-
-.footerLinks a {
   font-size: 12px;
 }
 
+.footerLinks a {
+  font-size: 13px;
+}
+
 .footerBottom {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 /* New dynamic hero center */
@@ -1961,7 +1961,7 @@
   bottom: 17px;
   width: 96px;
   overflow: hidden;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.1;
   text-align: center;
   text-overflow: ellipsis;
@@ -2310,7 +2310,7 @@
 
   .mobileNav > a,
   .mobileActions a {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 
@@ -2345,29 +2345,29 @@
   .footerTop > div:first-child p,
   .footerLinks a,
   .footerBottom {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .metrics span {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .visualTopline > span,
   .visualTopline > strong {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .satellite {
     min-height: 33px;
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .signalPanel span {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .signalPanel strong {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 
@@ -2420,7 +2420,7 @@
 .desktopNav a,
 .signInLink,
 .launchButton {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .launchButton {
@@ -2430,13 +2430,13 @@
 }
 
 .pageIndex > span {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .pageIndex small,
 .eyebrow,
 .sectionEyebrow {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .heroDescription {
@@ -2447,7 +2447,7 @@
 .primaryCta,
 .secondaryCta,
 .statement > a {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .metrics span,
@@ -2455,31 +2455,31 @@
 .visualTopline > strong,
 .cardTop > small,
 .workflowNumber span {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .satellite {
   min-height: 38px;
   padding-right: 12px;
   padding-left: 12px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .signalPanel span,
 .cardTag,
 .footerLinks span {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .signalPanel strong,
 .workflow p,
 .footerTop > div:first-child p,
 .footerLinks a {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .featureCard p {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .intro > p,
@@ -2488,7 +2488,7 @@
 }
 
 .footerBottom {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 /* Premium section reveal system */
@@ -2693,14 +2693,14 @@ body[data-public-reveal="ready"]
 
 .marketVisualHeader span {
   color: #8c9ab6;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 620;
   letter-spacing: 0.08em;
 }
 
 .marketVisualHeader strong {
   color: var(--public-green);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
 }
 
@@ -2765,13 +2765,13 @@ body[data-public-reveal="ready"]
   align-items: center;
   gap: 10px;
   color: #687693;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.07em;
 }
 
 .marketTicker strong {
   color: #dce6f8;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -2853,7 +2853,7 @@ body[data-public-reveal="ready"]
   color: #c9d6ed;
   background:
     rgba(7, 11, 24, 0.86);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 620;
   letter-spacing: 0.08em;
 }
@@ -2898,7 +2898,7 @@ body[data-public-reveal="ready"]
 
 .neuralDecision small {
   color: #8c79b8;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 
@@ -2912,7 +2912,7 @@ body[data-public-reveal="ready"]
 .neuralDecision span {
   margin-top: 7px;
   color: #8c98b4;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 /* Wallets Ã¢â‚¬" flowing balances */
@@ -2956,7 +2956,7 @@ body[data-public-reveal="ready"]
 
 .walletSourceCard span {
   color: #6c857f;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.09em;
 }
 
@@ -2970,7 +2970,7 @@ body[data-public-reveal="ready"]
 .walletSourceCard small {
   margin-top: 7px;
   color: #73829a;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .walletFlow {
@@ -3043,7 +3043,7 @@ body[data-public-reveal="ready"]
 .creditCore span {
   margin-top: 10px;
   color: #718a83;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.09em;
 }
 
@@ -3090,13 +3090,13 @@ body[data-public-reveal="ready"]
 
 .walletLedger span {
   color: #73837e;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.07em;
 }
 
 .walletLedger strong {
   color: #e8fff8;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 /* Strategies Ã¢â‚¬" lifecycle rail */
@@ -3171,14 +3171,14 @@ body[data-public-reveal="ready"]
 
 .strategyNode span {
   color: var(--public-cyan);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.11em;
 }
 
 .strategyNode strong {
   margin-top: 8px;
   color: #efeaff;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .strategyNode1 {
@@ -3214,7 +3214,7 @@ body[data-public-reveal="ready"]
 
 .strategySummary span {
   color: #766a91;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.1em;
 }
 
@@ -3228,7 +3228,7 @@ body[data-public-reveal="ready"]
 .strategySummary small {
   margin-top: 5px;
   color: #78849d;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 /* Security Ã¢â‚¬" scanning shield */
@@ -3323,7 +3323,7 @@ body[data-public-reveal="ready"]
 .securityShield span {
   margin-top: 8px;
   color: var(--public-green);
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.13em;
 }
 
@@ -3346,7 +3346,7 @@ body[data-public-reveal="ready"]
   color: #78928b;
   background:
     rgba(5, 13, 20, 0.76);
-  font-size: 8px;
+  font-size: 11px;
   text-align: center;
   letter-spacing: 0.07em;
 }
@@ -3500,7 +3500,7 @@ body[data-public-reveal="ready"]
 .platformPanelSide span,
 .platformPanelBottom span {
   color: #6f7c99;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.08em;
 }
 
@@ -3513,7 +3513,7 @@ body[data-public-reveal="ready"]
 .platformPanelSide small {
   margin-top: 6px;
   color: #73809a;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .platformPanelBottom {
@@ -3527,7 +3527,7 @@ body[data-public-reveal="ready"]
 .platformPanelBottom strong {
   margin-top: 7px;
   color: #e3ebfb;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 /* Company Ã¢â‚¬" modular operating layer */
@@ -3581,7 +3581,7 @@ body[data-public-reveal="ready"]
 .companyCore strong {
   margin-top: 8px;
   color: #8979a6;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.1em;
 }
 
@@ -3592,7 +3592,7 @@ body[data-public-reveal="ready"]
   height: 62px;
   border-radius: 16px;
   color: #cfc2e5;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   animation:
     publicPanelFloat
@@ -3676,7 +3676,7 @@ body[data-public-reveal="ready"]
   color: #8290ae;
   background:
     rgba(6, 10, 22, 0.82);
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   animation:
     publicPanelFloat
@@ -3965,7 +3965,7 @@ body[data-public-reveal="ready"]
   .neuralLabelThree {
     left: 1%;
     min-width: 70px;
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .walletSourceCard {
@@ -4017,7 +4017,7 @@ body[data-public-reveal="ready"]
   }
 
   .securityChecks span {
-    font-size: 6px;
+    font-size: 10px;
   }
 
   .platformPanelMain {
@@ -4039,7 +4039,7 @@ body[data-public-reveal="ready"]
   .companyBlockThree {
     width: 86px;
     height: 48px;
-    font-size: 7px;
+    font-size: 10px;
   }
 }
 
@@ -4273,7 +4273,7 @@ body[data-public-reveal="ready"]
     color: #adb9d1;
     background:
       rgba(255, 255, 255, 0.014);
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .mobileNav > a:hover {
@@ -4314,7 +4314,7 @@ body[data-public-reveal="ready"]
 
   .mobileActions a {
     min-height: 54px;
-    font-size: 12px;
+    font-size: 13px;
   }
 }
 
@@ -5033,7 +5033,7 @@ body[data-public-reveal="ready"]
       rgba(52, 183, 255, 0.07),
     inset 0 1px
       rgba(255, 255, 255, 0.05);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 680;
   letter-spacing: 0.15em;
   line-height: 1;
@@ -5093,7 +5093,7 @@ body[data-public-reveal="ready"]
   left: 31px;
   color: #718dab;
   content: "LIVE MARKET STREAM";
-  font-size: 6px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.12em;
 }
@@ -5105,7 +5105,7 @@ body[data-public-reveal="ready"]
   bottom: 8px;
   color: #8b78ad;
   content: "DETERMINISTIC GATE";
-  font-size: 6px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.11em;
 }
@@ -5209,7 +5209,7 @@ body[data-public-reveal="ready"]
   left: 50%;
   color: #8deaff;
   content: "INTELIBRAIN • LIVE CORE";
-  font-size: 6px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.15em;
   transform:
@@ -5633,7 +5633,7 @@ body[data-public-reveal="ready"]
     padding:
       11px 7px 16px 25px;
     border-radius: 11px;
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .heroVisual_home
@@ -5663,7 +5663,7 @@ body[data-public-reveal="ready"]
   .heroVisual_home
   .homeNodeTwo::after {
     bottom: 6px;
-    font-size: 5px;
+    font-size: 9px;
   }
 
   .heroVisual_home
@@ -5684,7 +5684,7 @@ body[data-public-reveal="ready"]
   .heroVisual_home
   .homeNodeThree::after {
     bottom: 30px;
-    font-size: 5px;
+    font-size: 9px;
   }
 
   .heroVisual_home

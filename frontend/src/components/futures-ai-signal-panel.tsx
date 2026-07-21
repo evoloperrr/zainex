@@ -299,7 +299,7 @@ export function FuturesAiSignalPanel({
             style={{
               display: "block",
               color: "#9d8cff",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 600,
               letterSpacing: 1.2,
             }}
@@ -325,7 +325,7 @@ export function FuturesAiSignalPanel({
               display: "block",
               marginTop: 7,
               color: "#9aa4bd",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 400,
               lineHeight: 1.5,
             }}
@@ -415,7 +415,7 @@ export function FuturesAiSignalPanel({
             color: "#ff9eb5",
             background:
               "rgba(255,70,110,.055)",
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 500,
             lineHeight: 1.65,
           }}
@@ -493,7 +493,7 @@ export function FuturesAiSignalPanel({
                   style={{
                     display: "block",
                     color: "#909bb6",
-                    fontSize: 11,
+                    fontSize: 13,
                     fontWeight: 500,
                     letterSpacing: 0.35,
                   }}
@@ -575,7 +575,7 @@ export function FuturesAiSignalPanel({
                   style={{
                     display: "block",
                     color: "#929db8",
-                    fontSize: 11,
+                    fontSize: 13,
                     fontWeight: 500,
                   }}
                 >
@@ -602,7 +602,7 @@ export function FuturesAiSignalPanel({
               style={{
                 display: "block",
                 color: "#a5afc8",
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 letterSpacing: 0.5,
               }}
@@ -618,7 +618,7 @@ export function FuturesAiSignalPanel({
                   "11px 0 0 21px",
                 padding: 0,
                 color: "#d0d5e5",
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 400,
                 lineHeight: 1.7,
               }}
@@ -643,7 +643,7 @@ export function FuturesAiSignalPanel({
                 color: "#f2cf83",
                 background:
                   "rgba(255,179,61,.045)",
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 500,
                 lineHeight: 1.7,
               }}
@@ -652,7 +652,7 @@ export function FuturesAiSignalPanel({
                 style={{
                   display: "block",
                   marginBottom: 6,
-                  fontSize: 12,
+                  fontSize: 13,
                   letterSpacing: 0.5,
                 }}
               >
@@ -670,7 +670,7 @@ export function FuturesAiSignalPanel({
               display: "grid",
               gap: 5,
               color: "#99a4bd",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 400,
               lineHeight: 1.6,
             }}
@@ -712,7 +712,7 @@ export function FuturesAiSignalPanel({
             <strong
               style={{
                 color: "#a99aff",
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 letterSpacing: 0.45,
               }}

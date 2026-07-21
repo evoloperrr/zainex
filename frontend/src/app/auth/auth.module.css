@@ -429,7 +429,7 @@
 .brandCopy small {
   margin-top: 4px;
   color: #687391;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.13em;
 }
 
@@ -447,7 +447,7 @@
   color: #72e9bc;
   background:
     rgba(60, 210, 165, 0.045);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.12em;
 }
@@ -482,7 +482,7 @@
 .eyebrow {
   margin: 0 0 20px;
   color: #58dcff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.19em;
 }
@@ -525,7 +525,7 @@
       223,
       0.72
     );
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.8;
 }
 
@@ -575,7 +575,7 @@
 
 .capabilities article > span {
   color: #58647f;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 
@@ -586,7 +586,7 @@
 
 .capabilities strong {
   color: #cfd5e9;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 560;
 }
 
@@ -594,7 +594,7 @@
   margin-top: 5px;
   overflow: hidden;
   color: #65708d;
-  font-size: 9px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -743,14 +743,14 @@
 
 .coreCopy strong {
   color: #dfe7fa;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.16em;
 }
 
 .coreCopy small {
   margin-top: 4px;
   color: #5f6d8d;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.13em;
 }
 
@@ -875,14 +875,14 @@
 
 .marketStrip span {
   color: #5e6a88;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.13em;
 }
 
 .marketStrip strong {
   margin-top: 5px;
   color: #9ba7c6;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 520;
   letter-spacing: 0.08em;
 }
@@ -945,20 +945,20 @@
 
 .accessHeader span {
   color: #687390;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.16em;
 }
 
 .accessHeader b {
   color: #4e5a7a;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 520;
 }
 
 .accessEyebrow {
   margin: 48px 0 14px;
   color: #59dcff;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.18em;
 }
@@ -993,7 +993,7 @@
 .accessCopy {
   margin: 20px 0 0;
   color: #818ba8;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.72;
 }
 
@@ -1033,7 +1033,7 @@
   color: #60ddff;
   background:
     rgba(53, 187, 255, 0.07);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 650;
 }
 
@@ -1044,14 +1044,14 @@
 
 .referral small {
   color: #65728f;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.13em;
 }
 
 .referral strong {
   margin-top: 5px;
   color: #dce8f8;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 570;
   letter-spacing: 0.07em;
 }
@@ -1094,12 +1094,12 @@
   border-radius: 9px;
   background:
     rgba(255, 90, 141, 0.1);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .error p {
   margin: 0;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -1217,14 +1217,14 @@
 }
 
 .buttonCopy strong {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
 }
 
 .buttonCopy small {
   margin-top: 4px;
   color: #65708b;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 
@@ -1247,7 +1247,7 @@
 
 .divider small {
   color: #505c79;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.14em;
 }
 
@@ -1285,7 +1285,7 @@
   color: #657492;
   background:
     rgba(65, 85, 148, 0.045);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .securityList strong,
@@ -1295,14 +1295,14 @@
 
 .securityList strong {
   color: #c7cee1;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 550;
 }
 
 .securityList small {
   margin-top: 4px;
   color: #5f6b87;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .securityList article > i {
@@ -1318,7 +1318,7 @@
 .finePrint {
   margin: 22px 0 0;
   color: #56617c;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.65;
 }
 
@@ -1328,7 +1328,7 @@
   gap: 8px;
   margin-top: 23px;
   color: #7783a1;
-  font-size: 9px;
+  font-size: 12px;
   text-decoration: none;
   transition:
     color 150ms ease,
@@ -1683,7 +1683,7 @@
     padding:
       7px
       9px;
-    font-size: 7px;
+    font-size: 10px;
   }
 
   .hero {
@@ -1692,7 +1692,7 @@
 
   .eyebrow {
     margin-bottom: 15px;
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .hero h1 {
@@ -1706,7 +1706,7 @@
 
   .heroCopy {
     margin-top: 22px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .capabilities {
@@ -1773,7 +1773,7 @@
   }
 
   .accessCopy {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .googleButton {

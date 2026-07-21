@@ -26,7 +26,7 @@
   color: #7e879f;
   background: transparent;
   cursor: pointer;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.7px;
 }
@@ -45,7 +45,7 @@
   overflow: hidden;
   margin-left: auto;
   color: #747d96;
-  font-size: 8px;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -97,7 +97,7 @@
 .accountGrid span,
 .estimateGrid span {
   color: #727c98;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.4px;
 }
 
@@ -106,7 +106,7 @@
   overflow: hidden;
   margin-top: 4px;
   color: #e7ecfb;
-  font-size: 9px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -129,7 +129,7 @@
 .inputGrid label > span,
 .leverage > span {
   color: #79839d;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -153,13 +153,13 @@
   outline: 0;
   color: #f2f5ff;
   background: transparent;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .inputGrid label b {
   color: #717b94;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .leverage > div {
@@ -179,7 +179,7 @@
   background:
     rgba(255, 255, 255, 0.02);
   cursor: pointer;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -210,7 +210,7 @@
   color: #ff879f;
   background:
     rgba(255, 114, 148, 0.055);
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.45;
 }
 
@@ -234,19 +234,19 @@
 }
 
 .futuresButton span {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 1.5px;
 }
 
 .futuresButton strong {
   margin-top: 2px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .futuresButton small {
   margin-top: 3px;
-  font-size: 7px;
+  font-size: 10px;
   opacity: 0.72;
 }
 
@@ -302,12 +302,12 @@
   color: #75809a;
   background:
     rgba(255, 255, 255, 0.016);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .liquidationGrid strong {
   color: #c1c9dc;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .positionCard {
@@ -338,14 +338,14 @@
 
 .positionCard header span {
   color: #77839d;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.7px;
 }
 
 .positionCard header strong {
   margin-top: 4px;
   color: #f1f5ff;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .positionCard header > b {
@@ -353,7 +353,7 @@
   border-radius: 8px;
   background:
     rgba(255, 255, 255, 0.035);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .positionGrid {
@@ -369,13 +369,13 @@
   min-width: 0;
   gap: 3px;
   color: #727d97;
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .positionGrid strong {
   overflow: hidden;
   color: #d9dfef;
-  font-size: 9px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -392,7 +392,7 @@
   background:
     rgba(255, 94, 134, 0.07);
   cursor: pointer;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -456,7 +456,7 @@
 
 .modalHeader span {
   color: #7d88a4;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.2px;
 }
@@ -492,7 +492,7 @@
   align-items: center;
   gap: 7px;
   color: #8590aa;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -528,7 +528,7 @@
   min-height: 37px;
   place-items: center;
   border-radius: 10px;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.7px;
 }
 
@@ -562,7 +562,7 @@
 .modalSummary div span {
   margin-top: 3px;
   color: #7e89a4;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .modalGrid {
@@ -591,14 +591,14 @@
 
 .modalGrid span {
   color: #77819b;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .modalGrid strong {
   overflow: hidden;
   margin-top: 5px;
   color: #f0f4ff;
-  font-size: 11px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -612,7 +612,7 @@
   color: #929bb0;
   background:
     rgba(255, 209, 104, 0.05);
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -644,7 +644,7 @@
 .pending span {
   margin-top: 7px;
   color: #858fa6;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .success,
@@ -727,14 +727,14 @@
 
 .success strong,
 .error strong {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .success span,
 .error span {
   margin-top: 4px;
   color: #919bb0;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .success > b {
@@ -743,7 +743,7 @@
   border-radius: 8px;
   background:
     rgba(255, 255, 255, 0.04);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .modalActions {
@@ -759,7 +759,7 @@
   padding: 9px 14px;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -915,29 +915,29 @@
 
 /* Larger Spot/Futures switch text */
 .modeSwitch button {
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 .modeSwitch > span {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 /* Larger account card labels and amounts */
 .accountGrid span {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 .accountGrid strong {
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
 }
 
 /* Larger margin and leverage controls */
 .inputGrid label > span,
 .leverage > span {
-  font-size: 11px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
 }
 
@@ -947,34 +947,34 @@
 }
 
 .inputGrid label b {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 .leverage button {
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
 }
 
 /* Larger notional, quantity and fee */
 .estimateGrid span {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 .estimateGrid strong {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
 }
 
 /* Larger liquidation preview */
 .liquidationGrid span {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 .liquidationGrid strong {
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
 }
 
@@ -993,19 +993,19 @@
 
 .futuresButton small {
   margin-top: 5px !important;
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 /* Larger validation and information messages */
 .warning {
-  font-size: 11px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
 }
 
 /* Larger open-position text */
 .positionCard header span {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
@@ -1015,28 +1015,28 @@
 }
 
 .positionCard header > b {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
 }
 
 .positionGrid span {
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
 }
 
 .positionGrid strong {
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
 }
 
 .closePosition {
-  font-size: 11px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
 }
 
 /* Larger Futures modal text */
 .modalHeader span {
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 
 .modalHeader h2 {
@@ -1044,11 +1044,11 @@
 }
 
 .paperLabel {
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 
 .modalSummary > b {
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 .modalSummary div strong {
@@ -1056,20 +1056,20 @@
 }
 
 .modalSummary div span {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 .modalGrid span {
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 
 .modalGrid strong {
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
 }
 
 .modalNote {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 .success strong,
@@ -1079,15 +1079,15 @@
 
 .success span,
 .error span {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 .success > b {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 .modalActions button {
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 /* ZAINEX_FUTURES_ORIGINAL_COLORS_BIGGER_TEXT_V1_END */
@@ -1120,7 +1120,7 @@
 :global(.desktop-chart-trade-overlay)
 .futuresButton strong {
   margin-top: 4px !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
   line-height: 1 !important;
 }
@@ -1128,7 +1128,7 @@
 :global(.desktop-chart-trade-overlay)
 .futuresButton small {
   margin-top: 6px !important;
-  font-size: 7px !important;
+  font-size: 10px !important;
   font-weight: 600 !important;
   line-height: 1 !important;
 }
@@ -1159,7 +1159,7 @@
 :global(.mobile-trade-actions)
 .futuresButton strong {
   margin-top: 3px !important;
-  font-size: 11px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
   line-height: 1 !important;
 }
@@ -1167,7 +1167,7 @@
 :global(.mobile-trade-actions)
 .futuresButton small {
   margin-top: 4px !important;
-  font-size: 7px !important;
+  font-size: 10px !important;
   font-weight: 600 !important;
   line-height: 1 !important;
 }
@@ -1212,7 +1212,7 @@
 
 .executionLogHeading span {
   color: #79839d;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.9px;
 }
@@ -1226,7 +1226,7 @@
 
 .executionLogHeading > b {
   color: #909ab4;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -1257,7 +1257,7 @@
 .executionLogHeader {
   padding: 0 12px 7px;
   color: #76809a;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -1282,7 +1282,7 @@
       rgba(35, 40, 65, 0.52),
       rgba(21, 27, 49, 0.45)
     );
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .executionLogRow > span,
@@ -1296,12 +1296,12 @@
 
 .executionLogRow > strong {
   color: #e5e9f8;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .executionLogRow > b {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -1317,7 +1317,7 @@
   color: #7c86a0;
   background:
     rgba(255, 255, 255, 0.014);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
   text-align: center;
@@ -1333,11 +1333,11 @@
   }
 
   .executionLogHeading strong {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .executionLogHeading > b {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .executionLogHeader,
@@ -1459,7 +1459,7 @@
   .executionLogRow > b::before {
     display: block;
     color: #717c99;
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 650;
     line-height: 1.2;
     letter-spacing: 0.1em;
@@ -1504,7 +1504,7 @@
 
   .executionLogRow > strong,
   .executionLogRow > b {
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.35;
   }
 
