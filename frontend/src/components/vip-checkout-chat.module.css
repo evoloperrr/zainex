@@ -4,11 +4,13 @@
   position: fixed;
   z-index: 1000000;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   padding: 18px;
+  overflow-y: auto;
   overscroll-behavior: contain;
-  touch-action: none;
+  -webkit-overflow-scrolling: touch;
   background: rgba(2, 4, 13, 0.82);
   backdrop-filter: blur(16px);
 }
@@ -16,9 +18,11 @@
 .panel {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   width: min(460px, 100%);
-  max-height: calc(100vh - 32px);
-  max-height: calc(100dvh - 32px);
+  max-height: calc(100vh - 36px);
+  max-height: calc(100dvh - 36px);
+  margin: auto 0;
   border: 1px solid rgba(101, 182, 255, 0.23);
   border-radius: 22px;
   overflow: hidden;
@@ -35,6 +39,7 @@
 
 .header {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
@@ -222,6 +227,7 @@
 
 .actions {
   display: flex;
+  flex-shrink: 0;
   gap: 10px;
   padding: 16px 18px;
   border-top: 1px solid rgba(124, 140, 195, 0.14);
@@ -256,12 +262,12 @@
 }
 
 @media (max-width: 480px) {
-  .panel {
-    border-radius: 20px 20px 0 0;
+  .backdrop {
+    padding: 10px;
   }
 
-  .backdrop {
-    align-items: flex-end;
-    padding: 0;
+  .panel {
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
   }
 }
