@@ -2641,6 +2641,7 @@ export function FuturesPaperTerminal({
                         }
                       >
                         <span>Time</span>
+                        <span>Pair</span>
                         <span>Action</span>
                         <span>Direction</span>
                         <span>Leverage</span>
@@ -2685,6 +2686,10 @@ export function FuturesPaperTerminal({
                                     {formatFuturesExecutionTime(
                                       trade.executedAt,
                                     )}
+                                  </span>
+
+                                  <span>
+                                    {trade.symbol}
                                   </span>
 
                                   <strong>

@@ -1251,9 +1251,10 @@
 .executionLogHeader,
 .executionLogRow {
   display: grid;
-  min-width: 780px;
+  min-width: 860px;
   grid-template-columns:
     78px
+    88px
     90px
     100px
     76px
@@ -1481,26 +1482,30 @@
   }
 
   .executionLogRow > :nth-child(2)::before {
-    content: "Action";
+    content: "Pair";
   }
 
   .executionLogRow > :nth-child(3)::before {
-    content: "Direction";
+    content: "Action";
   }
 
   .executionLogRow > :nth-child(4)::before {
-    content: "Leverage";
+    content: "Direction";
   }
 
   .executionLogRow > :nth-child(5)::before {
-    content: "Price";
+    content: "Leverage";
   }
 
   .executionLogRow > :nth-child(6)::before {
+    content: "Price";
+  }
+
+  .executionLogRow > :nth-child(7)::before {
     content: "Fee";
   }
 
-  .executionLogRow > :nth-child(7) {
+  .executionLogRow > :nth-child(8) {
     grid-column: 1 / -1;
     padding-top: 9px;
     border-top:
@@ -1508,7 +1513,7 @@
       rgba(124, 140, 195, 0.1);
   }
 
-  .executionLogRow > :nth-child(7)::before {
+  .executionLogRow > :nth-child(8)::before {
     content: "Result";
   }
 
