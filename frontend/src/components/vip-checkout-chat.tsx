@@ -51,6 +51,10 @@ type PaymentMethod =
   | "merchant"
   | "crypto";
 
+type PaymentContext =
+  | "subscription"
+  | "wallet";
+
 type ScriptStep =
   | {
       kind: "message";
@@ -59,6 +63,7 @@ type ScriptStep =
   | {
       kind: "payment";
       method: PaymentMethod;
+      forWallet: boolean;
     };
 
 function buildIntro(
@@ -82,38 +87,218 @@ function buildIntro(
 
 function buildMethodSteps(
   method: PaymentMethod,
+  context: PaymentContext,
 ): ScriptStep[] {
-  if (method === "merchant") {
-    return [
-      {
-        kind: "message",
-        text: "Got it — the fastest way is a manual GoTyme transfer. Here's how:",
-      },
-      {
-        kind: "payment",
-        method: "merchant",
-      },
-      {
-        kind: "message",
-        text: "Once you've sent the payment, attach a screenshot of the transfer below and tap “I've sent it.” Our team verifies transfers manually and activates your VIP access shortly after — usually within a few hours.",
-      },
-    ];
-  }
+  const intro =
+    method === "merchant"
+      ? "Got it — the fastest way is a manual GoTyme transfer. Here's how:"
+      : "Got it — here's our wallet for a manual crypto transfer:";
+
+  const outro =
+    context === "wallet"
+      ? "Once you've sent the funds, attach a screenshot below and tap “I've added it.” Our team credits your trading wallet manually — usually within a few hours."
+      : "Once you've sent the payment, attach a screenshot of the transfer below and tap “I've sent it.” Our team verifies transfers manually and activates your VIP access shortly after — usually within a few hours.";
 
   return [
     {
       kind: "message",
-      text: "Got it — here's our wallet for a manual crypto transfer:",
+      text: intro,
     },
     {
       kind: "payment",
-      method: "crypto",
+      method,
+      forWallet: context === "wallet",
     },
     {
       kind: "message",
-      text: "Once you've sent the payment, attach a screenshot of the transaction below and tap “I've sent it.” Our team verifies transfers manually and activates your VIP access shortly after — usually within a few hours.",
+      text: outro,
     },
   ];
+}
+
+function useProofUpload() {
+  const [
+    file,
+    setFile,
+  ] = useState<File | null>(null);
+
+  const [
+    previewUrl,
+    setPreviewUrl,
+  ] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(
+          previewUrl,
+        );
+      }
+    };
+  }, [previewUrl]);
+
+  function onFileChange(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) {
+    const nextFile =
+      event.target.files?.[0] ??
+      null;
+
+    setPreviewUrl((previous) => {
+      if (previous) {
+        URL.revokeObjectURL(previous);
+      }
+
+      return nextFile
+        ? URL.createObjectURL(
+            nextFile,
+          )
+        : null;
+    });
+
+    setFile(nextFile);
+  }
+
+  return {
+    file,
+    previewUrl,
+    onFileChange,
+  };
+}
+
+function MethodChoiceButtons({
+  onPick,
+}: {
+  onPick: (
+    method: PaymentMethod,
+  ) => void;
+}) {
+  return (
+    <div
+      className={styles.methodChoice}
+    >
+      <button
+        type="button"
+        className={
+          styles.secondaryAction
+        }
+        onClick={() => {
+          onPick("merchant");
+        }}
+      >
+        Pay via Merchant
+      </button>
+
+      <button
+        type="button"
+        className={
+          styles.primaryAction
+        }
+        onClick={() => {
+          onPick("crypto");
+        }}
+      >
+        Pay via Crypto Wallet
+      </button>
+    </div>
+  );
+}
+
+function AttachAndActions({
+  proofFile,
+  previewUrl,
+  onFileChange,
+  onSkip,
+  onSend,
+  sendLabel,
+}: {
+  proofFile: File | null;
+  previewUrl: string | null;
+  onFileChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
+  onSkip: () => void;
+  onSend: () => void;
+  sendLabel: string;
+}) {
+  const fileInputRef =
+    useRef<HTMLInputElement>(null);
+
+  return (
+    <>
+      <div
+        className={styles.attachRow}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className={
+            styles.attachInput
+          }
+          onChange={onFileChange}
+        />
+
+        <button
+          type="button"
+          className={
+            styles.attachButton
+          }
+          onClick={() => {
+            fileInputRef.current?.click();
+          }}
+        >
+          {proofFile
+            ? "Change screenshot"
+            : "Attach payment screenshot"}
+        </button>
+
+        {proofFile && previewUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={previewUrl}
+            alt="Attached payment screenshot preview"
+            className={
+              styles.attachThumb
+            }
+          />
+        ) : (
+          <span
+            className={
+              styles.attachHint
+            }
+          >
+            Optional — helps our
+            team verify faster
+          </span>
+        )}
+      </div>
+
+      <div
+        className={styles.actions}
+      >
+        <button
+          type="button"
+          className={
+            styles.secondaryAction
+          }
+          onClick={onSkip}
+        >
+          Not now
+        </button>
+
+        <button
+          type="button"
+          className={
+            styles.primaryAction
+          }
+          onClick={onSend}
+        >
+          {sendLabel}
+        </button>
+      </div>
+    </>
+  );
 }
 
 export function VipCheckoutChat({
@@ -138,19 +323,117 @@ export function VipCheckoutChat({
   >(() => ({
     merchant: buildMethodSteps(
       "merchant",
+      "subscription",
     ),
     crypto: buildMethodSteps(
       "crypto",
+      "subscription",
     ),
   }));
 
-  const script =
-    method === null
-      ? introScript
-      : [
-          ...introScript,
-          ...methodSteps[method],
-        ];
+  const [walletMethodSteps] =
+    useState<
+      Record<
+        PaymentMethod,
+        ScriptStep[]
+      >
+    >(() => ({
+      merchant: buildMethodSteps(
+        "merchant",
+        "wallet",
+      ),
+      crypto: buildMethodSteps(
+        "crypto",
+        "wallet",
+      ),
+    }));
+
+  const [
+    sent,
+    setSent,
+  ] = useState(false);
+
+  const [
+    walletUpsellAnswer,
+    setWalletUpsellAnswer,
+  ] = useState<
+    "yes" | "no" | null
+  >(null);
+
+  const [
+    walletMethod,
+    setWalletMethod,
+  ] = useState<PaymentMethod | null>(
+    null,
+  );
+
+  const [
+    walletSent,
+    setWalletSent,
+  ] = useState(false);
+
+  let script: ScriptStep[] =
+    introScript;
+
+  if (method) {
+    script = [
+      ...script,
+      ...methodSteps[method],
+    ];
+  }
+
+  if (sent) {
+    script = [
+      ...script,
+      {
+        kind: "message",
+        text: `Thank you! Your ${plan.name} upgrade is now pending verification. You'll see it reflected on this page once it's confirmed.`,
+      },
+      {
+        kind: "message",
+        text: "Would you like to fund your trading wallet too?",
+      },
+    ];
+  }
+
+  if (walletUpsellAnswer === "no") {
+    script = [
+      ...script,
+      {
+        kind: "message",
+        text: "No problem — you can fund your trading wallet anytime from the Wallet page.",
+      },
+    ];
+  }
+
+  if (walletUpsellAnswer === "yes") {
+    script = [
+      ...script,
+      {
+        kind: "message",
+        text: "Great — how would you like to pay?",
+      },
+    ];
+
+    if (walletMethod) {
+      script = [
+        ...script,
+        ...walletMethodSteps[
+          walletMethod
+        ],
+      ];
+    }
+
+    if (walletSent) {
+      script = [
+        ...script,
+        {
+          kind: "message",
+          text: "Thanks! Your trading wallet top-up is now pending verification — we'll credit it manually once confirmed.",
+        },
+      ];
+    }
+  }
 
   const [
     visibleCount,
@@ -160,23 +443,14 @@ export function VipCheckoutChat({
   const typing =
     visibleCount < script.length;
 
-  const [
-    sent,
-    setSent,
-  ] = useState(false);
+  const conversationDone =
+    sent &&
+    (walletUpsellAnswer === "no" ||
+      walletSent);
 
-  const [
-    proofFile,
-    setProofFile,
-  ] = useState<File | null>(null);
-
-  const [
-    proofPreviewUrl,
-    setProofPreviewUrl,
-  ] = useState<string | null>(null);
-
-  const fileInputRef =
-    useRef<HTMLInputElement>(null);
+  const vipProof = useProofUpload();
+  const walletProof =
+    useProofUpload();
 
   const scrollRef =
     useRef<HTMLDivElement>(null);
@@ -214,6 +488,9 @@ export function VipCheckoutChat({
     typing,
     sent,
     method,
+    walletUpsellAnswer,
+    walletMethod,
+    walletSent,
   ]);
 
   useEffect(() => {
@@ -237,40 +514,6 @@ export function VipCheckoutChat({
       );
     };
   }, [onClose]);
-
-  useEffect(() => {
-    return () => {
-      if (proofPreviewUrl) {
-        URL.revokeObjectURL(
-          proofPreviewUrl,
-        );
-      }
-    };
-  }, [proofPreviewUrl]);
-
-  function handleProofChange(
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) {
-    const file =
-      event.target.files?.[0] ??
-      null;
-
-    setProofPreviewUrl(
-      (previous) => {
-        if (previous) {
-          URL.revokeObjectURL(
-            previous,
-          );
-        }
-
-        return file
-          ? URL.createObjectURL(file)
-          : null;
-      },
-    );
-
-    setProofFile(file);
-  }
 
   const hasGotymeQr =
     GOTYME_QR_IMAGE_SRC.trim() !==
@@ -356,6 +599,11 @@ export function VipCheckoutChat({
                   </div>
                 );
               }
+
+              const amountLabel =
+                step.forWallet
+                  ? "Any amount you choose"
+                  : `${plan.price} ${plan.period}`;
 
               if (
                 step.method ===
@@ -450,8 +698,9 @@ export function VipCheckoutChat({
                           Amount
                         </span>
                         <strong>
-                          {plan.price}{" "}
-                          {plan.period}
+                          {
+                            amountLabel
+                          }
                         </strong>
                       </div>
                     </div>
@@ -539,10 +788,7 @@ export function VipCheckoutChat({
                           </span>
                           <strong>
                             {
-                              plan.price
-                            }{" "}
-                            {
-                              plan.period
+                              amountLabel
                             }
                           </strong>
                         </div>
@@ -579,6 +825,15 @@ export function VipCheckoutChat({
 
           {!typing &&
           method === null ? (
+            <MethodChoiceButtons
+              onPick={setMethod}
+            />
+          ) : null}
+
+          {!typing &&
+          sent &&
+          walletUpsellAnswer ===
+            null ? (
             <div
               className={
                 styles.methodChoice
@@ -590,12 +845,12 @@ export function VipCheckoutChat({
                   styles.secondaryAction
                 }
                 onClick={() => {
-                  setMethod(
-                    "merchant",
+                  setWalletUpsellAnswer(
+                    "no",
                   );
                 }}
               >
-                Pay via Merchant
+                Not now
               </button>
 
               <button
@@ -604,123 +859,74 @@ export function VipCheckoutChat({
                   styles.primaryAction
                 }
                 onClick={() => {
-                  setMethod("crypto");
+                  setWalletUpsellAnswer(
+                    "yes",
+                  );
                 }}
               >
-                Pay via Crypto Wallet
+                Yes, fund my wallet
               </button>
             </div>
           ) : null}
 
-          {!typing && sent ? (
-            <div
-              className={
-                styles.bubble
+          {!typing &&
+          walletUpsellAnswer ===
+            "yes" &&
+          walletMethod === null ? (
+            <MethodChoiceButtons
+              onPick={
+                setWalletMethod
               }
-            >
-              Thank you! Your{" "}
-              {plan.name} upgrade is
-              now pending verification.
-              You&rsquo;ll see it
-              reflected on this page
-              once it&rsquo;s
-              confirmed.
-            </div>
+            />
           ) : null}
         </div>
 
         {!typing &&
         method !== null &&
         !sent ? (
-          <div
-            className={
-              styles.attachRow
+          <AttachAndActions
+            proofFile={
+              vipProof.file
             }
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className={
-                styles.attachInput
-              }
-              onChange={
-                handleProofChange
-              }
-            />
-
-            <button
-              type="button"
-              className={
-                styles.attachButton
-              }
-              onClick={() => {
-                fileInputRef.current?.click();
-              }}
-            >
-              {proofFile
-                ? "Change screenshot"
-                : "Attach payment screenshot"}
-            </button>
-
-            {proofFile &&
-            proofPreviewUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={
-                  proofPreviewUrl
-                }
-                alt="Attached payment screenshot preview"
-                className={
-                  styles.attachThumb
-                }
-              />
-            ) : (
-              <span
-                className={
-                  styles.attachHint
-                }
-              >
-                Optional — helps our
-                team verify faster
-              </span>
-            )}
-          </div>
+            previewUrl={
+              vipProof.previewUrl
+            }
+            onFileChange={
+              vipProof.onFileChange
+            }
+            onSkip={onClose}
+            onSend={() => {
+              setSent(true);
+            }}
+            sendLabel="I’ve sent it"
+          />
         ) : null}
 
         {!typing &&
-        method !== null &&
-        !sent ? (
-          <div
-            className={
-              styles.actions
+        walletUpsellAnswer ===
+          "yes" &&
+        walletMethod !== null &&
+        !walletSent ? (
+          <AttachAndActions
+            proofFile={
+              walletProof.file
             }
-          >
-            <button
-              type="button"
-              className={
-                styles.secondaryAction
-              }
-              onClick={onClose}
-            >
-              Not now
-            </button>
-
-            <button
-              type="button"
-              className={
-                styles.primaryAction
-              }
-              onClick={() => {
-                setSent(true);
-              }}
-            >
-              I&rsquo;ve sent it
-            </button>
-          </div>
+            previewUrl={
+              walletProof.previewUrl
+            }
+            onFileChange={
+              walletProof.onFileChange
+            }
+            onSkip={onClose}
+            onSend={() => {
+              setWalletSent(true);
+            }}
+            sendLabel="I’ve added it"
+          />
         ) : null}
 
-        {sent ? (
+        {!typing &&
+        conversationDone ? (
           <div
             className={
               styles.actions
