@@ -75,6 +75,8 @@
 
 .thread {
   display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
   flex-direction: column;
   gap: 12px;
   padding: 18px;
