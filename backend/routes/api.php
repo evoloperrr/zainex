@@ -50,6 +50,19 @@ Route::controller(
         ->middleware('throttle:20,1');
     Route::get('/positions', 'positions');
 });
+// ZAINEX_SPOT_DB_PERSISTENCE_V1
+Route::controller(
+    \App\Http\Controllers\Api\SpotPaperTradingController::class
+)->prefix('/trading/spot')->group(function (): void {
+    Route::get('/account', 'account');
+    Route::get('/orders', 'orders');
+    Route::post('/buy', 'buy')
+        ->middleware('throttle:20,1');
+    Route::post('/sell', 'sell')
+        ->middleware('throttle:20,1');
+    Route::get('/positions', 'positions');
+});
+
 // ZAINEX_STRATEGY_ACTIVATION_BACKEND_V2_2
 Route::post(
     '/trading/futures/strategies/activate',

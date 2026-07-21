@@ -51,7 +51,7 @@ final class FuturesMarketPriceService
     {
         $payload = $this->client()
             ->get(
-                'https://api.binance.com/api/v3/ticker/price',
+                'https://data-api.binance.vision/api/v3/ticker/price',
                 ['symbol' => 'BTCUSDT'],
             )
             ->throw()
