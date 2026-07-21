@@ -1523,6 +1523,11 @@ export function DesktopSidebar({
             title={item.label}
             data-label={item.label}
             onClick={() => {
+              if (item.label === "AI Signals") {
+                router.push("/ai-signals");
+                return;
+              }
+
               if (item.label === "Workflow") {
                 router.push("/workflow");
                 return;
