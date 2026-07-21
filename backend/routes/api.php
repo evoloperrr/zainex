@@ -2,6 +2,46 @@
 
 use Illuminate\Support\Facades\Route;
 
+// TEMP_DIAGNOSTIC_DB_PROBE_REMOVE_ME
+Route::get('/debug/db-probe', function () {
+    $steps = [];
+
+    try {
+        $steps['select_1'] = \Illuminate\Support\Facades\DB::select('select 1 as one');
+    } catch (\Throwable $e) {
+        $steps['select_1_error'] = $e->getMessage();
+    }
+
+    try {
+        $steps['cache_table_exists'] = \Illuminate\Support\Facades\Schema::hasTable('cache');
+        $steps['cache_locks_table_exists'] = \Illuminate\Support\Facades\Schema::hasTable('cache_locks');
+        $steps['users_table_exists'] = \Illuminate\Support\Facades\Schema::hasTable('users');
+    } catch (\Throwable $e) {
+        $steps['schema_check_error'] = $e->getMessage();
+    }
+
+    try {
+        $steps['cache_put'] = \Illuminate\Support\Facades\Cache::put('db_probe_key', 'v1', 5);
+        $steps['cache_get'] = \Illuminate\Support\Facades\Cache::get('db_probe_key');
+    } catch (\Throwable $e) {
+        $steps['cache_put_error'] = $e->getMessage();
+    }
+
+    try {
+        \Illuminate\Support\Facades\DB::transaction(function () {
+            \Illuminate\Support\Facades\DB::table('cache')
+                ->where('key', 'db_probe_manual_txn')
+                ->lockForUpdate()
+                ->first();
+        });
+        $steps['manual_txn'] = 'ok';
+    } catch (\Throwable $e) {
+        $steps['manual_txn_error'] = $e->getMessage();
+    }
+
+    return response()->json($steps);
+});
+
 Route::get('/health', function () {
     return response()->json([
         'ok' => true,
