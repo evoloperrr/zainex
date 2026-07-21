@@ -6,6 +6,7 @@ export const SUPPORTED_FOREX_PAIRS = [
   "USDCAD",
   "USDCHF",
   "NZDUSD",
+  "XAUUSD",
 ] as const;
 
 export type ForexPair =
@@ -22,6 +23,7 @@ export const FOREX_PAIR_LABELS: Record<
   USDCAD: "USD / CAD",
   USDCHF: "USD / CHF",
   NZDUSD: "NZD / USD",
+  XAUUSD: "XAU / USD",
 };
 
 export const FOREX_PAIR_NAMES: Record<
@@ -35,6 +37,7 @@ export const FOREX_PAIR_NAMES: Record<
   USDCAD: "US Dollar vs Canadian Dollar",
   USDCHF: "US Dollar vs Swiss Franc",
   NZDUSD: "New Zealand Dollar vs US Dollar",
+  XAUUSD: "Gold vs US Dollar",
 };
 
 export function isSupportedForexPair(
@@ -51,9 +54,21 @@ export function isJpyForexPair(
   return pair.endsWith("JPY");
 }
 
+export function isGoldPair(
+  pair: ForexPair,
+): boolean {
+  return pair === "XAUUSD";
+}
+
 export function toYahooForexSymbol(
   pair: ForexPair,
 ): string {
+  if (isGoldPair(pair)) {
+    // Yahoo has no XAUUSD=X spot ticker; COMEX gold futures
+    // (GC=F) is the closest tracked proxy for spot gold.
+    return "GC=F";
+  }
+
   return `${pair}=X`;
 }
 

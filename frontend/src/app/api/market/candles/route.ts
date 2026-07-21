@@ -206,8 +206,13 @@ function normalizeLimit(
 function decimalPlaces(
   market: MarketKey,
   value: number,
+  forexPair?: ForexPair,
 ): number {
   if (market === "forex") {
+    if (forexPair === "XAUUSD") {
+      return 2;
+    }
+
     return value >= 20 ? 3 : 5;
   }
 
@@ -221,9 +226,10 @@ function decimalPlaces(
 function formatRawPrice(
   market: MarketKey,
   value: number,
+  forexPair?: ForexPair,
 ): string {
   const digits =
-    decimalPlaces(market, value);
+    decimalPlaces(market, value, forexPair);
 
   return new Intl.NumberFormat(
     "en-US",
@@ -237,11 +243,13 @@ function formatRawPrice(
 function formatPrice(
   market: MarketKey,
   value: number,
+  forexPair?: ForexPair,
 ): string {
   const raw =
     formatRawPrice(
       market,
       value,
+      forexPair,
     );
 
   return market === "forex"
@@ -863,12 +871,14 @@ async function loadYahoo(
           formatPrice(
             "forex",
             currentPrice,
+            forexPair,
           ),
 
         rawPrice:
           formatRawPrice(
             "forex",
             currentPrice,
+            forexPair,
           ),
 
         currencySymbol: "",
@@ -890,6 +900,7 @@ async function loadYahoo(
           formatPrice(
             "forex",
             previousClose,
+            forexPair,
           ),
 
         volumeLabel:
@@ -899,6 +910,7 @@ async function loadYahoo(
           formatPrice(
             "forex",
             dayHigh,
+            forexPair,
           ),
 
         pooledPrimaryLabel:
@@ -908,6 +920,7 @@ async function loadYahoo(
           formatPrice(
             "forex",
             dayLow,
+            forexPair,
           ),
 
         pooledSecondaryLabel:
@@ -1243,12 +1256,14 @@ async function loadStooqDaily(
           formatPrice(
             "forex",
             last.close,
+            forexPair,
           ),
 
         rawPrice:
           formatRawPrice(
             "forex",
             last.close,
+            forexPair,
           ),
 
         currencySymbol: "",
@@ -1270,6 +1285,7 @@ async function loadStooqDaily(
           formatPrice(
             "forex",
             previous.close,
+            forexPair,
           ),
 
         volumeLabel:
@@ -1279,6 +1295,7 @@ async function loadStooqDaily(
           formatPrice(
             "forex",
             last.high,
+            forexPair,
           ),
 
         pooledPrimaryLabel:
@@ -1288,6 +1305,7 @@ async function loadStooqDaily(
           formatPrice(
             "forex",
             last.low,
+            forexPair,
           ),
 
         pooledSecondaryLabel:

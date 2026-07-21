@@ -24,6 +24,7 @@ import {
 import {
   FOREX_PAIR_LABELS,
   type ForexPair,
+  isGoldPair,
   isJpyForexPair,
 } from "@/lib/forex-symbols";
 
@@ -292,9 +293,11 @@ export function TradingViewChart({
 
           precision:
             market === "forex"
-              ? isJpyForexPair(forexPair)
-                ? 3
-                : 5
+              ? isGoldPair(forexPair)
+                ? 2
+                : isJpyForexPair(forexPair)
+                  ? 3
+                  : 5
               : market === "crypto" &&
                 (cryptoSymbol === "XRPUSDT" ||
                   cryptoSymbol === "ADAUSDT" ||
@@ -304,9 +307,11 @@ export function TradingViewChart({
 
           minMove:
             market === "forex"
-              ? isJpyForexPair(forexPair)
-                ? 0.001
-                : 0.00001
+              ? isGoldPair(forexPair)
+                ? 0.01
+                : isJpyForexPair(forexPair)
+                  ? 0.001
+                  : 0.00001
               : market === "crypto" &&
                 (cryptoSymbol === "XRPUSDT" ||
                   cryptoSymbol === "ADAUSDT" ||
