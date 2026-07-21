@@ -348,7 +348,7 @@ async function loadBinance(
   limit: number,
 ): Promise<MarketResult> {
   const klineUrl = new URL(
-    "https://api.binance.com/api/v3/klines",
+    "https://data-api.binance.vision/api/v3/klines",
   );
 
   klineUrl.searchParams.set(
@@ -367,7 +367,7 @@ async function loadBinance(
   );
 
   const tickerUrl = new URL(
-    "https://api.binance.com/api/v3/ticker/24hr",
+    "https://data-api.binance.vision/api/v3/ticker/24hr",
   );
 
   tickerUrl.searchParams.set(
