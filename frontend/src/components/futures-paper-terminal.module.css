@@ -416,6 +416,8 @@
   display: grid;
   padding: 18px;
   place-items: center;
+  overscroll-behavior: contain;
+  touch-action: none;
   background:
     radial-gradient(
       circle at 50% 18%,
@@ -429,7 +431,10 @@
 .modal {
   width: min(100%, 550px);
   max-height: calc(100vh - 30px);
+  max-height: calc(100dvh - 30px);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 22px;
   border:
     1px solid

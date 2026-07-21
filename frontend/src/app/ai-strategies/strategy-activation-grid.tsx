@@ -19,6 +19,8 @@ import {
   StrategyTransactionLogs,
 } from "./strategy-transaction-logs";
 
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
 const strategies = [
   {
     tier: "FREE TIER",
@@ -367,15 +369,14 @@ export function StrategyActivationGrid() {
     };
   }, []);
 
+  useBodyScrollLock(
+    selected !== null,
+  );
+
   useEffect(() => {
     if (!selected) {
       return;
     }
-
-    const previousOverflow =
-      document.body.style.overflow;
-
-    document.body.style.overflow = "hidden";
 
     function handleEscape(
       event: KeyboardEvent,
@@ -398,9 +399,6 @@ export function StrategyActivationGrid() {
     );
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
       window.removeEventListener(
         "keydown",
         handleEscape,

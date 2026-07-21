@@ -12,6 +12,8 @@ import {
   createPortal,
 } from "react-dom";
 
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
 import styles from "./admin-wallet-transfer.module.css";
 
 type AdminTransferLog = {
@@ -182,16 +184,12 @@ export function AdminWalletTransfer({
     };
   }, [isAdmin]);
 
+  useBodyScrollLock(open);
+
   useEffect(() => {
     if (!open) {
       return;
     }
-
-    const previousOverflow =
-      document.body.style.overflow;
-
-    document.body.style.overflow =
-      "hidden";
 
     function onKeyDown(
       event: KeyboardEvent,
@@ -210,9 +208,6 @@ export function AdminWalletTransfer({
     );
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
       window.removeEventListener(
         "keydown",
         onKeyDown,

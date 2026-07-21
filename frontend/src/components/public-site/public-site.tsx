@@ -10,6 +10,8 @@ import {
 } from "react";
 import { usePathname } from "next/navigation";
 
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
 import styles from "./public-site.module.css";
 
 export type PublicPageKey =
@@ -1780,20 +1782,7 @@ export function PublicSite({
     setMobileOpen(false);
   }, [pathname]);
 
-  useEffect(() => {
-    const previous =
-      document.body.style.overflow;
-
-    if (mobileOpen) {
-      document.body.style.overflow =
-        "hidden";
-    }
-
-    return () => {
-      document.body.style.overflow =
-        previous;
-    };
-  }, [mobileOpen]);
+  useBodyScrollLock(mobileOpen);
 
   useEffect(() => {
     const body =

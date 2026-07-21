@@ -26,6 +26,8 @@ import {
   type ForexPair,
 } from "@/lib/forex-symbols";
 
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
 type MarketKey = "crypto" | "forex" | "stocks";
 
 type IconName =
@@ -564,16 +566,14 @@ function PaperTradeModalHost() {
     };
   }, []);
 
+  useBodyScrollLock(
+    modal !== null,
+  );
+
   useEffect(() => {
     if (!modal) {
       return;
     }
-
-    const previousOverflow =
-      document.body.style.overflow;
-
-    document.body.style.overflow =
-      "hidden";
 
     const handleEscape = (
       event: KeyboardEvent,
@@ -592,9 +592,6 @@ function PaperTradeModalHost() {
     );
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
       window.removeEventListener(
         "keydown",
         handleEscape,
@@ -3311,22 +3308,14 @@ function MobileDashboard({
     },
   ];
 
+  useBodyScrollLock(
+    mobileMenuOpen,
+  );
+
   useEffect(() => {
     if (!mobileMenuOpen) {
       return;
     }
-
-    const previousBodyOverflow =
-      document.body.style.overflow;
-
-    const previousHtmlOverflow =
-      document.documentElement.style.overflow;
-
-    document.body.style.overflow =
-      "hidden";
-
-    document.documentElement.style.overflow =
-      "hidden";
 
     const handleEscape = (
       event: KeyboardEvent,
@@ -3342,12 +3331,6 @@ function MobileDashboard({
     );
 
     return () => {
-      document.body.style.overflow =
-        previousBodyOverflow;
-
-      document.documentElement.style.overflow =
-        previousHtmlOverflow;
-
       window.removeEventListener(
         "keydown",
         handleEscape,

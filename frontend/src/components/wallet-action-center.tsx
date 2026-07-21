@@ -20,6 +20,8 @@ import {
   WalletToCreditsConverter,
 } from "@/components/wallet-to-credits-converter";
 
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
 import styles from "./wallet-action-center.module.css";
 
 type WalletAction =
@@ -429,16 +431,14 @@ export function WalletActionCenter({
     };
   }, []);
 
+  useBodyScrollLock(
+    openAction !== null,
+  );
+
   useEffect(() => {
     if (!openAction) {
       return;
     }
-
-    const previousOverflow =
-      document.body.style.overflow;
-
-    document.body.style.overflow =
-      "hidden";
 
     function handleEscape(
       event: KeyboardEvent,
@@ -454,9 +454,6 @@ export function WalletActionCenter({
     );
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
       window.removeEventListener(
         "keydown",
         handleEscape,

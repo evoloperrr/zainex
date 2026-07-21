@@ -15,6 +15,8 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
 type IconName =
   | "home"
   | "market"
@@ -299,24 +301,12 @@ export function MobileAppFloatingNav() {
     setMenuOpen(false);
   }, [pathname]);
 
+  useBodyScrollLock(menuOpen);
+
   useEffect(() => {
     if (!menuOpen) {
       return;
     }
-
-    const bodyOverflow =
-      document.body.style.overflow;
-
-    const htmlOverflow =
-      document.documentElement.style
-        .overflow;
-
-    document.body.style.overflow =
-      "hidden";
-
-    document.documentElement.style
-      .overflow =
-      "hidden";
 
     const closeOnEscape = (
       event: KeyboardEvent,
@@ -332,13 +322,6 @@ export function MobileAppFloatingNav() {
     );
 
     return () => {
-      document.body.style.overflow =
-        bodyOverflow;
-
-      document.documentElement.style
-        .overflow =
-        htmlOverflow;
-
       window.removeEventListener(
         "keydown",
         closeOnEscape,

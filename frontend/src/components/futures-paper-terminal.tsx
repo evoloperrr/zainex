@@ -26,6 +26,8 @@ import {
   type ForexPair,
 } from "@/lib/forex-symbols";
 
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
 type MarketKey =
   | "crypto"
   | "forex"
@@ -550,16 +552,14 @@ export function FuturesPaperTerminal({
     refreshAccount,
   ]);
 
+  useBodyScrollLock(
+    modal !== null,
+  );
+
   useEffect(() => {
     if (!modal) {
       return;
     }
-
-    const previousOverflow =
-      document.body.style.overflow;
-
-    document.body.style.overflow =
-      "hidden";
 
     const handleEscape = (
       event: KeyboardEvent,
@@ -578,9 +578,6 @@ export function FuturesPaperTerminal({
     );
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
       window.removeEventListener(
         "keydown",
         handleEscape,
