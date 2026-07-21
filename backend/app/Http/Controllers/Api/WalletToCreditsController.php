@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use App\Services\Referral\ReferralRewardService;
 use Brick\Math\BigDecimal;
@@ -20,6 +21,8 @@ use Throwable;
 
 final class WalletToCreditsController extends Controller
 {
+    use LinksTradingAccountToUser;
+
     private const EVENT_TYPE =
         'WALLET_TO_CREDITS';
 
@@ -40,6 +43,11 @@ final class WalletToCreditsController extends Controller
                 'X-Zainex-Session-Id',
                 '',
             ),
+        );
+
+        $this->linkAccountToUser(
+            $sessionId,
+            $request->header('X-Zainex-User-Email'),
         );
 
         $account =
@@ -164,6 +172,11 @@ final class WalletToCreditsController extends Controller
                 'X-Zainex-Session-Id',
                 '',
             ),
+        );
+
+        $this->linkAccountToUser(
+            $sessionId,
+            $request->header('X-Zainex-User-Email'),
         );
 
         try {

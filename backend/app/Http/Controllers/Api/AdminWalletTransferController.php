@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -19,6 +20,8 @@ use Throwable;
 
 final class AdminWalletTransferController extends Controller
 {
+    use LinksTradingAccountToUser;
+
     private const ASSET = 'USDT';
 
     public function index(
@@ -31,16 +34,20 @@ final class AdminWalletTransferController extends Controller
             return $guard;
         }
 
+        $sessionId = trim(
+            (string) $request->header(
+                'X-Zainex-Session-Id',
+                '',
+            ),
+        );
+
+        $this->linkAccountToUser(
+            $sessionId,
+            $request->header('X-Zainex-User-Email'),
+        );
+
         $actor =
-            $this->actor(
-                trim(
-                    (string)
-                        $request->header(
-                            'X-Zainex-Session-Id',
-                            '',
-                        ),
-                ),
-            );
+            $this->actor($sessionId);
 
         if ($actor === null) {
             return $this->error(
@@ -216,6 +223,11 @@ final class AdminWalletTransferController extends Controller
                         '',
                     ),
             );
+
+        $this->linkAccountToUser(
+            $sessionId,
+            $request->header('X-Zainex-User-Email'),
+        );
 
         try {
             $result =

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,8 @@ use Throwable;
 
 final class CreditTransferController extends Controller
 {
+    use LinksTradingAccountToUser;
+
     private const MAX_AMOUNT =
         1_000_000_000;
 
@@ -30,14 +33,21 @@ final class CreditTransferController extends Controller
             return $guard;
         }
 
+        $sessionId = trim(
+            (string) $request->header(
+                'X-Zainex-Session-Id',
+                '',
+            ),
+        );
+
+        $this->linkAccountToUser(
+            $sessionId,
+            $request->header('X-Zainex-User-Email'),
+        );
+
         $account =
             $this->accountForSession(
-                trim(
-                    (string) $request->header(
-                        'X-Zainex-Session-Id',
-                        '',
-                    ),
-                ),
+                $sessionId,
             );
 
         if ($account === null) {
@@ -168,6 +178,11 @@ final class CreditTransferController extends Controller
                 'X-Zainex-Session-Id',
                 '',
             ),
+        );
+
+        $this->linkAccountToUser(
+            $sessionId,
+            $request->header('X-Zainex-User-Email'),
         );
 
         try {

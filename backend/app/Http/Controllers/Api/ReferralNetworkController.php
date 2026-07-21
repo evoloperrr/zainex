@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 
 final class ReferralNetworkController extends Controller
 {
+    use LinksTradingAccountToUser;
+
     private const MAX_DEPTH = 3;
 
     public function __invoke(
@@ -71,6 +74,11 @@ final class ReferralNetworkController extends Controller
                 'A valid ZAINEX session is required.',
             );
         }
+
+        $this->linkAccountToUser(
+            $sessionId,
+            $request->header('X-Zainex-User-Email'),
+        );
 
         $currentUser = DB::table(
             'trading_accounts as account',
