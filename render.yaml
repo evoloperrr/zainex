@@ -92,3 +92,15 @@ services:
 
       - key: OPENAI_MODEL
         sync: false
+
+      - key: NOWPAYMENTS_API_KEY
+        sync: false
+
+      - key: NOWPAYMENTS_IPN_SECRET
+        sync: false
+
+      - key: NOWPAYMENTS_PAY_CURRENCY
+        value: usdttrc20
+
+      - key: NOWPAYMENTS_IPN_CALLBACK_URL
+        sync: false
