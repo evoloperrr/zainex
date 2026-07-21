@@ -106,6 +106,59 @@
   font-weight: 600;
 }
 
+.crown {
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 8px;
+  color: #ffd66b;
+  filter: drop-shadow(0 0 10px rgba(255, 200, 80, 0.55));
+}
+
+.zonePremium .glow {
+  background: radial-gradient(
+    circle,
+    rgba(255, 200, 70, 0.3),
+    rgba(255, 150, 40, 0.1) 38%,
+    transparent 69%
+  );
+}
+
+.zonePremium .frame {
+  border-color: rgba(255, 205, 100, 0.34);
+  background: radial-gradient(
+    circle,
+    rgba(46, 34, 10, 0.92),
+    rgba(20, 14, 6, 0.96)
+  );
+}
+
+.zonePremium .ring {
+  border-color: rgba(255, 195, 60, 0.32);
+  box-shadow: 0 0 22px rgba(255, 180, 40, 0.14);
+}
+
+.zonePremium .ring::before {
+  background: #ffe37a;
+  box-shadow: 0 0 16px #ffe37a;
+}
+
+.zonePremium .ring::after {
+  background: #ffb347;
+  box-shadow: 0 0 16px #ffb347;
+}
+
+.zonePremium .core span {
+  color: #ffd66b;
+}
+
+.zonePremium .core strong {
+  background: linear-gradient(135deg, #fff3d6, #ffcf6e);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .ring {
     animation: zainexNeuralOrbit 12s linear infinite;

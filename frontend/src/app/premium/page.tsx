@@ -18,6 +18,7 @@ type FeatureRow = {
   vip1: boolean | string;
   vip2: boolean | string;
   vip3: boolean | string;
+  premium: boolean | string;
 };
 
 const featureRows: FeatureRow[] = [
@@ -27,6 +28,7 @@ const featureRows: FeatureRow[] = [
     vip1: true,
     vip2: true,
     vip3: true,
+    premium: true,
   },
   {
     label: "InteliBrain AI signal previews",
@@ -34,6 +36,7 @@ const featureRows: FeatureRow[] = [
     vip1: "Full access",
     vip2: "Full access",
     vip3: "Full access",
+    premium: "Full access",
   },
   {
     label: "Spot markets covered",
@@ -41,6 +44,7 @@ const featureRows: FeatureRow[] = [
     vip1: "Crypto + Forex",
     vip2: "All 3 markets",
     vip3: "All 3 markets",
+    premium: "All 3 markets",
   },
   {
     label: "Personal asset watchlist",
@@ -48,6 +52,7 @@ const featureRows: FeatureRow[] = [
     vip1: true,
     vip2: true,
     vip3: true,
+    premium: true,
   },
   {
     label: "Strategy activation slots",
@@ -55,6 +60,7 @@ const featureRows: FeatureRow[] = [
     vip1: "1",
     vip2: "3",
     vip3: "Unlimited",
+    premium: "Unlimited",
   },
   {
     label: "Priority signal refresh",
@@ -62,6 +68,7 @@ const featureRows: FeatureRow[] = [
     vip1: false,
     vip2: true,
     vip3: true,
+    premium: true,
   },
   {
     label: "Priority support",
@@ -69,6 +76,23 @@ const featureRows: FeatureRow[] = [
     vip1: false,
     vip2: false,
     vip3: true,
+    premium: true,
+  },
+  {
+    label: "Dedicated account manager",
+    free: false,
+    vip1: false,
+    vip2: false,
+    vip3: false,
+    premium: true,
+  },
+  {
+    label: "Early access to new markets",
+    free: false,
+    vip1: false,
+    vip2: false,
+    vip3: false,
+    premium: true,
   },
 ];
 
@@ -117,7 +141,7 @@ function PremiumContent() {
         <section className={styles.hero}>
           <div>
             <span className={styles.eyebrow}>
-              WHAT VIP UNLOCKS
+              WHAT PREMIUM UNLOCKS
             </span>
 
             <h1>
@@ -128,8 +152,9 @@ function PremiumContent() {
             <p>
               A side-by-side look at what each tier
               unlocks across markets, AI signals, and
-              strategy access. Upgrade any time from
-              Billing.
+              strategy access. Premium is the tier
+              above VIP 3 — our highest level of
+              access. Upgrade any time from Billing.
             </p>
           </div>
         </section>
@@ -144,6 +169,14 @@ function PremiumContent() {
                   <th scope="col">VIP 1</th>
                   <th scope="col">VIP 2</th>
                   <th scope="col">VIP 3</th>
+                  <th
+                    scope="col"
+                    className={
+                      premiumStyles.premiumColumn
+                    }
+                  >
+                    PREMIUM
+                  </th>
                 </tr>
               </thead>
 
@@ -155,6 +188,13 @@ function PremiumContent() {
                     <td>{renderCell(row.vip1)}</td>
                     <td>{renderCell(row.vip2)}</td>
                     <td>{renderCell(row.vip3)}</td>
+                    <td
+                      className={
+                        premiumStyles.premiumColumn
+                      }
+                    >
+                      {renderCell(row.premium)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -163,9 +203,10 @@ function PremiumContent() {
 
           <div className={premiumStyles.orbitCard}>
             <NeuralOrbit
+              variant="premium"
               label="TOP TIER"
-              value="VIP 3"
-              caption="Unlimited strategies + priority support"
+              value="PREMIUM"
+              caption="Unlimited strategies + dedicated account manager"
             />
           </div>
         </section>

@@ -72,6 +72,22 @@ const plans = [
     current: false,
     featured: false,
   },
+  {
+    name: "PREMIUM",
+    price: "$75",
+    period: "per month",
+    description:
+      "Our highest tier, above VIP 3 — dedicated support and first access to every new market.",
+    features: [
+      "Everything in VIP 3",
+      "Dedicated account manager",
+      "Early access to new markets",
+      "Unlimited strategy slots",
+    ],
+    action: "Choose Premium",
+    current: false,
+    featured: false,
+  },
 ];
 
 function CardIcon() {
