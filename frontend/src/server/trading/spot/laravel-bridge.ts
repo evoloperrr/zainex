@@ -13,6 +13,8 @@ import {
   type DemoSession,
 } from "@/server/trading/session";
 
+import { auth } from "@/auth";
+
 // ZAINEX_SPOT_DB_PERSISTENCE_V1
 
 const DEFAULT_BACKEND_URL =
@@ -170,6 +172,13 @@ export async function proxySpotToLaravel(
     );
   }
 
+  const authSession = await auth();
+
+  const userEmail =
+    authSession?.user?.email
+      ?.trim()
+      .toLowerCase() ?? "";
+
   let body: string | undefined;
 
   if (options.method === "POST") {
@@ -210,6 +219,9 @@ export async function proxySpotToLaravel(
           "X-Zainex-Internal-Token": internalToken,
           "X-Zainex-Session-Id": session.sessionId,
           "X-Zainex-Request-Id": randomUUID(),
+          ...(userEmail
+            ? { "X-Zainex-User-Email": userEmail }
+            : {}),
           "User-Agent":
             options.request.headers.get(
               "user-agent",

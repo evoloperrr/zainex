@@ -5,6 +5,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\FuturesTradingException;
+use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use App\Services\Trading\FuturesPaperTradingService;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,8 @@ use Throwable;
 
 final class FuturesPaperTradingController extends Controller
 {
+    use LinksTradingAccountToUser;
+
     public function __construct(
         private readonly FuturesPaperTradingService $service,
     ) {}
@@ -162,6 +165,11 @@ final class FuturesPaperTradingController extends Controller
             if (! Str::isUuid($requestId)) {
                 $requestId = (string) Str::uuid();
             }
+
+            $this->linkAccountToUser(
+                $sessionId,
+                $request->header('X-Zainex-User-Email'),
+            );
 
             $payload = $operation($sessionId, $requestId);
             $status = (int) ($payload['_status'] ?? 200);

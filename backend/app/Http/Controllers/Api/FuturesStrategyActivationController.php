@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\FuturesTradingException;
+use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -19,6 +20,8 @@ use Throwable;
 
 final class FuturesStrategyActivationController extends Controller
 {
+    use LinksTradingAccountToUser;
+
     private const STRATEGIES = [
         'FREE TIER' => [
             'name' =>
@@ -96,6 +99,11 @@ final class FuturesStrategyActivationController extends Controller
                 $requestId =
                     (string) Str::uuid();
             }
+
+            $this->linkAccountToUser(
+                $sessionId,
+                $request->header('X-Zainex-User-Email'),
+            );
 
             $result = $this->activate(
                 $sessionId,

@@ -5,6 +5,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\SpotTradingException;
+use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use App\Services\Trading\SpotPaperTradingService;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,8 @@ use Throwable;
 
 final class SpotPaperTradingController extends Controller
 {
+    use LinksTradingAccountToUser;
+
     public function __construct(
         private readonly SpotPaperTradingService $service,
     ) {}
@@ -162,6 +165,11 @@ final class SpotPaperTradingController extends Controller
             if (! Str::isUuid($requestId)) {
                 $requestId = (string) Str::uuid();
             }
+
+            $this->linkAccountToUser(
+                $sessionId,
+                $request->header('X-Zainex-User-Email'),
+            );
 
             $payload = $operation($sessionId, $requestId);
             $status = (int) ($payload['_status'] ?? 200);

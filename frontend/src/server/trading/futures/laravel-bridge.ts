@@ -13,6 +13,8 @@ import {
   type DemoSession,
 } from "@/server/trading/session";
 
+import { auth } from "@/auth";
+
 // ZAINEX_DB_PHASE2B2_NEXTJS_FUTURES_LARAVEL_BRIDGE_V1
 
 const DEFAULT_BACKEND_URL =
@@ -190,6 +192,13 @@ export async function proxyFuturesToLaravel(
     );
   }
 
+  const authSession = await auth();
+
+  const userEmail =
+    authSession?.user?.email
+      ?.trim()
+      .toLowerCase() ?? "";
+
   let body:
     | string
     | undefined;
@@ -249,6 +258,12 @@ export async function proxyFuturesToLaravel(
               session.sessionId,
             "X-Zainex-Request-Id":
               randomUUID(),
+            ...(userEmail
+              ? {
+                  "X-Zainex-User-Email":
+                    userEmail,
+                }
+              : {}),
             "User-Agent":
               options.request
                 .headers
