@@ -122,3 +122,9 @@ Route::get(
     '/referrals/network',
     \App\Http\Controllers\Api\ReferralNetworkController::class,
 )->middleware('throttle:60,1');
+
+// ZAINEX_SPOT_INTELIBRAIN_V1
+Route::post(
+    '/trading/spot/ai/analyze',
+    \App\Http\Controllers\Api\SpotAiSignalController::class,
+)->middleware('throttle:20,1');

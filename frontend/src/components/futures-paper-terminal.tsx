@@ -14,6 +14,7 @@ import {
 import styles from "./futures-paper-terminal.module.css";
 
 import { FuturesAiSignalPanel } from "./futures-ai-signal-panel";
+import { SpotAiSignalPanel } from "./spot-ai-signal-panel";
 
 type MarketKey =
   | "crypto"
@@ -1732,6 +1733,20 @@ export function FuturesPaperTerminal({
               </small>
             </button>
           </>
+        ) : null}
+
+        {mode === "spot" ? (
+          <section
+            className={
+              styles.panel
+            }
+          >
+            <SpotAiSignalPanel
+              assetClass={
+                activeMarket
+              }
+            />
+          </section>
         ) : (
           <>
             <section
