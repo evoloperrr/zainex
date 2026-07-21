@@ -12,13 +12,20 @@ import { NeuralOrbit } from "@/components/neural-orbit";
 import styles from "../billing/billing.module.css";
 import connectionsStyles from "./connections.module.css";
 
-const connections = [
+const connections: Array<{
+  name: string;
+  description: string;
+  mark: string;
+  gradient: string;
+  status: "connected" | "pending";
+}> = [
   {
     name: "Google Identity",
     description:
       "Verified Google sign-in secures every ZAINEX session.",
     mark: "G",
     gradient: "linear-gradient(145deg, #4285F4, #34A853)",
+    status: "connected",
   },
   {
     name: "Binance market data",
@@ -26,6 +33,7 @@ const connections = [
       "Live and historical candles across BTC, ETH, SOL, BNB, XRP, ADA and DOGE power the Crypto terminal and chart.",
     mark: "B",
     gradient: "linear-gradient(145deg, #F0B90B, #F8D33A)",
+    status: "connected",
   },
   {
     name: "Yahoo Finance & Stooq",
@@ -33,17 +41,81 @@ const connections = [
       "Delayed Forex and Stocks candles with a daily-close fallback provider.",
     mark: "Y",
     gradient: "linear-gradient(145deg, #7B4CFF, #B14CFF)",
+    status: "connected",
   },
   {
-    name: "OpenAI InteliBrain",
+    name: "GPT-5.1 (OpenAI)",
     description:
-      "GPT-5-mini reads the deterministic technical snapshot for Spot and Futures signals.",
+      "OpenAI's flagship model reads the deterministic technical snapshot for Spot and Futures signals.",
     mark: "AI",
     gradient: "linear-gradient(145deg, #22d3ee, #6366f1)",
+    status: "connected",
+  },
+  {
+    name: "Claude Sonnet 4.5 (Anthropic)",
+    description:
+      "Adds an independent InteliBrain read alongside GPT-5.1 for cross-checked signals.",
+    mark: "C",
+    gradient: "linear-gradient(145deg, #d97757, #c2542f)",
+    status: "pending",
+  },
+  {
+    name: "Gemini 3 Pro (Google)",
+    description:
+      "Google's Gemini contributes a second opinion to every InteliBrain signal.",
+    mark: "Ge",
+    gradient: "linear-gradient(145deg, #4285F4, #9b72cb)",
+    status: "pending",
+  },
+  {
+    name: "Grok 4.20 (xAI)",
+    description:
+      "xAI's latest Grok model adds a real-time market read to InteliBrain.",
+    mark: "X",
+    gradient: "linear-gradient(145deg, #3a3a3a, #0a0a0a)",
+    status: "pending",
+  },
+  {
+    name: "Grok 4 (xAI)",
+    description:
+      "xAI's Grok 4 model provides an additional InteliBrain signal opinion.",
+    mark: "X",
+    gradient: "linear-gradient(145deg, #55565a, #232326)",
+    status: "pending",
+  },
+  {
+    name: "DeepSeek Chat V3.1 (DeepSeek)",
+    description:
+      "Adds a cost-efficient, independent InteliBrain read to the signal mix.",
+    mark: "D",
+    gradient: "linear-gradient(145deg, #2f6fed, #1743a3)",
+    status: "pending",
+  },
+  {
+    name: "Qwen3-Max (Alibaba)",
+    description:
+      "Alibaba's Qwen3-Max model contributes another InteliBrain signal perspective.",
+    mark: "Q",
+    gradient: "linear-gradient(145deg, #7b4cff, #b14cff)",
+    status: "pending",
+  },
+  {
+    name: "Kimi K2 Thinking (Moonshot AI)",
+    description:
+      "A reasoning-focused model that adds a deeper InteliBrain read.",
+    mark: "K",
+    gradient: "linear-gradient(145deg, #17c3b2, #0b7a70)",
+    status: "pending",
   },
 ];
 
 function ConnectionsContent() {
+  const connectedCount = connections.filter(
+    (connection) => connection.status === "connected",
+  ).length;
+
+  const totalCount = connections.length;
+
   return (
     <div className={styles.page}>
       <div className={styles.glow} aria-hidden="true" />
@@ -61,7 +133,7 @@ function ConnectionsContent() {
         <div className={styles.headerRight}>
           <span className={styles.secure}>
             <i />
-            All systems online
+            Multi-model rollout in progress
           </span>
 
           <Link href="/market" className={styles.back}>
@@ -85,10 +157,12 @@ function ConnectionsContent() {
             </h1>
 
             <p>
-              These are the live systems ZAINEX depends on
-              for market data, identity, and AI analysis.
-              They are managed at the platform level and
-              require no setup from you.
+              These are the systems ZAINEX depends on for
+              market data, identity, and AI analysis —
+              including the additional InteliBrain models
+              being rolled out beyond OpenAI. They are
+              managed at the platform level and require no
+              setup from you.
             </p>
           </div>
         </section>
@@ -112,9 +186,17 @@ function ConnectionsContent() {
                   <strong>{connection.name}</strong>
                   <span>{connection.description}</span>
 
-                  <span className={connectionsStyles.status}>
+                  <span
+                    className={
+                      connection.status === "connected"
+                        ? connectionsStyles.status
+                        : `${connectionsStyles.status} ${connectionsStyles.statusPending}`
+                    }
+                  >
                     <i />
-                    CONNECTED
+                    {connection.status === "connected"
+                      ? "CONNECTED"
+                      : "ROLLING OUT"}
                   </span>
                 </div>
               </article>
@@ -124,8 +206,8 @@ function ConnectionsContent() {
           <div className={connectionsStyles.orbitCard}>
             <NeuralOrbit
               label="INTEGRATIONS"
-              value="4 / 4"
-              caption="All platform connections online"
+              value={`${connectedCount} / ${totalCount}`}
+              caption="Live connections — more InteliBrain models rolling out"
             />
           </div>
         </section>
@@ -143,7 +225,7 @@ function ConnectionsContent() {
 
           <div>
             <span>AI ENGINE</span>
-            <strong>OpenAI GPT-5-mini</strong>
+            <strong>8 models · GPT-5.1 live</strong>
           </div>
 
           <div>

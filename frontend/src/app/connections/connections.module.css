@@ -72,6 +72,15 @@
   box-shadow: 0 0 10px rgba(49, 226, 175, 0.8);
 }
 
+.statusPending {
+  color: #ffd66b;
+}
+
+.statusPending i {
+  background: #ffc44a;
+  box-shadow: 0 0 10px rgba(255, 196, 74, 0.8);
+}
+
 .orbitCard {
   display: flex;
   flex-direction: column;
