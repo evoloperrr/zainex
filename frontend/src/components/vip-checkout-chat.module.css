@@ -6,21 +6,11 @@
   inset: 0;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   padding: 18px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   background: rgba(2, 4, 13, 0.82);
   backdrop-filter: blur(16px);
-}
-
-@media (max-width: 979px) {
-  .backdrop {
-    padding-bottom: calc(
-      110px + env(safe-area-inset-bottom)
-    );
-  }
 }
 
 .panel {
@@ -30,7 +20,6 @@
   width: min(460px, 100%);
   max-height: calc(100vh - 36px);
   max-height: calc(100dvh - 36px);
-  margin: auto 0;
   border: 1px solid rgba(101, 182, 255, 0.23);
   border-radius: 22px;
   overflow: hidden;
@@ -43,6 +32,20 @@
   box-shadow:
     0 34px 100px rgba(0, 0, 0, 0.56),
     0 0 55px rgba(118, 57, 233, 0.17);
+}
+
+/* Reserve space below the panel for the floating mobile nav bar,
+   so the modal's own max-height keeps it clear — no second (backdrop)
+   scrollbar is introduced to do this. */
+@media (max-width: 979px) {
+  .panel {
+    max-height: calc(
+      100vh - 36px - 110px - env(safe-area-inset-bottom)
+    );
+    max-height: calc(
+      100dvh - 36px - 110px - env(safe-area-inset-bottom)
+    );
+  }
 }
 
 .header {
@@ -271,13 +274,15 @@
 
 @media (max-width: 480px) {
   .backdrop {
-    padding-top: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
   }
 
   .panel {
-    max-height: calc(100vh - 20px);
-    max-height: calc(100dvh - 20px);
+    max-height: calc(
+      100vh - 20px - 110px - env(safe-area-inset-bottom)
+    );
+    max-height: calc(
+      100dvh - 20px - 110px - env(safe-area-inset-bottom)
+    );
   }
 }
