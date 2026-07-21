@@ -1,160 +1,79 @@
-﻿import { randomUUID } from "node:crypto";
-
 import {
   NextRequest,
   NextResponse,
 } from "next/server";
 
-import { TradingError } from "@/server/trading/errors";
 import {
-  normalizeTradingError,
-} from "@/server/trading/errors";
-import {
-  tradingExecutionService,
-} from "@/server/trading/execution-service";
-import {
-  applyDemoSessionCookie,
-  getOrCreateDemoSession,
-} from "@/server/trading/session";
+  proxySpotToLaravel,
+} from "@/server/trading/spot/laravel-bridge";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_REQUEST_BYTES = 16_384;
-
-function finalizeResponse(
-  response: NextResponse,
-  session: ReturnType<typeof getOrCreateDemoSession>,
-): NextResponse {
-  response.headers.set("Cache-Control", "no-store");
-  applyDemoSessionCookie(response, session);
-  return response;
-}
-
 export async function GET(
   request: NextRequest,
-): Promise<NextResponse> {
-  const session = getOrCreateDemoSession(request);
-
-  try {
-    const orders = await tradingExecutionService.getOrders({
-      sessionId: session.sessionId,
-      requestId: randomUUID(),
-    });
-
-    return finalizeResponse(
-      NextResponse.json(
-        {
-          ok: true,
-          mode: "paper",
-          orders,
-        },
-        {
-          status: 200,
-        },
-      ),
-      session,
-    );
-  } catch (error) {
-    const normalized = normalizeTradingError(error);
-
-    return finalizeResponse(
-      NextResponse.json(
-        normalized.body,
-        {
-          status: normalized.status,
-        },
-      ),
-      session,
-    );
-  }
+) {
+  return proxySpotToLaravel({
+    request,
+    path: "/api/trading/spot/orders",
+    method: "GET",
+  });
 }
 
 export async function POST(
   request: NextRequest,
-): Promise<NextResponse> {
-  const session = getOrCreateDemoSession(request);
+) {
+  let side = "";
 
   try {
-    const contentLengthHeader =
-      request.headers.get("content-length");
+    const peek = (await request
+      .clone()
+      .json()) as {
+      side?: unknown;
+    };
 
-    const contentLength = contentLengthHeader
-      ? Number(contentLengthHeader)
-      : 0;
-
-    if (
-      Number.isFinite(contentLength) &&
-      contentLength > MAX_REQUEST_BYTES
-    ) {
-      throw new TradingError(
-        "REQUEST_TOO_LARGE",
-        "The order request is too large.",
-        413,
-      );
-    }
-
-    const contentType =
-      request.headers.get("content-type") ?? "";
-
-    if (
-      !contentType
-        .toLowerCase()
-        .includes("application/json")
-    ) {
-      throw new TradingError(
-        "JSON_REQUIRED",
-        "Content-Type must be application/json.",
-        415,
-      );
-    }
-
-    let body: unknown;
-
-    try {
-      body = await request.json();
-    } catch {
-      throw new TradingError(
-        "INVALID_JSON",
-        "The order request contains invalid JSON.",
-        400,
-      );
-    }
-
-    const result =
-      await tradingExecutionService.executeOrder(
-        {
-          sessionId: session.sessionId,
-          requestId: randomUUID(),
+    side =
+      typeof peek.side === "string"
+        ? peek.side.toUpperCase()
+        : "";
+  }
+  catch {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: "INVALID_JSON",
+          message:
+            "The order request contains invalid JSON.",
         },
-        body,
-      );
-
-    return finalizeResponse(
-      NextResponse.json(
-        {
-          ok: true,
-          mode: "paper",
-          liveTrading: false,
-          result,
-        },
-        {
-          status: result.idempotentReplay ? 200 : 201,
-        },
-      ),
-      session,
-    );
-  } catch (error) {
-    const normalized = normalizeTradingError(error);
-
-    return finalizeResponse(
-      NextResponse.json(
-        normalized.body,
-        {
-          status: normalized.status,
-        },
-      ),
-      session,
+      },
+      {
+        status: 400,
+      },
     );
   }
+
+  if (side !== "BUY" && side !== "SELL") {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: "INVALID_ORDER_SIDE",
+          message: "Order side must be BUY or SELL.",
+        },
+      },
+      {
+        status: 400,
+      },
+    );
+  }
+
+  return proxySpotToLaravel({
+    request,
+    path:
+      side === "BUY"
+        ? "/api/trading/spot/buy"
+        : "/api/trading/spot/sell",
+    method: "POST",
+  });
 }
