@@ -23,7 +23,7 @@ const connections = [
   {
     name: "Binance market data",
     description:
-      "Live and historical BTC/USDT candles power the Crypto terminal and chart.",
+      "Live and historical candles across BTC, ETH, SOL, BNB, XRP, ADA and DOGE power the Crypto terminal and chart.",
     mark: "B",
     gradient: "linear-gradient(145deg, #F0B90B, #F8D33A)",
   },

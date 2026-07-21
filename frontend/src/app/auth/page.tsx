@@ -266,7 +266,7 @@ export default async function AuthPage({
 
             <div className={styles.marketStrip}>
               <span>
-                BTCUSDT
+                7 CRYPTO PAIRS
                 <strong>LIVE DATA</strong>
               </span>
 
