@@ -179,6 +179,8 @@ final class FuturesStrategyActivationController extends Controller
                                 'STRATEGY_ACTIVATION_ERROR',
                             'message' =>
                                 'The strategy activation could not be completed.',
+                            'debug' =>
+                                $exception::class . ': ' . $exception->getMessage(),
                         ],
                     ],
                     500,
