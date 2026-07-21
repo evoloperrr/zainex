@@ -2,47 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-// TEMP_DIAGNOSTIC_OPENAI_PROBE_REMOVE_ME
-Route::get('/debug/openai-probe', function () {
-    $apiKey = (string) config('intelibrain.openai_api_key', '');
-    $model = (string) config('intelibrain.openai_model', '');
-    $baseUrl = (string) config('intelibrain.openai_base_url', '');
-
-    $info = [
-        'api_key_present' => $apiKey !== '',
-        'model' => $model,
-        'base_url' => $baseUrl,
-    ];
-
-    if ($apiKey === '' || $model === '') {
-        $info['probe'] = 'skipped: missing api key or model';
-        return response()->json($info);
-    }
-
-    try {
-        $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
-            ->acceptJson()
-            ->asJson()
-            ->timeout(30)
-            ->post($baseUrl.'/responses', [
-                'model' => $model,
-                'store' => false,
-                'max_output_tokens' => 2000,
-                'reasoning' => ['effort' => 'low'],
-                'input' => [
-                    ['role' => 'user', 'content' => 'Reply with the single word OK.'],
-                ],
-            ]);
-
-        $info['probe_status'] = $response->status();
-        $info['probe_body'] = substr($response->body(), 0, 1500);
-    } catch (\Throwable $e) {
-        $info['probe_exception'] = $e->getMessage();
-    }
-
-    return response()->json($info);
-});
-
 Route::get('/health', function () {
     return response()->json([
         'ok' => true,
