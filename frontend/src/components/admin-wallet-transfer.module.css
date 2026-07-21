@@ -375,7 +375,7 @@
     padding:
       24px
       18px
-      34px;
+      calc(110px + env(safe-area-inset-bottom));
     border-right: 0;
     border-bottom: 0;
     border-left: 0;

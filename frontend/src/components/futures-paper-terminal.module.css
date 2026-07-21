@@ -830,6 +830,11 @@
 
   .modal {
     padding: 18px;
+    padding-bottom:
+      calc(
+        110px +
+        env(safe-area-inset-bottom)
+      );
     border-radius: 18px;
   }
 
