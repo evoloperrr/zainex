@@ -169,3 +169,21 @@ Route::post(
         'webhook',
     ],
 )->middleware('throttle:30,1');
+
+// ZAINEX_ADMIN_CONSOLE_V1
+Route::controller(
+    \App\Http\Controllers\Api\AdminController::class
+)->prefix('/admin')->group(function (): void {
+    Route::get('/overview', 'overview')
+        ->middleware('throttle:60,1');
+    Route::get('/users', 'users')
+        ->middleware('throttle:60,1');
+    Route::post('/users/grant-vip', 'grantVip')
+        ->middleware('throttle:20,1');
+    Route::post('/users/credit-wallet', 'creditWallet')
+        ->middleware('throttle:20,1');
+    Route::get('/crypto-payments', 'cryptoPayments')
+        ->middleware('throttle:60,1');
+    Route::get('/wallet-ledger', 'walletLedger')
+        ->middleware('throttle:60,1');
+});

@@ -1,0 +1,325 @@
+/* ZAINEX_ADMIN_CONSOLE_V1 */
+
+.gate {
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: var(--z-bg);
+  color: var(--z-text);
+  text-align: center;
+}
+
+.gate a {
+  color: var(--z-blue);
+}
+
+.shell {
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  background: var(--z-bg);
+  color: var(--z-text);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px clamp(18px, 3vw, 40px);
+  border-bottom: 1px solid var(--z-border);
+  background: var(--z-shell);
+}
+
+.header > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  color: var(--z-blue);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.header strong {
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.adminEmail {
+  color: var(--z-muted);
+  font-size: 13px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 clamp(18px, 3vw, 40px);
+  border-bottom: 1px solid var(--z-border);
+  background: var(--z-shell);
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 14px 16px;
+  border-bottom: 2px solid transparent;
+  color: var(--z-muted);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--z-text);
+}
+
+.tabActive {
+  border-bottom-color: var(--z-blue);
+  color: var(--z-text);
+}
+
+.content {
+  flex: 1 1 auto;
+  padding: clamp(18px, 3vw, 32px);
+}
+
+.statGrid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.statCard {
+  padding: 16px 18px;
+  border: 1px solid var(--z-border);
+  border-radius: 14px;
+  background: var(--z-card);
+}
+
+.statCard span {
+  display: block;
+  color: var(--z-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.statCard strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.section {
+  margin-bottom: 28px;
+}
+
+.sectionTitle {
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--z-border);
+  border-radius: 14px;
+  background: var(--z-card);
+}
+
+.table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--z-border);
+  color: var(--z-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--z-border);
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.pillNeutral {
+  background: rgba(137, 148, 182, 0.16);
+  color: var(--z-muted);
+}
+
+.pillGood {
+  background: rgba(90, 241, 190, 0.14);
+  color: var(--z-green);
+}
+
+.pillWarn {
+  background: rgba(255, 209, 104, 0.14);
+  color: var(--z-yellow);
+}
+
+.pillBad {
+  background: rgba(255, 111, 145, 0.14);
+  color: var(--z-pink);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.searchInput,
+.selectInput {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--z-border-bright);
+  border-radius: 10px;
+  background: var(--z-card-deep);
+  color: var(--z-text);
+  font-size: 13px;
+}
+
+.searchInput {
+  min-width: 220px;
+  flex: 1;
+}
+
+.pageControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--z-muted);
+  font-size: 12px;
+}
+
+.pageButton {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--z-border-bright);
+  border-radius: 8px;
+  background: var(--z-card-deep);
+  color: var(--z-text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.pageButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rowActions {
+  display: flex;
+  gap: 6px;
+}
+
+.rowActionButton {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--z-border-bright);
+  border-radius: 8px;
+  background: var(--z-card-deep);
+  color: var(--z-text);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.inlineForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--z-border);
+  background: var(--z-card-deep);
+}
+
+.inlineForm input,
+.inlineForm select {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--z-border-bright);
+  border-radius: 8px;
+  background: var(--z-shell);
+  color: var(--z-text);
+  font-size: 12px;
+}
+
+.inlineForm button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(120deg, #4bdcff, #8b6cff 48%, #dd4fff);
+  color: #061019;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.inlineForm button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.feedback {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.feedbackOk {
+  color: var(--z-green);
+}
+
+.feedbackError {
+  color: var(--z-pink);
+}
+
+.empty {
+  padding: 30px;
+  color: var(--z-muted);
+  font-size: 13px;
+  text-align: center;
+}

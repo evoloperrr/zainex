@@ -1,0 +1,27 @@
+import {
+  NextRequest,
+  NextResponse,
+} from "next/server";
+
+import {
+  proxyFuturesToLaravel,
+} from "@/server/trading/futures/laravel-bridge";
+
+// ZAINEX_ADMIN_CONSOLE_NEXT_ROUTE_V1
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function POST(
+  request: NextRequest,
+): Promise<NextResponse> {
+  return proxyFuturesToLaravel({
+    request,
+    method: "POST",
+    path: "/api/admin/users/grant-vip",
+    invalidJsonMessage:
+      "The VIP grant request contains invalid JSON.",
+    requestTooLargeMessage:
+      "The VIP grant request is too large.",
+  });
+}
