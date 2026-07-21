@@ -106,6 +106,10 @@ const navigation = [
     href: "/company",
     label: "Company",
   },
+  {
+    href: "/news",
+    label: "News",
+  },
 ] as const;
 
 const pages: Record<PublicPageKey, PublicPageData> = {
@@ -1559,7 +1563,7 @@ function HeroVisual({
   );
 }
 
-function SiteHeader({
+export function SiteHeader({
   mobileOpen,
   setMobileOpen,
 }: {
@@ -1697,7 +1701,7 @@ function SiteHeader({
   );
 }
 
-function SiteFooter() {
+export function SiteFooter() {
   return (
     <footer
       className={styles.footer}
