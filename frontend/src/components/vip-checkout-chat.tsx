@@ -438,6 +438,78 @@ function AddressQr({
   );
 }
 
+function CopyButton({
+  value,
+}: {
+  value: string;
+}) {
+  const [copied, setCopied] =
+    useState(false);
+
+  return (
+    <button
+      type="button"
+      className={
+        styles.copyButton
+      }
+      aria-label="Copy to clipboard"
+      onClick={() => {
+        navigator.clipboard
+          .writeText(value)
+          .then(() => {
+            setCopied(true);
+
+            window.setTimeout(
+              () => {
+                setCopied(false);
+              },
+              1500,
+            );
+          })
+          .catch(() => {});
+      }}
+    >
+      {copied ? (
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 10.5l4 4 8-9"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ) : (
+        <svg
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+        >
+          <rect
+            x="7"
+            y="7"
+            width="10"
+            height="10"
+            rx="1.5"
+            stroke="currentColor"
+            strokeWidth="1.6"
+          />
+          <path
+            d="M13 7V4.5A1.5 1.5 0 0 0 11.5 3h-6A1.5 1.5 0 0 0 4 4.5v6A1.5 1.5 0 0 0 5.5 12H7"
+            stroke="currentColor"
+            strokeWidth="1.6"
+          />
+        </svg>
+      )}
+      {copied ? "Copied" : "Copy"}
+    </button>
+  );
+}
+
 function MethodChoiceButtons({
   onPick,
 }: {
@@ -1020,17 +1092,31 @@ export function VipCheckoutChat({
                               Wallet
                               address
                             </span>
-                            <strong
+                            <span
                               className={
-                                styles.walletAddress
+                                styles.walletAddressRow
                               }
                             >
-                              {
-                                cryptoState
-                                  .invoice
-                                  .payAddress
-                              }
-                            </strong>
+                              <strong
+                                className={
+                                  styles.walletAddress
+                                }
+                              >
+                                {
+                                  cryptoState
+                                    .invoice
+                                    .payAddress
+                                }
+                              </strong>
+
+                              <CopyButton
+                                value={
+                                  cryptoState
+                                    .invoice
+                                    .payAddress
+                                }
+                              />
+                            </span>
                           </div>
 
                           <div>
