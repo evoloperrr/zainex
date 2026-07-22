@@ -17,6 +17,10 @@ type StrategyLog = {
   sourceEventType?: string;
   tier?: string;
   amount?: number | string;
+  walletBalanceBefore?: number | string;
+  walletBalanceAfter?: number | string;
+  principalBasis?: number | string | null;
+  dailyRate?: number | string | null;
   creditCost?: number | string;
   rate?: string | null;
   status?: string | null;
@@ -139,11 +143,19 @@ function eventDetail(
         .join(" • ");
 
     case "STRATEGY_DAILY_PROFIT":
-      return (
+      return [
         `${tier} • Day ` +
-        `${log.dayNumber ?? log.paidDays ?? 0}/` +
-        `${termDays}`
-      );
+          `${log.dayNumber ?? log.paidDays ?? 0}/` +
+          `${termDays}`,
+        log.dailyRate == null
+          ? null
+          : `${toNumber(log.dailyRate) * 100}% daily`,
+        log.principalBasis == null
+          ? null
+          : `${formatUsd(log.principalBasis)} trading amount`,
+      ]
+        .filter(Boolean)
+        .join(" • ");
 
     case "STRATEGY_PRINCIPAL_RELEASED":
       return (
@@ -164,6 +176,24 @@ function eventDetail(
         tier
       );
   }
+}
+
+function eventDescription(
+  log: StrategyLog,
+): string | null | undefined {
+  if (
+    log.eventType ===
+      "STRATEGY_DAILY_PROFIT" &&
+    log.walletBalanceBefore != null &&
+    log.walletBalanceAfter != null
+  ) {
+    return (
+      `Wallet ${formatUsd(log.walletBalanceBefore)} → ` +
+      `${formatUsd(log.walletBalanceAfter)}`
+    );
+  }
+
+  return log.description;
 }
 
 function amountLabel(
@@ -360,7 +390,7 @@ export function StrategyTransactionLogs() {
                 </strong>
 
                 <small>
-                  {log.description}
+                  {eventDescription(log)}
                 </small>
               </div>
 

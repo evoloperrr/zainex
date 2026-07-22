@@ -77,8 +77,9 @@ RUN rm -f bootstrap/cache/*.php \
         bootstrap/cache \
     && chmod -R ug+rwX \
         storage \
-        bootstrap/cache
+        bootstrap/cache \
+    && chmod +x docker-entrypoint.sh
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "php artisan package:discover --ansi && php artisan migrate --force && php artisan config:cache && exec apache2-foreground"]
+CMD ["./docker-entrypoint.sh"]

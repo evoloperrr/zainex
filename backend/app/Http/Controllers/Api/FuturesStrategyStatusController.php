@@ -130,11 +130,15 @@ final class FuturesStrategyStatusController extends Controller
                     'wallet_tx.event_type',
                     'wallet_tx.direction',
                     'wallet_tx.amount',
+                    'wallet_tx.wallet_balance_before',
+                    'wallet_tx.wallet_balance_after',
                     'wallet_tx.description',
                     'wallet_tx.metadata',
                     'wallet_tx.occurred_at',
                     'activation.tier',
                     'activation.display_rate',
+                    'activation.allocated_amount',
+                    'activation.daily_rate',
                     'activation.credit_cost',
                     'activation.status as activation_status',
                     'activation.paid_days',
@@ -209,6 +213,42 @@ final class FuturesStrategyStatusController extends Controller
                                 'FREE TIER',
                             'amount' =>
                                 (float) $row->amount,
+                            'walletBalanceBefore' =>
+                                (float)
+                                    $row
+                                        ->wallet_balance_before,
+                            'walletBalanceAfter' =>
+                                (float)
+                                    $row
+                                        ->wallet_balance_after,
+                            'principalBasis' =>
+                                isset(
+                                    $metadata['principal'],
+                                )
+                                    ? (float)
+                                        $metadata['principal']
+                                    : (
+                                        $row
+                                            ->allocated_amount ===
+                                            null
+                                            ? null
+                                            : (float)
+                                                $row
+                                                    ->allocated_amount
+                                    ),
+                            'dailyRate' =>
+                                isset(
+                                    $metadata['dailyRate'],
+                                )
+                                    ? (float)
+                                        $metadata['dailyRate']
+                                    : (
+                                        $row->daily_rate ===
+                                        null
+                                            ? null
+                                            : (float)
+                                                $row->daily_rate
+                                    ),
                             'creditCost' =>
                                 (int)
                                     ($row->credit_cost ?? 0),
