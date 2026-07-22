@@ -208,6 +208,96 @@ final class StrategyReferralIncomeTest extends TestCase
         );
     }
 
+    public function test_backfill_credits_previous_qualifying_activation_once(): void
+    {
+        $inviterId = $this->createInviter();
+        $sourceUserId = (int) DB::table('users')
+            ->where('email', RootUserSeeder::EMAIL)
+            ->value('id');
+
+        DB::table('users')
+            ->where('id', $sourceUserId)
+            ->update([
+                'inviter_id' => $inviterId,
+                'referred_at' => now(),
+            ]);
+
+        Config::set(
+            'referral_rewards.strategy_trading_amount_rate_bps',
+            0,
+        );
+
+        $this
+            ->withHeaders($this->headers())
+            ->postJson(
+                '/api/trading/futures/strategies/activate',
+                [
+                    'tier' => 'VIP 2',
+                    'amount' => 100,
+                    'clientRequestId' => (string) Str::uuid(),
+                ],
+            )
+            ->assertCreated();
+
+        self::assertSame(
+            0,
+            DB::table('wallet_transactions')
+                ->where('event_type', 'STRATEGY_REFERRAL_INCOME')
+                ->count(),
+        );
+
+        Config::set(
+            'referral_rewards.strategy_trading_amount_rate_bps',
+            1000,
+        );
+
+        $this
+            ->artisan('strategy:backfill-referral-income')
+            ->assertExitCode(0);
+
+        self::assertSame(
+            110.0,
+            (float) DB::table('users')
+                ->where('id', $inviterId)
+                ->value('wallet_balance'),
+        );
+        self::assertSame(
+            110.0,
+            (float) DB::table('trading_balances as balance')
+                ->join(
+                    'trading_accounts as account',
+                    'account.id',
+                    '=',
+                    'balance.trading_account_id',
+                )
+                ->where('account.user_id', $inviterId)
+                ->value('balance.available_balance'),
+        );
+        self::assertSame(
+            10.0,
+            (float) DB::table('wallet_transactions')
+                ->where('event_type', 'STRATEGY_REFERRAL_INCOME')
+                ->value('amount'),
+        );
+
+        $this
+            ->artisan('strategy:backfill-referral-income')
+            ->assertExitCode(0);
+
+        self::assertSame(
+            1,
+            DB::table('wallet_transactions')
+                ->where('event_type', 'STRATEGY_REFERRAL_INCOME')
+                ->count(),
+        );
+        self::assertSame(
+            110.0,
+            (float) DB::table('users')
+                ->where('id', $inviterId)
+                ->value('wallet_balance'),
+        );
+    }
+
     private function createInviter(): int
     {
         $now = now();

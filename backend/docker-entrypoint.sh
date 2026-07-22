@@ -10,6 +10,9 @@ php artisan config:cache
 # Catch up due credits immediately after a cold start/deploy, then keep the
 # scheduler alive beside Apache. The accrual command is idempotent per day.
 (
+    # Backfill previous qualifying activations. Unique ledger keys make this
+    # safe on every restart and skip every referral income already credited.
+    php artisan strategy:backfill-referral-income || true
     php artisan strategy:accrue-due || true
     exec php artisan schedule:work --no-interaction
 ) &
