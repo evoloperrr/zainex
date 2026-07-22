@@ -605,7 +605,7 @@ function NetworkContent() {
               {" "}
               <strong>
                 {payload.inviter
-                  ? `${payload.inviter.name} Â· ${payload.inviter.email}`
+                  ? `${payload.inviter.name} · ${payload.inviter.email}`
                   : "No inviter assigned"}
               </strong>
             </p>
