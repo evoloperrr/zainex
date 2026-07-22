@@ -108,15 +108,21 @@ type ReferralPayload = {
   };
 };
 
-function formatCreditAmount(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 8,
-  }).format(value);
-}
-
 function NetworkContent() {
-  const { formatUsd } = useCurrency();
+  const { formatUsd, rate } =
+    useCurrency();
+
+  function formatCreditAmount(
+    value: number,
+  ): string {
+    return new Intl.NumberFormat(
+      "en-US",
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 8,
+      },
+    ).format(value * rate);
+  }
 
   const [
     payload,
