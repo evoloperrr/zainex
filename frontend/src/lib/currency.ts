@@ -16,22 +16,24 @@ export type CurrencyCode =
   | "INR"
   | "CNY";
 
+// Alphabetical by code — default currency is still forced to USD via
+// CurrencyProvider's initial state, regardless of this order.
 export const CURRENCIES: Array<{
   code: CurrencyCode;
   label: string;
   locale: string;
 }> = [
-  { code: "USD", label: "US Dollar", locale: "en-US" },
-  { code: "PHP", label: "Philippine Peso", locale: "en-PH" },
-  { code: "EUR", label: "Euro", locale: "en-IE" },
-  { code: "GBP", label: "British Pound", locale: "en-GB" },
-  { code: "JPY", label: "Japanese Yen", locale: "ja-JP" },
   { code: "AUD", label: "Australian Dollar", locale: "en-AU" },
   { code: "CAD", label: "Canadian Dollar", locale: "en-CA" },
-  { code: "SGD", label: "Singapore Dollar", locale: "en-SG" },
+  { code: "CNY", label: "Chinese Yuan", locale: "zh-CN" },
+  { code: "EUR", label: "Euro", locale: "en-IE" },
+  { code: "GBP", label: "British Pound", locale: "en-GB" },
   { code: "HKD", label: "Hong Kong Dollar", locale: "en-HK" },
   { code: "INR", label: "Indian Rupee", locale: "en-IN" },
-  { code: "CNY", label: "Chinese Yuan", locale: "zh-CN" },
+  { code: "JPY", label: "Japanese Yen", locale: "ja-JP" },
+  { code: "PHP", label: "Philippine Peso", locale: "en-PH" },
+  { code: "SGD", label: "Singapore Dollar", locale: "en-SG" },
+  { code: "USD", label: "US Dollar", locale: "en-US" },
 ];
 
 // Fallback rates (USD -> currency) used until a live rate is fetched, and
