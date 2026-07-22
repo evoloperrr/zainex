@@ -47,6 +47,10 @@ type OpenAction =
       userId: number;
       kind: "name";
     }
+  | {
+      userId: number;
+      kind: "role";
+    }
   | null;
 
 const PER_PAGE = 20;
@@ -153,6 +157,9 @@ export default function AdminUsersPage() {
 
   const [nameInput, setNameInput] =
     useState("");
+
+  const [roleValue, setRoleValue] =
+    useState("ADMIN");
 
   const [submitting, setSubmitting] =
     useState(false);
@@ -301,6 +308,66 @@ export default function AdminUsersPage() {
         ok: false,
         message:
           "Network error while updating the name.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function submitUpdateRole(
+    user: AdminUser,
+  ) {
+    setSubmitting(true);
+    setRowFeedback(null);
+
+    try {
+      const response = await fetch(
+        "/api/admin/users/update-role",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            targetEmail: user.email,
+            role: roleValue,
+          }),
+        },
+      );
+
+      const payload =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !payload.ok
+      ) {
+        setRowFeedback({
+          userId: user.id,
+          ok: false,
+          message:
+            payload.error
+              ?.message ??
+            "Could not update the role.",
+        });
+        return;
+      }
+
+      setRowFeedback({
+        userId: user.id,
+        ok: true,
+        message: `Role updated to ${roleValue}.`,
+      });
+
+      setOpenAction(null);
+      refresh();
+    } catch {
+      setRowFeedback({
+        userId: user.id,
+        ok: false,
+        message:
+          "Network error while updating the role.",
       });
     } finally {
       setSubmitting(false);
@@ -652,6 +719,37 @@ export default function AdminUsersPage() {
                               setRowFeedback(
                                 null,
                               );
+                              setRoleValue(
+                                user.isAdmin
+                                  ? user.role
+                                  : "ADMIN",
+                              );
+                              setOpenAction(
+                                openAction?.userId ===
+                                  user.id &&
+                                openAction.kind ===
+                                  "role"
+                                  ? null
+                                  : {
+                                      userId:
+                                        user.id,
+                                      kind: "role",
+                                    },
+                              );
+                            }}
+                          >
+                            Change role
+                          </button>
+
+                          <button
+                            type="button"
+                            className={
+                              styles.rowActionButton
+                            }
+                            onClick={() => {
+                              setRowFeedback(
+                                null,
+                              );
                               setOpenAction(
                                 openAction?.userId ===
                                   user.id &&
@@ -751,6 +849,86 @@ export default function AdminUsersPage() {
                             >
                               Confirm
                               name
+                            </button>
+
+                            {rowFeedback?.userId ===
+                            user.id ? (
+                              <span
+                                className={`${
+                                  styles.feedback
+                                } ${
+                                  rowFeedback.ok
+                                    ? styles.feedbackOk
+                                    : styles.feedbackError
+                                }`}
+                              >
+                                {
+                                  rowFeedback.message
+                                }
+                              </span>
+                            ) : null}
+                          </div>
+                        </td>
+                      </tr>
+                    ) : null}
+
+                    {openAction?.userId ===
+                      user.id &&
+                    openAction.kind ===
+                      "role" ? (
+                      <tr
+                        key={`${user.id}-role-form`}
+                      >
+                        <td
+                          colSpan={
+                            8
+                          }
+                        >
+                          <div
+                            className={
+                              styles.inlineForm
+                            }
+                          >
+                            <select
+                              value={
+                                roleValue
+                              }
+                              onChange={(
+                                event,
+                              ) => {
+                                setRoleValue(
+                                  event
+                                    .target
+                                    .value,
+                                );
+                              }}
+                            >
+                              <option value="USER">
+                                USER
+                                (remove
+                                admin)
+                              </option>
+                              <option value="ADMIN">
+                                ADMIN
+                              </option>
+                              <option value="ROOT">
+                                ROOT
+                              </option>
+                            </select>
+
+                            <button
+                              type="button"
+                              disabled={
+                                submitting
+                              }
+                              onClick={() => {
+                                void submitUpdateRole(
+                                  user,
+                                );
+                              }}
+                            >
+                              Confirm
+                              role
                             </button>
 
                             {rowFeedback?.userId ===
