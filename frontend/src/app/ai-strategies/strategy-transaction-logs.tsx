@@ -8,6 +8,10 @@ import {
   useState,
 } from "react";
 
+import {
+  useCurrency,
+} from "@/components/currency-provider";
+
 import styles from "./ai-strategies.module.css";
 
 type StrategyLog = {
@@ -78,21 +82,9 @@ function toNumber(
     : 0;
 }
 
-function formatUsd(
+type FormatUsd = (
   value: unknown,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(
-    toNumber(value),
-  );
-}
+) => string;
 
 function formatPercent(
   value: unknown,
@@ -165,6 +157,7 @@ function eventTitle(
 
 function eventDetail(
   log: StrategyLog,
+  formatUsd: FormatUsd,
 ): string {
   const tier =
     log.tier ?? "FREE TIER";
@@ -283,6 +276,7 @@ function padCountdown(
 
 function eventDescription(
   log: StrategyLog,
+  formatUsd: FormatUsd,
 ): string | null | undefined {
   if (
     [
@@ -303,6 +297,7 @@ function eventDescription(
 
 function amountLabel(
   log: StrategyLog,
+  formatUsd: FormatUsd,
 ): string {
   switch (log.eventType) {
     case "STRATEGY_DAILY_PROFIT":
@@ -343,6 +338,17 @@ function eventClassName(
 }
 
 export function StrategyTransactionLogs() {
+  const {
+    formatUsd: formatDisplayCurrency,
+  } = useCurrency();
+
+  const formatUsd: FormatUsd = (
+    value,
+  ) =>
+    formatDisplayCurrency(
+      toNumber(value),
+    );
+
   const [logs, setLogs] =
     useState<StrategyLog[]>([]);
 
@@ -609,17 +615,26 @@ export function StrategyTransactionLogs() {
                 </span>
 
                 <strong>
-                  {eventDetail(log)}
+                  {eventDetail(
+                    log,
+                    formatUsd,
+                  )}
                 </strong>
 
                 <small>
-                  {eventDescription(log)}
+                  {eventDescription(
+                    log,
+                    formatUsd,
+                  )}
                 </small>
               </div>
 
               <div className={styles.combinedLogAmount}>
                 <strong>
-                  {amountLabel(log)}
+                  {amountLabel(
+                    log,
+                    formatUsd,
+                  )}
                 </strong>
 
                 <span>
