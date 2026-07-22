@@ -35,9 +35,9 @@ const QUICK_ACTIONS: Array<{
     href: "/roadmap",
   },
   {
-    label: "Materials",
-    hint: "Brand assets and press kit",
-    href: "/materials",
+    label: "Collaterals",
+    hint: "Banners and the pitch deck",
+    href: "/collaterals",
   },
   {
     label: "Get support",
