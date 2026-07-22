@@ -12,6 +12,8 @@ import {
   useState,
 } from "react";
 
+import { createPortal } from "react-dom";
+
 import {
   useCurrency,
 } from "@/components/currency-provider";
@@ -691,19 +693,21 @@ export function StrategyActivationGrid() {
 
       <StrategyTransactionLogs />
 
-      {selected ? (
-        <div
-          className={styles.modalBackdrop}
-          role="presentation"
-          onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
-              closeModal();
-            }
-          }}
-        >
+      {selected &&
+      typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className={styles.modalBackdrop}
+              role="presentation"
+              onMouseDown={(event) => {
+                if (
+                  event.target ===
+                  event.currentTarget
+                ) {
+                  closeModal();
+                }
+              }}
+            >
           <section
             className={styles.activationModal}
             role="dialog"
@@ -927,8 +931,10 @@ export function StrategyActivationGrid() {
               </div>
             </form>
           </section>
-        </div>
-      ) : null}
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }
