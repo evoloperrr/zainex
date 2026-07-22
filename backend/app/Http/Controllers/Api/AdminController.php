@@ -192,6 +192,68 @@ final class AdminController extends Controller
             ->header('Cache-Control', 'no-store');
     }
 
+    public function updateUserRole(Request $request): JsonResponse
+    {
+        [$guard, $actor] = $this->authorizeWithActor($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        if ((string) ($actor->role ?? '') !== 'ROOT') {
+            return $this->error(403, 'ROOT_PERMISSION_REQUIRED', 'Only a ROOT administrator can change admin roles.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'targetEmail' => ['required', 'string', 'email:rfc', 'max:255'],
+            'role' => ['required', 'string', 'in:USER,ADMIN,ROOT'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(422, 'INVALID_ROLE_UPDATE_REQUEST', $validator->errors()->first());
+        }
+
+        $validated = $validator->validated();
+        $targetEmail = strtolower(trim((string) $validated['targetEmail']));
+        $role = (string) $validated['role'];
+
+        $target = DB::table('users')
+            ->whereRaw('LOWER(email) = ?', [$targetEmail])
+            ->first();
+
+        if ($target === null) {
+            return $this->error(404, 'TARGET_USER_NOT_FOUND', 'No user was found with that email.');
+        }
+
+        if (
+            $targetEmail === strtolower(trim((string) $actor->email)) &&
+            $role === 'USER'
+        ) {
+            return $this->error(422, 'CANNOT_SELF_DEMOTE', 'You cannot remove your own admin access.');
+        }
+
+        DB::table('users')
+            ->where('id', $target->id)
+            ->update([
+                'is_admin' => $role !== 'USER',
+                'role' => $role,
+                'updated_at' => now(),
+            ]);
+
+        return response()
+            ->json([
+                'ok' => true,
+                'user' => [
+                    'id' => (int) $target->id,
+                    'email' => (string) $target->email,
+                    'name' => (string) ($target->name ?? ''),
+                    'role' => $role,
+                    'isAdmin' => $role !== 'USER',
+                ],
+            ])
+            ->header('Cache-Control', 'no-store');
+    }
+
     public function grantVip(Request $request): JsonResponse
     {
         $guard = $this->authorize($request);

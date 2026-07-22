@@ -198,6 +198,8 @@ Route::controller(
         ->middleware('throttle:60,1');
     Route::post('/users/update-name', 'updateUserName')
         ->middleware('throttle:20,1');
+    Route::post('/users/update-role', 'updateUserRole')
+        ->middleware('throttle:20,1');
     Route::post('/users/grant-vip', 'grantVip')
         ->middleware('throttle:20,1');
     Route::post('/users/credit-wallet', 'creditWallet')
