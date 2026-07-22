@@ -1818,109 +1818,49 @@ function SectionHologram({
       {page === "home" ? (
         <svg
           viewBox="0 0 600 300"
-          preserveAspectRatio="xMidYMid meet"
+          preserveAspectRatio="none"
           className={
             styles.hologramSvg
           }
         >
-          <defs>
-            <radialGradient
-              id="zainexHomeAmbientGlow"
-              cx="0"
-              cy="0"
-              r="1"
-              gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(300 140) scale(110)"
-            >
-              <stop
-                offset="0%"
-                stopColor="var(--hologram-accent)"
-                stopOpacity="0.4"
-              />
-              <stop
-                offset="100%"
-                stopColor="var(--hologram-accent)"
-                stopOpacity="0"
-              />
-            </radialGradient>
-            <radialGradient
-              id="zainexHomeCoreGlow"
-              cx="0"
-              cy="0"
-              r="1"
-              gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(300 226) scale(36)"
-            >
-              <stop
-                offset="0%"
-                stopColor="var(--hologram-accent-2, #ff4dd8)"
-                stopOpacity="0.85"
-              />
-              <stop
-                offset="100%"
-                stopColor="var(--hologram-accent-2, #ff4dd8)"
-                stopOpacity="0"
-              />
-            </radialGradient>
-          </defs>
-
-          <circle
-            cx="300"
-            cy="140"
-            r="110"
-            fill="url(#zainexHomeAmbientGlow)"
-          />
-
-          <path
-            className={
-              styles.hologramBrainOutline
-            }
-            d="M300,66 L274,54 L250,60 L236,78 L228,100 L234,122 L224,146 L236,168 L258,184 L300,192 L342,184 L364,168 L376,146 L366,122 L372,100 L364,78 L350,60 L326,54 Z"
-          />
-
           <g
             className={
-              styles.hologramBrainTraces
+              styles.hologramMesh
             }
           >
-            <path d="M250,60 L250,44" />
-            <path d="M350,60 L350,44" />
-            <path d="M224,146 L204,146" />
-            <path d="M376,146 L396,146" />
+            <path d="M70,55 L190,95 L330,45 L470,85 L555,150" />
+            <path d="M120,185 L255,225 L395,195 L515,245" />
+            <path d="M255,225 L185,265" />
+            <path d="M190,95 L300,150 L410,110 L470,85" />
+            <path d="M300,150 L120,185" />
+            <path d="M300,150 L395,195" />
           </g>
 
           <g
             className={
-              styles.hologramBrainNodes
+              styles.hologramNodes
             }
           >
-            <circle cx="250" cy="44" r="3" />
-            <circle cx="350" cy="44" r="3" />
-            <circle cx="204" cy="146" r="3" />
-            <circle cx="396" cy="146" r="3" />
-            <circle cx="280" cy="100" r="2.6" />
-            <circle cx="320" cy="100" r="2.6" />
-            <circle cx="300" cy="140" r="3.2" />
+            <circle cx="70" cy="55" r="4" />
+            <circle cx="190" cy="95" r="4" />
+            <circle cx="330" cy="45" r="4" />
+            <circle cx="470" cy="85" r="4" />
+            <circle cx="555" cy="150" r="4" />
+            <circle cx="120" cy="185" r="4" />
+            <circle cx="255" cy="225" r="4" />
+            <circle cx="395" cy="195" r="4" />
+            <circle cx="515" cy="245" r="4" />
+            <circle cx="185" cy="265" r="4" />
           </g>
 
-          <line
+          <g
             className={
-              styles.hologramBrainStem
+              styles.hologramNodesAccent
             }
-            x1="300"
-            y1="192"
-            x2="300"
-            y2="222"
-          />
-
-          <circle
-            className={
-              styles.hologramBrainCore
-            }
-            cx="300"
-            cy="226"
-            r="6"
-          />
+          >
+            <circle cx="300" cy="150" r="8" />
+            <circle cx="410" cy="110" r="7" />
+          </g>
         </svg>
       ) : null}
     </div>
