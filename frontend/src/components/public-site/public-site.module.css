@@ -5745,3 +5745,416 @@ body[data-public-reveal="ready"]
 }
 
 /* ZAINEX_ROOT_HOME_NEURAL_REACTOR_CSS_ONLY_V3_END */
+
+/* ZAINEX_PER_PAGE_SECTION_HOLOGRAM_AND_LAYOUT_V1 */
+
+.site {
+  --hologram-accent: var(--public-cyan);
+}
+
+.site[data-page="platform"] {
+  --hologram-accent: var(--public-blue);
+}
+
+.site[data-page="intellibrain"] {
+  --hologram-accent: var(--public-violet);
+}
+
+.site[data-page="strategies"] {
+  --hologram-accent: var(--public-violet);
+}
+
+.site[data-page="security"] {
+  --hologram-accent: var(--public-green);
+}
+
+.site[data-page="company"] {
+  --hologram-accent: #b7c2e6;
+}
+
+.intro,
+.workflowSection,
+.cardSection,
+.statementSection {
+  position: relative;
+  overflow: hidden;
+}
+
+.cardSection {
+  width: 100%;
+}
+
+.statementSection {
+  width: 100%;
+}
+
+.hologram {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.16;
+}
+
+.hologramSvg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.hologram_intro {
+  inset: -10% -6% auto auto;
+  width: 46%;
+  height: 240px;
+}
+
+.hologram_cards {
+  inset: 0;
+  opacity: 0.13;
+}
+
+.hologram_workflow {
+  inset: 0;
+  opacity: 0.11;
+}
+
+.hologram_statement {
+  inset: 0;
+  opacity: 0.2;
+}
+
+.intro > *,
+.cardGrid,
+.workflowHeading,
+.workflow,
+.statement {
+  position: relative;
+  z-index: 1;
+}
+
+.hologramGrid line,
+.hologramFlow line,
+.hologramBlueprint line {
+  stroke: var(--hologram-accent);
+  stroke-width: 1;
+  opacity: 0.4;
+}
+
+.hologramWave {
+  fill: none;
+  stroke: var(--hologram-accent);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px currentColor);
+  color: var(--hologram-accent);
+}
+
+.hologramMesh path,
+.hologramCircuit path {
+  fill: none;
+  stroke: var(--hologram-accent);
+  stroke-width: 1.4;
+  opacity: 0.5;
+}
+
+.hologramNodes circle {
+  fill: var(--hologram-accent);
+  filter: drop-shadow(0 0 5px var(--hologram-accent));
+  animation: publicHologramPulse 2.6s ease-in-out infinite;
+}
+
+@keyframes publicHologramPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.hologramOrbit {
+  fill: none;
+  stroke: var(--hologram-accent);
+  stroke-width: 1;
+  opacity: 0.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: publicHologramSpin 46s linear infinite;
+}
+
+.hologramOrbit:nth-of-type(2) {
+  animation-duration: 60s;
+  animation-direction: reverse;
+}
+
+.hologramOrbit:nth-of-type(3) {
+  animation-duration: 76s;
+}
+
+@keyframes publicHologramSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hologramHex polygon {
+  fill: none;
+  stroke: var(--hologram-accent);
+  stroke-width: 1;
+  opacity: 0.3;
+}
+
+.hologramScan {
+  fill: var(--hologram-accent);
+  opacity: 0.16;
+  animation: publicHologramScan 5.5s ease-in-out infinite;
+}
+
+@keyframes publicHologramScan {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(230px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.hologramCorner {
+  fill: none;
+  stroke: var(--hologram-accent);
+  stroke-width: 1.5;
+  opacity: 0.45;
+}
+
+.hologramRing {
+  fill: none;
+  stroke: var(--hologram-accent);
+  stroke-width: 1;
+  opacity: 0.32;
+}
+
+.hologramSweep {
+  stroke: var(--hologram-accent);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: publicHologramSpin 9s linear infinite;
+  filter: drop-shadow(0 0 8px var(--hologram-accent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hologramNodes circle,
+  .hologramOrbit,
+  .hologramScan,
+  .hologramSweep {
+    animation: none;
+  }
+}
+
+.cardGridLayout {
+  position: relative;
+}
+
+.site[data-page="platform"]
+  .featureCard[data-card-index="0"] {
+  transform: translateY(0);
+}
+
+.site[data-page="platform"]
+  .featureCard[data-card-index="1"] {
+  transform: translateY(36px);
+}
+
+.site[data-page="platform"]
+  .featureCard[data-card-index="2"] {
+  transform: translateY(0);
+}
+
+.site[data-page="markets"] .cardGridLayout {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, auto);
+}
+
+.site[data-page="markets"]
+  .featureCard[data-card-index="0"] {
+  grid-column: span 2;
+  border-color: rgba(70, 220, 255, 0.22);
+}
+
+.site[data-page="intellibrain"]
+  .featureCard[data-card-index="1"] {
+  transform: scale(1.045);
+  z-index: 1;
+  border-color: rgba(161, 93, 255, 0.4);
+  box-shadow: 0 30px 90px rgba(161, 93, 255, 0.16);
+}
+
+.site[data-page="strategies"] .cardGridLayout {
+  position: relative;
+}
+
+.site[data-page="strategies"] .cardGridLayout::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4%;
+  right: 4%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(161, 93, 255, 0.4),
+    transparent
+  );
+}
+
+.site[data-page="strategies"]
+  .featureCard[data-card-index="1"] {
+  transform: translateY(-20px);
+}
+
+.site[data-page="strategies"]
+  .featureCard[data-card-index="0"],
+.site[data-page="strategies"]
+  .featureCard[data-card-index="2"] {
+  transform: translateY(20px);
+}
+
+.site[data-page="wallets"] .cardGridLayout {
+  gap: 0;
+}
+
+.site[data-page="wallets"] .featureCard {
+  transition: transform 220ms ease;
+}
+
+.site[data-page="wallets"]
+  .featureCard[data-card-index="0"] {
+  margin-right: -16px;
+  z-index: 1;
+}
+
+.site[data-page="wallets"]
+  .featureCard[data-card-index="1"] {
+  z-index: 3;
+  transform: scale(1.035);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.5);
+}
+
+.site[data-page="wallets"]
+  .featureCard[data-card-index="2"] {
+  margin-left: -16px;
+  z-index: 1;
+}
+
+.site[data-page="security"]
+  .featureCard[data-card-index="0"] {
+  border-color: rgba(98, 239, 189, 0.32);
+  box-shadow:
+    0 0 0 1px rgba(98, 239, 189, 0.1),
+    0 30px 80px rgba(98, 239, 189, 0.1);
+}
+
+.site[data-page="company"] .cardGridLayout {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.site[data-page="company"]
+  .featureCard[data-card-index="0"] {
+  grid-column: 1 / -1;
+  min-height: 200px;
+}
+
+@media (max-width: 900px) {
+  .site[data-page="platform"]
+    .featureCard[data-card-index="1"],
+  .site[data-page="strategies"]
+    .featureCard[data-card-index="0"],
+  .site[data-page="strategies"]
+    .featureCard[data-card-index="1"],
+  .site[data-page="strategies"]
+    .featureCard[data-card-index="2"] {
+    transform: none;
+  }
+
+  .site[data-page="markets"]
+    .featureCard[data-card-index="0"],
+  .site[data-page="company"] .cardGridLayout {
+    grid-column: auto;
+  }
+
+  .site[data-page="wallets"] .featureCard {
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .site[data-page="strategies"] .cardGridLayout::before {
+    display: none;
+  }
+}
+
+.site[data-page="strategies"] .workflow,
+.site[data-page="wallets"] .workflow,
+.site[data-page="security"] .workflow {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 620px;
+  gap: 30px;
+}
+
+.site[data-page="strategies"] .workflow article,
+.site[data-page="wallets"] .workflow article,
+.site[data-page="security"] .workflow article {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 20px;
+  padding: 0;
+}
+
+.site[data-page="strategies"] .workflow article + article,
+.site[data-page="wallets"] .workflow article + article,
+.site[data-page="security"] .workflow article + article {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.site[data-page="strategies"] .workflowNumber,
+.site[data-page="wallets"] .workflowNumber,
+.site[data-page="security"] .workflowNumber {
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+}
+
+.site[data-page="strategies"] .workflowNumber i,
+.site[data-page="wallets"] .workflowNumber i,
+.site[data-page="security"] .workflowNumber i {
+  width: 1px;
+  height: auto;
+  flex: 1;
+  min-height: 24px;
+  background: linear-gradient(
+    180deg,
+    var(--hologram-accent),
+    transparent
+  );
+  opacity: 0.5;
+}
+
+@media (max-width: 900px) {
+  .site[data-page="strategies"] .workflow,
+  .site[data-page="wallets"] .workflow,
+  .site[data-page="security"] .workflow {
+    max-width: none;
+  }
+}
+
+/* ZAINEX_PER_PAGE_SECTION_HOLOGRAM_AND_LAYOUT_V1_END */

@@ -643,7 +643,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         label: "Stop loss input",
       },
       {
-        value: "PAPER",
+        value: "GUARDED",
         label: "Current execution scope",
       },
     ],
@@ -1470,6 +1470,398 @@ function HeroDetailVisual({
     </div>
   );
 }
+
+type HologramSection =
+  | "intro"
+  | "cards"
+  | "workflow"
+  | "statement";
+
+function SectionHologram({
+  page,
+  section,
+}: {
+  page: PublicPageKey;
+  section: HologramSection;
+}) {
+  return (
+    <div
+      className={`${styles.hologram} ${
+        styles[
+          `hologram_${section}` as
+            | "hologram_intro"
+            | "hologram_cards"
+            | "hologram_workflow"
+            | "hologram_statement"
+        ]
+      }`}
+      data-hologram-page={page}
+      aria-hidden="true"
+    >
+      {page === "markets" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <g
+            className={
+              styles.hologramGrid
+            }
+          >
+            {[
+              40, 100, 160, 220,
+              280,
+            ].map((y) => (
+              <line
+                key={y}
+                x1="0"
+                x2="600"
+                y1={y}
+                y2={y}
+              />
+            ))}
+          </g>
+
+          <path
+            className={
+              styles.hologramWave
+            }
+            d="M0 220 C60 200 90 160 140 170 C190 180 220 120 270 100 C320 80 350 140 400 120 C450 100 480 40 540 60 L600 50"
+          />
+        </svg>
+      ) : null}
+
+      {page === "intellibrain" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <g
+            className={
+              styles.hologramMesh
+            }
+          >
+            <path d="M40 60 L180 130 L60 220" />
+            <path d="M180 130 L340 60 L480 140 L340 220 L180 130" />
+            <path d="M480 140 L560 70" />
+            <path d="M480 140 L560 230" />
+          </g>
+
+          <g
+            className={
+              styles.hologramNodes
+            }
+          >
+            <circle
+              cx="40"
+              cy="60"
+              r="5"
+            />
+            <circle
+              cx="60"
+              cy="220"
+              r="5"
+            />
+            <circle
+              cx="180"
+              cy="130"
+              r="8"
+            />
+            <circle
+              cx="340"
+              cy="60"
+              r="5"
+            />
+            <circle
+              cx="340"
+              cy="220"
+              r="5"
+            />
+            <circle
+              cx="480"
+              cy="140"
+              r="8"
+            />
+            <circle
+              cx="560"
+              cy="70"
+              r="5"
+            />
+            <circle
+              cx="560"
+              cy="230"
+              r="5"
+            />
+          </g>
+        </svg>
+      ) : null}
+
+      {page === "strategies" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <ellipse
+            className={
+              styles.hologramOrbit
+            }
+            cx="300"
+            cy="150"
+            rx="260"
+            ry="90"
+          />
+          <ellipse
+            className={
+              styles.hologramOrbit
+            }
+            cx="300"
+            cy="150"
+            rx="170"
+            ry="150"
+          />
+          <ellipse
+            className={
+              styles.hologramOrbit
+            }
+            cx="300"
+            cy="150"
+            rx="90"
+            ry="200"
+          />
+        </svg>
+      ) : null}
+
+      {page === "wallets" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <g
+            className={
+              styles.hologramFlow
+            }
+          >
+            {[
+              70, 190, 310, 430,
+              550,
+            ].map((x) => (
+              <line
+                key={x}
+                x1={x}
+                x2={x}
+                y1="0"
+                y2="300"
+              />
+            ))}
+          </g>
+        </svg>
+      ) : null}
+
+      {page === "security" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <g
+            className={
+              styles.hologramHex
+            }
+          >
+            {Array.from({
+              length: 6,
+            }).map((_, row) =>
+              Array.from({
+                length: 8,
+              }).map((_, col) => {
+                const x =
+                  col * 84 +
+                  (row % 2 === 0
+                    ? 0
+                    : 42);
+                const y =
+                  row * 56;
+
+                return (
+                  <polygon
+                    key={`${row}-${col}`}
+                    points="20,0 40,12 40,36 20,48 0,36 0,12"
+                    transform={`translate(${x - 20} ${y})`}
+                  />
+                );
+              }),
+            )}
+          </g>
+
+          <rect
+            className={
+              styles.hologramScan
+            }
+            x="0"
+            y="0"
+            width="600"
+            height="40"
+          />
+        </svg>
+      ) : null}
+
+      {page === "platform" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <g
+            className={
+              styles.hologramCircuit
+            }
+          >
+            <path d="M0 60 H180 V140 H360 V40 H600" />
+            <path d="M0 220 H140 V160 H420 V260 H600" />
+            <path d="M80 0 V90" />
+            <path d="M340 0 V40" />
+            <path d="M420 300 V260" />
+          </g>
+
+          <g
+            className={
+              styles.hologramNodes
+            }
+          >
+            <circle
+              cx="180"
+              cy="140"
+              r="5"
+            />
+            <circle
+              cx="360"
+              cy="40"
+              r="5"
+            />
+            <circle
+              cx="140"
+              cy="160"
+              r="5"
+            />
+            <circle
+              cx="420"
+              cy="260"
+              r="5"
+            />
+          </g>
+        </svg>
+      ) : null}
+
+      {page === "company" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <g
+            className={
+              styles.hologramBlueprint
+            }
+          >
+            {[
+              0, 100, 200, 300,
+              400, 500, 600,
+            ].map((x) => (
+              <line
+                key={`v${x}`}
+                x1={x}
+                x2={x}
+                y1="0"
+                y2="300"
+              />
+            ))}
+            {[
+              0, 75, 150, 225, 300,
+            ].map((y) => (
+              <line
+                key={`h${y}`}
+                x1="0"
+                x2="600"
+                y1={y}
+                y2={y}
+              />
+            ))}
+          </g>
+
+          <path
+            className={
+              styles.hologramCorner
+            }
+            d="M20 20 H70 M20 20 V70 M580 20 H530 M580 20 V70 M20 280 H70 M20 280 V230 M580 280 H530 M580 280 V230"
+          />
+        </svg>
+      ) : null}
+
+      {page === "home" ? (
+        <svg
+          viewBox="0 0 600 300"
+          preserveAspectRatio="none"
+          className={
+            styles.hologramSvg
+          }
+        >
+          <circle
+            className={
+              styles.hologramRing
+            }
+            cx="300"
+            cy="150"
+            r="60"
+          />
+          <circle
+            className={
+              styles.hologramRing
+            }
+            cx="300"
+            cy="150"
+            r="120"
+          />
+          <circle
+            className={
+              styles.hologramRing
+            }
+            cx="300"
+            cy="150"
+            r="180"
+          />
+          <line
+            className={
+              styles.hologramSweep
+            }
+            x1="300"
+            y1="150"
+            x2="300"
+            y2="-30"
+          />
+        </svg>
+      ) : null}
+    </div>
+  );
+}
+
 function HeroVisual({
   page,
 }: {
@@ -1873,7 +2265,10 @@ export function PublicSite({
   );
 
   return (
-    <main className={styles.site}>
+    <main
+      className={styles.site}
+      data-page={page}
+    >
       <div
         className={styles.noise}
         aria-hidden="true"
@@ -1981,6 +2376,11 @@ export function PublicSite({
         className={styles.intro}
         data-reveal="intro"
       >
+        <SectionHologram
+          page={page}
+          section="intro"
+        />
+
         <div>
           <p className={styles.sectionEyebrow}>
             {data.sectionEyebrow}
@@ -1995,61 +2395,84 @@ export function PublicSite({
       </section>
 
       <section
-        className={styles.cardGrid}
+        className={
+          styles.cardSection
+        }
         data-reveal="cards"
       >
-        {data.cards.map(
-          (card, index) => (
-            <article
-              key={card.title}
-              className={styles.featureCard}
-            >
-              <div
-                className={
-                  styles.cardTop
+        <SectionHologram
+          page={page}
+          section="cards"
+        />
+
+        <div
+          className={`${styles.cardGrid} ${styles.cardGridLayout}`}
+        >
+          {data.cards.map(
+            (card, index) => (
+              <article
+                key={card.title}
+                className={styles.featureCard}
+                data-card-index={
+                  index
                 }
               >
-                <span
+                <div
                   className={
-                    styles.cardIcon
+                    styles.cardTop
                   }
                 >
-                  <Icon
-                    name={card.icon}
-                  />
+                  <span
+                    className={
+                      styles.cardIcon
+                    }
+                  >
+                    <Icon
+                      name={
+                        card.icon
+                      }
+                    />
+                  </span>
+
+                  <small>
+                    0{index + 1}
+                  </small>
+                </div>
+
+                <span
+                  className={
+                    styles.cardTag
+                  }
+                >
+                  {card.tag}
                 </span>
 
-                <small>
-                  0{index + 1}
-                </small>
-              </div>
+                <h3>
+                  {card.title}
+                </h3>
 
-              <span
-                className={
-                  styles.cardTag
-                }
-              >
-                {card.tag}
-              </span>
+                <p>{card.copy}</p>
 
-              <h3>{card.title}</h3>
-
-              <p>{card.copy}</p>
-
-              <div
-                className={
-                  styles.cardLine
-                }
-              />
-            </article>
-          ),
-        )}
+                <div
+                  className={
+                    styles.cardLine
+                  }
+                />
+              </article>
+            ),
+          )}
+        </div>
       </section>
 
       <section
-        className={styles.workflowSection}
+        className={`${styles.workflowSection} ${styles.workflowLayout}`}
         data-reveal="workflow"
       >
+        <SectionHologram
+          page={page}
+          section="workflow"
+        />
+
         <div
           className={
             styles.workflowHeading
@@ -2104,29 +2527,42 @@ export function PublicSite({
       </section>
 
       <section
-        className={styles.statement}
+        className={
+          styles.statementSection
+        }
         data-reveal="statement"
       >
+        <SectionHologram
+          page={page}
+          section="statement"
+        />
+
         <div
           className={
-            styles.statementMark
+            styles.statement
           }
         >
-          <Icon
-            name="spark"
-            size={24}
-          />
+          <div
+            className={
+              styles.statementMark
+            }
+          >
+            <Icon
+              name="spark"
+              size={24}
+            />
+          </div>
+
+          <p>{data.statement}</p>
+
+          <Link href="/market">
+            Enter ZAINEX
+            <Icon
+              name="arrow"
+              size={18}
+            />
+          </Link>
         </div>
-
-        <p>{data.statement}</p>
-
-        <Link href="/market">
-          Enter ZAINEX
-          <Icon
-            name="arrow"
-            size={18}
-          />
-        </Link>
       </section>
 
       <SiteFooter />
