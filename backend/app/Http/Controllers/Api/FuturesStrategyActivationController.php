@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Exceptions\FuturesTradingException;
 use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
+use App\Services\Referral\StrategyReferralIncomeService;
 use App\Services\Trading\StrategyPayoutSchedule;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -677,6 +678,13 @@ final class FuturesStrategyActivationController extends Controller
                         'occurred_at' => $now,
                         'created_at' => $now,
                     ]);
+
+                app(StrategyReferralIncomeService::class)->credit(
+                    sourceUserId: (int) $user->id,
+                    strategyActivationId: (int) $activationId,
+                    tradingAmount: (string) $amount,
+                    occurredAt: $now,
+                );
 
                 $activation = DB::table(
                     'strategy_activations',

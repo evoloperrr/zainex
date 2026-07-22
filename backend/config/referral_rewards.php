@@ -5,6 +5,9 @@ declare(strict_types=1);
 // ZAINEX_REFERRAL_REWARD_PERCENTAGES_V1
 
 return [
+    // Direct inviter wallet income on every new strategy activation.
+    'strategy_trading_amount_rate_bps' => 1000,
+
     'max_depth' => 3,
 
     'level_rates_bps' => [

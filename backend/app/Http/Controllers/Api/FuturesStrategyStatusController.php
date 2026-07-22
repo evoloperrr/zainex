@@ -257,6 +257,7 @@ final class FuturesStrategyStatusController extends Controller
 
                         $priority = match ($eventType) {
                             'STRATEGY_PRINCIPAL_RELEASED' => 30,
+                            'STRATEGY_REFERRAL_INCOME' => 25,
                             'STRATEGY_DAILY_PROFIT' => 20,
                             'STRATEGY_ACTIVATED' => 11,
                             default => 5,
@@ -366,6 +367,18 @@ final class FuturesStrategyStatusController extends Controller
                                             ? 'RANDOM_15_OF_30'
                                             : 'EVERY_24_HOURS'
                                     ),
+                            'referralPercentage' => isset(
+                                $metadata['percentage'],
+                            )
+                                    ? (float)
+                                        $metadata['percentage']
+                                    : null,
+                            'referralSourceAmount' => isset(
+                                $metadata['tradingAmount'],
+                            )
+                                    ? (float)
+                                        $metadata['tradingAmount']
+                                    : null,
                             'description' => $row->description,
                             'occurredAt' => $row->occurred_at,
                             '_priority' => $priority,

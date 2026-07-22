@@ -31,6 +31,8 @@ type StrategyLog = {
   termDays?: number | null;
   windowDays?: number | null;
   cadence?: "RANDOM_15_OF_30" | "EVERY_24_HOURS" | null;
+  referralPercentage?: number | string | null;
+  referralSourceAmount?: number | string | null;
   description?: string | null;
   occurredAt?: string | null;
 };
@@ -140,6 +142,9 @@ function eventTitle(
     case "STRATEGY_DAILY_PROFIT":
       return "Daily profit credited";
 
+    case "STRATEGY_REFERRAL_INCOME":
+      return "Referral income credited";
+
     case "STRATEGY_PRINCIPAL_RELEASED":
       return "Principal released";
 
@@ -195,6 +200,19 @@ function eventDetail(
         log.principalBasis == null
           ? null
           : `${formatUsd(log.principalBasis)} trading amount`,
+      ]
+        .filter(Boolean)
+        .join(" • ");
+
+    case "STRATEGY_REFERRAL_INCOME":
+      return [
+        `${tier} • Direct inviter income`,
+        log.referralPercentage == null
+          ? "10% referral reward"
+          : `${toNumber(log.referralPercentage)}% referral reward`,
+        log.referralSourceAmount == null
+          ? null
+          : `${formatUsd(log.referralSourceAmount)} trading amount`,
       ]
         .filter(Boolean)
         .join(" • ");
@@ -267,8 +285,10 @@ function eventDescription(
   log: StrategyLog,
 ): string | null | undefined {
   if (
-    log.eventType ===
-      "STRATEGY_DAILY_PROFIT" &&
+    [
+      "STRATEGY_DAILY_PROFIT",
+      "STRATEGY_REFERRAL_INCOME",
+    ].includes(log.eventType) &&
     log.walletBalanceBefore != null &&
     log.walletBalanceAfter != null
   ) {
@@ -286,6 +306,7 @@ function amountLabel(
 ): string {
   switch (log.eventType) {
     case "STRATEGY_DAILY_PROFIT":
+    case "STRATEGY_REFERRAL_INCOME":
       return `+${formatUsd(log.amount)}`;
 
     case "STRATEGY_PRINCIPAL_RELEASED":
@@ -307,6 +328,7 @@ function eventClassName(
 ): string {
   switch (eventType) {
     case "STRATEGY_DAILY_PROFIT":
+    case "STRATEGY_REFERRAL_INCOME":
       return styles.combinedLogProfit;
 
     case "STRATEGY_PRINCIPAL_RELEASED":
