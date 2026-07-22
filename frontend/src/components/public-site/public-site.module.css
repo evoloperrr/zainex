@@ -6432,7 +6432,27 @@ body[data-public-reveal="ready"]
 }
 
 .site[data-page="platform"] .statement {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "mark"
+    "text"
+    "cta";
+  justify-items: start;
+  gap: 22px;
   border-color: rgba(70, 140, 255, 0.28);
+}
+
+.site[data-page="platform"] .statementMark {
+  grid-area: mark;
+}
+
+.site[data-page="platform"] .statement > p {
+  grid-area: text;
+  max-width: none;
+}
+
+.site[data-page="platform"] .statement > a {
+  grid-area: cta;
 }
 
 .site[data-page="platform"] .statement::before {
@@ -6470,7 +6490,30 @@ body[data-public-reveal="ready"]
 }
 
 .site[data-page="markets"] .statement {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "text mark"
+    "text cta";
+  align-items: start;
+  row-gap: 14px;
   border-color: rgba(70, 220, 255, 0.28);
+}
+
+.site[data-page="markets"] .statementMark {
+  grid-area: mark;
+  justify-self: end;
+}
+
+.site[data-page="markets"] .statement > p {
+  grid-area: text;
+  max-width: none;
+  padding-right: 24px;
+}
+
+.site[data-page="markets"] .statement > a {
+  grid-area: cta;
+  justify-self: end;
 }
 
 .site[data-page="markets"] .statement::before {
@@ -6509,7 +6552,28 @@ body[data-public-reveal="ready"]
 }
 
 .site[data-page="intellibrain"] .statement {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "mark"
+    "text"
+    "cta";
+  justify-items: center;
+  gap: 18px;
+  text-align: center;
   border-color: rgba(161, 93, 255, 0.3);
+}
+
+.site[data-page="intellibrain"] .statementMark {
+  grid-area: mark;
+}
+
+.site[data-page="intellibrain"] .statement > p {
+  grid-area: text;
+  max-width: 640px;
+}
+
+.site[data-page="intellibrain"] .statement > a {
+  grid-area: cta;
 }
 
 .site[data-page="intellibrain"] .statement::before {
@@ -6543,7 +6607,28 @@ body[data-public-reveal="ready"]
 }
 
 .site[data-page="strategies"] .statement {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "text text text"
+    "mark . cta";
+  row-gap: 22px;
+  align-items: center;
   border-color: rgba(161, 93, 255, 0.3);
+}
+
+.site[data-page="strategies"] .statementMark {
+  grid-area: mark;
+}
+
+.site[data-page="strategies"] .statement > p {
+  grid-area: text;
+  max-width: none;
+}
+
+.site[data-page="strategies"] .statement > a {
+  grid-area: cta;
+  justify-self: end;
 }
 
 .site[data-page="strategies"] .statement::before {
@@ -6576,7 +6661,30 @@ body[data-public-reveal="ready"]
 }
 
 .site[data-page="wallets"] .statement {
+  grid-template-columns: 130px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "mark text"
+    "cta  text";
+  row-gap: 16px;
+  align-items: start;
   overflow: visible;
+}
+
+.site[data-page="wallets"] .statementMark {
+  grid-area: mark;
+  justify-self: center;
+}
+
+.site[data-page="wallets"] .statement > p {
+  grid-area: text;
+  align-self: center;
+  max-width: none;
+}
+
+.site[data-page="wallets"] .statement > a {
+  grid-area: cta;
+  justify-self: center;
 }
 
 .site[data-page="wallets"] .statement::before {
@@ -6591,8 +6699,49 @@ body[data-public-reveal="ready"]
   background: rgba(8, 12, 26, 0.5);
 }
 
+.site[data-page="wallets"] .statement::after {
+  content: "";
+  position: absolute;
+  top: 14%;
+  bottom: 14%;
+  left: 130px;
+  z-index: 0;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(93, 188, 255, 0.35),
+    transparent
+  );
+}
+
 .site[data-page="security"] .statement {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "mark text"
+    "mark cta";
+  align-items: center;
+  column-gap: 36px;
   border-color: rgba(98, 239, 189, 0.3);
+}
+
+.site[data-page="security"] .statementMark {
+  grid-area: mark;
+  width: 84px;
+  height: 84px;
+  align-self: center;
+}
+
+.site[data-page="security"] .statement > p {
+  grid-area: text;
+  max-width: none;
+}
+
+.site[data-page="security"] .statement > a {
+  grid-area: cta;
+  justify-self: start;
+  margin-top: 8px;
 }
 
 .site[data-page="security"] .statement::before {
@@ -6662,6 +6811,12 @@ body[data-public-reveal="ready"]
   box-shadow: none;
 }
 
+.site[data-page="company"] .statement > p {
+  text-transform: uppercase;
+  font-size: clamp(19px, 2.3vw, 30px);
+  letter-spacing: 0.03em;
+}
+
 .site[data-page="home"] .statement::before {
   content: "";
   position: absolute;
@@ -6703,6 +6858,59 @@ body[data-public-reveal="ready"]
   .site[data-page="home"] .workflow article:nth-child(3),
   .site[data-page="home"] .workflow article:nth-child(4) {
     transform: none;
+  }
+
+  .site[data-page="platform"] .statement,
+  .site[data-page="markets"] .statement,
+  .site[data-page="intellibrain"] .statement,
+  .site[data-page="strategies"] .statement,
+  .site[data-page="wallets"] .statement,
+  .site[data-page="security"] .statement {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "mark"
+      "text"
+      "cta";
+    justify-items: start;
+    text-align: left;
+    row-gap: 18px;
+  }
+
+  .site[data-page="platform"] .statementMark,
+  .site[data-page="markets"] .statementMark,
+  .site[data-page="intellibrain"] .statementMark,
+  .site[data-page="strategies"] .statementMark,
+  .site[data-page="wallets"] .statementMark,
+  .site[data-page="security"] .statementMark,
+  .site[data-page="platform"] .statement > p,
+  .site[data-page="markets"] .statement > p,
+  .site[data-page="intellibrain"] .statement > p,
+  .site[data-page="strategies"] .statement > p,
+  .site[data-page="wallets"] .statement > p,
+  .site[data-page="security"] .statement > p,
+  .site[data-page="platform"] .statement > a,
+  .site[data-page="markets"] .statement > a,
+  .site[data-page="intellibrain"] .statement > a,
+  .site[data-page="strategies"] .statement > a,
+  .site[data-page="wallets"] .statement > a,
+  .site[data-page="security"] .statement > a {
+    justify-self: start;
+    align-self: auto;
+    width: auto;
+    max-width: none;
+    margin-top: 0;
+  }
+
+  .site[data-page="security"] .statementMark {
+    width: 58px;
+    height: 58px;
+  }
+
+  .site[data-page="wallets"] .statement::after,
+  .site[data-page="strategies"] .statement::before,
+  .site[data-page="strategies"] .statement::after {
+    display: none;
   }
 }
 
