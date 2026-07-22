@@ -43,6 +43,10 @@ type OpenAction =
       userId: number;
       kind: "credit";
     }
+  | {
+      userId: number;
+      kind: "name";
+    }
   | null;
 
 const PER_PAGE = 20;
@@ -147,6 +151,9 @@ export default function AdminUsersPage() {
   const [creditNote, setCreditNote] =
     useState("");
 
+  const [nameInput, setNameInput] =
+    useState("");
+
   const [submitting, setSubmitting] =
     useState(false);
 
@@ -225,6 +232,79 @@ export default function AdminUsersPage() {
     setRefreshKey(
       (value) => value + 1,
     );
+  }
+
+  async function submitUpdateName(
+    user: AdminUser,
+  ) {
+    const name = nameInput.trim();
+
+    if (name === "") {
+      setRowFeedback({
+        userId: user.id,
+        ok: false,
+        message:
+          "Enter a name.",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    setRowFeedback(null);
+
+    try {
+      const response = await fetch(
+        "/api/admin/users/update-name",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            targetEmail: user.email,
+            name,
+          }),
+        },
+      );
+
+      const payload =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !payload.ok
+      ) {
+        setRowFeedback({
+          userId: user.id,
+          ok: false,
+          message:
+            payload.error
+              ?.message ??
+            "Could not update the name.",
+        });
+        return;
+      }
+
+      setRowFeedback({
+        userId: user.id,
+        ok: true,
+        message: `Name updated to ${name}.`,
+      });
+
+      setOpenAction(null);
+      setNameInput("");
+      refresh();
+    } catch {
+      setRowFeedback({
+        userId: user.id,
+        ok: false,
+        message:
+          "Network error while updating the name.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function submitGrantVip(
@@ -543,6 +623,35 @@ export default function AdminUsersPage() {
                               setRowFeedback(
                                 null,
                               );
+                              setNameInput(
+                                user.name,
+                              );
+                              setOpenAction(
+                                openAction?.userId ===
+                                  user.id &&
+                                openAction.kind ===
+                                  "name"
+                                  ? null
+                                  : {
+                                      userId:
+                                        user.id,
+                                      kind: "name",
+                                    },
+                              );
+                            }}
+                          >
+                            Edit name
+                          </button>
+
+                          <button
+                            type="button"
+                            className={
+                              styles.rowActionButton
+                            }
+                            onClick={() => {
+                              setRowFeedback(
+                                null,
+                              );
                               setOpenAction(
                                 openAction?.userId ===
                                   user.id &&
@@ -589,6 +698,81 @@ export default function AdminUsersPage() {
                         </div>
                       </td>
                     </tr>
+
+                    {openAction?.userId ===
+                      user.id &&
+                    openAction.kind ===
+                      "name" ? (
+                      <tr
+                        key={`${user.id}-name-form`}
+                      >
+                        <td
+                          colSpan={
+                            8
+                          }
+                        >
+                          <div
+                            className={
+                              styles.inlineForm
+                            }
+                          >
+                            <input
+                              type="text"
+                              placeholder="Display name"
+                              value={
+                                nameInput
+                              }
+                              onChange={(
+                                event,
+                              ) => {
+                                setNameInput(
+                                  event
+                                    .target
+                                    .value,
+                                );
+                              }}
+                              style={{
+                                flex: 1,
+                                minWidth:
+                                  "160px",
+                              }}
+                            />
+
+                            <button
+                              type="button"
+                              disabled={
+                                submitting
+                              }
+                              onClick={() => {
+                                void submitUpdateName(
+                                  user,
+                                );
+                              }}
+                            >
+                              Confirm
+                              name
+                            </button>
+
+                            {rowFeedback?.userId ===
+                            user.id ? (
+                              <span
+                                className={`${
+                                  styles.feedback
+                                } ${
+                                  rowFeedback.ok
+                                    ? styles.feedbackOk
+                                    : styles.feedbackError
+                                }`}
+                              >
+                                {
+                                  rowFeedback.message
+                                }
+                              </span>
+                            ) : null}
+                          </div>
+                        </td>
+                      </tr>
+                    ) : null}
 
                     {openAction?.userId ===
                       user.id &&

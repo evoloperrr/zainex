@@ -144,6 +144,54 @@ final class AdminController extends Controller
             ->header('Cache-Control', 'no-store');
     }
 
+    public function updateUserName(Request $request): JsonResponse
+    {
+        $guard = $this->authorize($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        $validator = Validator::make($request->all(), [
+            'targetEmail' => ['required', 'string', 'email:rfc', 'max:255'],
+            'name' => ['required', 'string', 'min:1', 'max:255'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(422, 'INVALID_NAME_UPDATE_REQUEST', $validator->errors()->first());
+        }
+
+        $validated = $validator->validated();
+        $targetEmail = strtolower(trim((string) $validated['targetEmail']));
+        $name = trim((string) $validated['name']);
+
+        $target = DB::table('users')
+            ->whereRaw('LOWER(email) = ?', [$targetEmail])
+            ->first();
+
+        if ($target === null) {
+            return $this->error(404, 'TARGET_USER_NOT_FOUND', 'No user was found with that email.');
+        }
+
+        DB::table('users')
+            ->where('id', $target->id)
+            ->update([
+                'name' => $name,
+                'updated_at' => now(),
+            ]);
+
+        return response()
+            ->json([
+                'ok' => true,
+                'user' => [
+                    'id' => (int) $target->id,
+                    'email' => (string) $target->email,
+                    'name' => $name,
+                ],
+            ])
+            ->header('Cache-Control', 'no-store');
+    }
+
     public function grantVip(Request $request): JsonResponse
     {
         $guard = $this->authorize($request);
