@@ -117,7 +117,7 @@ export default async function ProfilePage() {
             <p>
               Review the Google identity
               connected to your protected
-              ZAINEX paper-trading account.
+              ZAINEX trading account.
             </p>
           </div>
 

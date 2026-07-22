@@ -266,7 +266,7 @@ async function fetchPaperAccount(
   ) {
     throw new Error(
       payload.error?.message ??
-        "Paper account is unavailable.",
+        "Account is unavailable.",
     );
   }
 
@@ -415,13 +415,13 @@ async function executePaperTrade(
 ): Promise<PaperTradeModalResult> {
   if (paperTradeRequestPending) {
     throw new Error(
-      "Another paper order is already processing.",
+      "Another order is already processing.",
     );
   }
 
   if (request.activeMarket !== "crypto") {
     throw new Error(
-      "Paper trading currently supports Crypto only.",
+      "Trading currently supports Crypto only.",
     );
   }
 
@@ -477,7 +477,7 @@ async function executePaperTrade(
     ) {
       throw new Error(
         payload.error?.message ??
-          "The paper order could not be executed.",
+          "The order could not be executed.",
       );
     }
 
@@ -541,7 +541,7 @@ function PaperTradeModalHost() {
           phase: "error",
           request,
           message:
-            "Paper trading currently supports Crypto only.",
+            "Trading currently supports Crypto only.",
         });
 
         return;
@@ -646,7 +646,7 @@ function PaperTradeModalHost() {
         message:
           error instanceof Error
             ? error.message
-            : "The paper order failed.",
+            : "The order failed.",
       });
     }
   };
@@ -691,16 +691,16 @@ function PaperTradeModalHost() {
         <header className="zainex-trade-modal-header">
           <div>
             <span>
-              ZAINEX PAPER EXECUTION
+              ZAINEX EXECUTION
             </span>
 
             <h2 id="zainex-trade-modal-title">
               {modal.phase === "confirm"
                 ? `Confirm ${request.side}`
                 : modal.phase === "pending"
-                  ? "Executing paper order"
+                  ? "Executing order"
                   : modal.phase === "success"
-                    ? "Paper order filled"
+                    ? "Order filled"
                     : "Order failed"}
             </h2>
           </div>
@@ -711,7 +711,7 @@ function PaperTradeModalHost() {
             disabled={
               modal.phase === "pending"
             }
-            aria-label="Close paper trade modal"
+            aria-label="Close trade modal"
           >
             X
           </button>
@@ -737,7 +737,7 @@ function PaperTradeModalHost() {
                 </strong>
 
                 <span>
-                  Market paper order
+                  Market order
                 </span>
               </div>
 
@@ -770,7 +770,7 @@ function PaperTradeModalHost() {
 
               <div>
                 <span>Trading mode</span>
-                <strong>PAPER DEMO</strong>
+                <strong>SIMULATED</strong>
               </div>
 
               {request.side === "BUY" &&
@@ -803,7 +803,7 @@ function PaperTradeModalHost() {
               available public exchange price.
               {request.side === "BUY"
                 ? " BUY opens or adds to the virtual BTC position."
-                : " SELL closes virtual BTC quantity and calculates the actual paper result."}
+                : " SELL closes virtual BTC quantity and calculates the actual result."}
             </p>
           </>
         ) : null}
@@ -831,7 +831,7 @@ function PaperTradeModalHost() {
 
               <div>
                 <strong>
-                  PAPER {modal.result.order.side} FILLED
+                  {modal.result.order.side} FILLED
                 </strong>
 
                 <span>
@@ -2632,7 +2632,7 @@ function DesktopAssetColumn({
           >
             <span>BUY LOW</span>
             <strong>{market.price}</strong>
-            <small>Buy paper position</small>
+            <small>Buy position</small>
           </button>
 
           <button
@@ -2642,7 +2642,7 @@ function DesktopAssetColumn({
           >
             <span>SELL HIGH</span>
             <strong>{market.price}</strong>
-            <small>Sell paper position</small>
+            <small>Sell position</small>
           </button>
         </div>
       </article>
@@ -2808,7 +2808,7 @@ function DesktopMarketColumn({
         setPaperAccountError(
           error instanceof Error
             ? error.message
-            : "Paper account unavailable.",
+            : "Account unavailable.",
         );
       }
     }
@@ -2914,13 +2914,13 @@ function DesktopMarketColumn({
         <article className="trade-history-card">
           <div className="trade-history-heading">
             <div>
-              <span>PAPER EXECUTION FEED</span>
+              <span>EXECUTION FEED</span>
               <h2>Trade History</h2>
             </div>
   
   
             <div className="trade-history-actions">
-              <strong>PAPER DEMO</strong>
+              <strong>SIMULATED</strong>
   
               <span>
                 {paperAccount
@@ -2941,7 +2941,7 @@ function DesktopMarketColumn({
                       `Trades ${paperTrades.length}`,
                     ].join(" | ")
                   : paperAccountError ||
-                    "Loading paper account..."}
+                    "Loading account..."}
               </span>
             </div>
           </div>
@@ -2969,7 +2969,7 @@ function DesktopMarketColumn({
                         8,
                       )}`,
                     ].join(" | ")
-                  : "BUY to open a paper position"}
+                  : "BUY to open a position"}
               </small>
   
               <b
@@ -3004,7 +3004,7 @@ function DesktopMarketColumn({
               <small>
                 {latestClosedTrade
                   ? `${latestClosedTrade.symbol} | SELL`
-                  : "SELL closes a paper position"}
+                  : "SELL closes a position"}
               </small>
   
               <b
@@ -3026,7 +3026,7 @@ function DesktopMarketColumn({
             </div>
   
             <div className="paper-trading-status-card">
-              <span>TOTAL PAPER PNL</span>
+              <span>TOTAL PNL</span>
   
               <strong>
                 {paperAccount
@@ -3138,7 +3138,7 @@ function DesktopMarketColumn({
   
                   <button
                     type="button"
-                    aria-label={`${trade.side} ${trade.symbol} paper trade`}
+                    aria-label={`${trade.side} ${trade.symbol} trade`}
                     title={`Realized PnL: ${formatPaperUsd(
                       trade.realizedPnl,
                       8,
@@ -3156,9 +3156,9 @@ function DesktopMarketColumn({
                 <span>--:--:--</span>
   
                 <strong>
-                  No paper trades
+                  No trades
                   <i className="trade-up">
-                    DEMO
+                    NONE
                   </i>
                 </strong>
   
@@ -3170,12 +3170,12 @@ function DesktopMarketColumn({
                 <span>$0.00</span>
   
                 <span className="wallet-cell">
-                  PAPER
+                  N/A
                 </span>
   
                 <button
                   type="button"
-                  aria-label="No paper trades yet"
+                  aria-label="No trades yet"
                   disabled
                 >
                   <Icon
@@ -3199,7 +3199,7 @@ function DesktopMarketColumn({
               );
             }}
           >
-            Refresh paper account
+            Refresh account
           </button>
         </article>
       ) : null}

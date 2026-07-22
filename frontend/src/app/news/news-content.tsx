@@ -287,7 +287,7 @@ export function NewsContent() {
 
           <p>
             Every position on ZAINEX today is{" "}
-            <strong>paper trading</strong> &mdash;
+            <strong>simulated</strong> &mdash;
             real market data and real exchange
             mechanics (fees, margin, liquidation
             math) running against a simulated
@@ -305,7 +305,7 @@ export function NewsContent() {
               </span>
               <span className={styles.v}>
                 Tiered &ldquo;Guarantrade&rdquo;
-                paper-yield strategies &mdash;
+                yield strategies &mdash;
                 Free, VIP 1, VIP 2, VIP 3 &mdash;
                 each locking a chosen allocation at
                 a fixed or variable daily rate,
@@ -356,8 +356,8 @@ export function NewsContent() {
 
           <div className={styles.disclosure}>
             <b>Editor&rsquo;s note &mdash;</b>{" "}
-            ZAINEX currently operates in
-            paper-trading mode across all markets;
+            ZAINEX currently operates in a
+            simulated trading mode across all markets;
             no real funds are placed on exchange.
             InteliBrain output is advisory only
             and is never executed automatically.

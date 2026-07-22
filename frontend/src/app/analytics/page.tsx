@@ -246,7 +246,7 @@ function AnalyticsContent() {
 
             <p>
               Win rate, realized PnL, and market activity
-              computed from every paper Spot and Futures
+              computed from every Spot and Futures
               execution on your account.
             </p>
           </div>
@@ -317,7 +317,7 @@ function AnalyticsContent() {
 
           {stats.totalTrades === 0 ? (
             <div className={styles.emptyState}>
-              No trades yet. Execute a paper order from
+              No trades yet. Execute an order from
               the market terminal to start building your
               analytics.
             </div>

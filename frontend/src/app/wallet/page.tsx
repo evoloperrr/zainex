@@ -308,7 +308,7 @@ function WalletContent() {
             </h1>
 
             <p>
-              View your real paper Futures wallet,
+              View your Futures wallet,
               available funds, total equity, margin,
               profit and loss, and separate AI credits.
             </p>

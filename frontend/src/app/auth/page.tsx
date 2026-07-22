@@ -166,7 +166,7 @@ export default async function AuthPage({
 
             <p className={styles.heroCopy}>
               One verified identity connects your
-              private paper wallet, deterministic
+              private trading wallet, deterministic
               risk controls, referral network, and
               manual execution environment.
             </p>
@@ -454,7 +454,7 @@ export default async function AuthPage({
             </div>
 
             <p className={styles.finePrint}>
-              By continuing, you enter a paper-trading
+              By continuing, you enter a simulated trading
               environment. ZAINEX does not execute
               autonomous live trades.
             </p>

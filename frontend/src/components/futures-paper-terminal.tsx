@@ -1339,7 +1339,7 @@ export function FuturesPaperTerminal({
                       styles.modalNote
                     }
                   >
-                    Paper trading only.
+                    Trading only.
                     No real money or live
                     exchange order will be used.
                   </p>
@@ -1704,7 +1704,7 @@ export function FuturesPaperTerminal({
 
           <span>
             {mode === "spot"
-              ? "Paper spot"
+              ? "Spot"
               : "USDT-M perpetual"}
           </span>
         </div>
@@ -1786,7 +1786,7 @@ export function FuturesPaperTerminal({
               ) : null}
 
               <small>
-                Sell paper position
+                Sell position
               </small>
             </button>
 
@@ -1820,7 +1820,7 @@ export function FuturesPaperTerminal({
               ) : null}
 
               <small>
-                Buy paper position
+                Buy position
               </small>
             </button>
           </>

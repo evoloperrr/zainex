@@ -22,11 +22,11 @@ export const metadata: Metadata = {
       "%s | ZAINEX",
   },
   description:
-    "ZAINEX unifies market intelligence, deterministic risk controls, manual paper execution, strategies, wallets, and AI credits in one professional platform.",
+    "ZAINEX unifies market intelligence, deterministic risk controls, manual execution, strategies, wallets, and AI credits in one professional platform.",
   keywords: [
     "ZAINEX",
     "AI trading platform",
-    "paper trading",
+    "trading",
     "market intelligence",
     "risk management",
     "crypto trading",

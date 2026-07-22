@@ -343,7 +343,7 @@ export function AdminWalletTransfer({
                   </h2>
 
                   <p>
-                    Send paper USDT from the root
+                    Send USDT from the root
                     administrator wallet to an
                     existing ZAINEX user.
                   </p>
@@ -375,7 +375,7 @@ export function AdminWalletTransfer({
                 </strong>
 
                 <small>
-                  Paper wallet only. No live funds.
+                  Internal wallet only. No live funds.
                 </small>
               </div>
 

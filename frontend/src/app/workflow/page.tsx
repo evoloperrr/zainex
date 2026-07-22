@@ -38,7 +38,7 @@ const pipelineSteps = [
     status: "REQUIRED",
   },
   {
-    title: "Paper execution",
+    title: "Execution",
     description:
       "Approved orders fill instantly at the live public market price inside your virtual account.",
     status: "ACTIVE",

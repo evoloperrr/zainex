@@ -834,7 +834,7 @@ export default function DashboardPage() {
               </strong>
 
               <span className={styles.equityCaption}>
-                Total paper Futures equity
+                Total Futures equity
               </span>
 
               <div className={styles.equityMeta}>

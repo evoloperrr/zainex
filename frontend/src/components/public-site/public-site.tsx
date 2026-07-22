@@ -118,7 +118,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
     title: "Trade with intelligence.",
     accent: "Decide with control.",
     description:
-      "ZAINEX unifies market data, deterministic risk controls, AI interpretation, paper execution, strategy accounting, and wallet utilities in one disciplined operating environment.",
+      "ZAINEX unifies market data, deterministic risk controls, AI interpretation, execution, strategy accounting, and wallet utilities in one disciplined operating environment.",
     primaryLabel: "Launch platform",
     primaryHref: "/market",
     secondaryLabel: "Explore InteliBrain",
@@ -154,7 +154,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         icon: "shield",
         title: "Risk before execution",
         copy:
-          "Mandatory stop loss, exposure checks, idempotent requests, and paper-only execution keep experimentation inside defined boundaries.",
+          "Mandatory stop loss, exposure checks, idempotent requests, and controlled execution keep experimentation inside defined boundaries.",
         tag: "CONTROL",
       },
       {
@@ -203,7 +203,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
     title: "One interface.",
     accent: "Every critical decision.",
     description:
-      "The ZAINEX platform brings charts, paper Spot and Futures workflows, positions, execution history, AI signals, wallet state, and strategy access into one coherent workspace.",
+      "The ZAINEX platform brings charts, Spot and Futures workflows, positions, execution history, AI signals, wallet state, and strategy access into one coherent workspace.",
     primaryLabel: "Open trading terminal",
     primaryHref: "/market",
     secondaryLabel: "Review security",
@@ -211,11 +211,11 @@ const pages: Record<PublicPageKey, PublicPageData> = {
     metrics: [
       {
         value: "SPOT",
-        label: "Paper execution",
+        label: "Execution",
       },
       {
         value: "FUTURES",
-        label: "Isolated paper workflow",
+        label: "Isolated workflow",
       },
       {
         value: "LIVE",
@@ -239,7 +239,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         icon: "layers",
         title: "Unified account state",
         copy:
-          "User identity, wallet balances, paper accounts, locked capital, and realized performance remain synchronized.",
+          "User identity, wallet balances, accounts, locked capital, and realized performance remain synchronized.",
         tag: "ACCOUNT",
       },
       {
@@ -271,7 +271,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         step: "03",
         title: "Execution layer",
         copy:
-          "Paper orders, positions, and close actions follow validated contracts.",
+          "Orders, positions, and close actions follow validated contracts.",
       },
       {
         step: "04",
@@ -288,7 +288,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
     title: "A single market language.",
     accent: "Built to expand.",
     description:
-      "ZAINEX organizes Crypto, Forex, and Stocks under one product experience. Crypto paper workflows are the current execution focus, while the platform structure is prepared for additional market connectors.",
+      "ZAINEX organizes Crypto, Forex, and Stocks under one product experience. Crypto workflows are the current execution focus, while the platform structure is prepared for additional market connectors.",
     primaryLabel: "View crypto terminal",
     primaryHref: "/market",
     secondaryLabel: "Explore platform",
@@ -296,7 +296,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
     metrics: [
       {
         value: "CRYPTO",
-        label: "Current paper focus",
+        label: "Current focus",
       },
       {
         value: "FOREX",
@@ -317,7 +317,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         icon: "market",
         title: "Crypto",
         copy:
-          "Real public market data, paper Spot and Futures flows, technical indicators, and risk-gated manual execution.",
+          "Real public market data, Spot and Futures flows, technical indicators, and risk-gated manual execution.",
         tag: "ACTIVE FOCUS",
       },
       {
@@ -454,11 +454,11 @@ const pages: Record<PublicPageKey, PublicPageData> = {
       "AI is most valuable when its role is powerful, visible, and bounded.",
   },
   strategies: {
-    eyebrow: "PAPER STRATEGY ECOSYSTEM",
+    eyebrow: "STRATEGY ECOSYSTEM",
     title: "Strategy access.",
     accent: "Ledger-level transparency.",
     description:
-      "ZAINEX paper strategies use independent activations, explicit principal locking, daily accrual records, credit costs, and a defined lifecycle - without hiding activity behind a single balance.",
+      "ZAINEX strategies use independent activations, explicit principal locking, daily accrual records, credit costs, and a defined lifecycle - without hiding activity behind a single balance.",
     primaryLabel: "View AI strategies",
     primaryHref: "/ai-strategies",
     secondaryLabel: "Explore wallets",
@@ -466,7 +466,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
     metrics: [
       {
         value: "30D",
-        label: "Defined paper lifecycle",
+        label: "Defined lifecycle",
       },
       {
         value: "DAILY",
@@ -481,13 +481,13 @@ const pages: Record<PublicPageKey, PublicPageData> = {
     sectionTitle:
       "Every activation is independent and traceable.",
     sectionCopy:
-      "Repeated tiers and multiple active paper strategies can coexist while current access follows the highest active tier.",
+      "Repeated tiers and multiple active strategies can coexist while current access follows the highest active tier.",
     cards: [
       {
         icon: "strategy",
         title: "Independent activations",
         copy:
-          "Each paper strategy holds its own principal, rate, paid-day count, next accrual time, and completion state.",
+          "Each strategy holds its own principal, rate, paid-day count, next accrual time, and completion state.",
         tag: "LIFECYCLE",
       },
       {
@@ -501,7 +501,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         icon: "layers",
         title: "Combined activity ledger",
         copy:
-          "Activations, daily paper profit, principal release, and completion events appear in one latest-first record.",
+          "Activations, daily profit, principal release, and completion events appear in one latest-first record.",
         tag: "LEDGER",
       },
     ],
@@ -514,13 +514,13 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         step: "01",
         title: "Activate",
         copy:
-          "Available paper funds move into strategy-locked accounting.",
+          "Available funds move into strategy-locked accounting.",
       },
       {
         step: "02",
         title: "Accrue",
         copy:
-          "Due paper profit records are processed idempotently.",
+          "Due profit records are processed idempotently.",
       },
       {
         step: "03",
@@ -664,7 +664,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         icon: "lock",
         title: "Session isolation",
         copy:
-          "Verified Google users receive separate ZAINEX identities, private paper accounts, wallets, and trading sessions.",
+          "Verified Google users receive separate ZAINEX identities, private accounts, wallets, and trading sessions.",
         tag: "IDENTITY",
       },
       {
@@ -769,7 +769,7 @@ const pages: Record<PublicPageKey, PublicPageData> = {
         step: "01",
         title: "Foundation",
         copy:
-          "Identity, accounts, wallet state, and paper execution establish reliable core behavior.",
+          "Identity, accounts, wallet state, and execution establish reliable core behavior.",
       },
       {
         step: "02",
@@ -1760,7 +1760,7 @@ export function SiteFooter() {
         </span>
 
         <span>
-          Paper trading environment.
+          Trading environment.
           No autonomous execution.
         </span>
       </div>

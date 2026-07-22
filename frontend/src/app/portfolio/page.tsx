@@ -303,7 +303,7 @@ function PortfolioContent() {
             </h1>
 
             <p>
-              Paper Futures and Spot balances across Crypto,
+              Futures and Spot balances across Crypto,
               Forex and Stocks, combined into a single
               portfolio snapshot.
             </p>
@@ -353,7 +353,7 @@ function PortfolioContent() {
             <NeuralOrbit
               label="PORTFOLIO"
               value={formatUsd(combinedEquity)}
-              caption="Combined paper equity"
+              caption="Combined equity"
             />
           </div>
         </section>
