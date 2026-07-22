@@ -12,6 +12,10 @@ import {
   useState,
 } from "react";
 
+import {
+  useCurrency,
+} from "@/components/currency-provider";
+
 import billingStyles from "../billing/billing.module.css";
 import styles from "./ai-strategies.module.css";
 
@@ -119,20 +123,6 @@ function toNumber(
     : 0;
 }
 
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
-
 function readErrorMessage(
   payload: unknown,
   fallback: string,
@@ -166,6 +156,8 @@ function readErrorMessage(
 }
 
 export function StrategyActivationGrid() {
+  const { formatUsd } = useCurrency();
+
   const [account, setAccount] =
     useState<AccountData | null>(null);
 

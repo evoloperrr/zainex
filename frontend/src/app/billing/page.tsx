@@ -6,6 +6,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { DesktopSidebar } from "../../components/market-dashboard";
+import { CurrencySwitcher } from "@/components/currency-switcher";
+import { useCurrency } from "@/components/currency-provider";
 import { SharedProfileMenu } from "@/components/shared-profile-menu";
 import { VipCheckoutChat } from "@/components/vip-checkout-chat";
 
@@ -89,7 +91,21 @@ function CardIcon() {
   );
 }
 
+function parsePriceUsd(
+  price: string,
+): number {
+  const numeric = Number(
+    price.replace(/[^0-9.]/g, ""),
+  );
+
+  return Number.isFinite(numeric)
+    ? numeric
+    : 0;
+}
+
 function BillingContent() {
+  const { formatUsd } = useCurrency();
+
   const [
     checkoutPlan,
     setCheckoutPlan,
@@ -114,6 +130,8 @@ function BillingContent() {
         </Link>
 
         <div className={styles.headerRight}>
+          <CurrencySwitcher />
+
           <span className={styles.secure}>
             <i />
             Secure billing
@@ -180,7 +198,13 @@ function BillingContent() {
               </span>
 
               <div className={styles.price}>
-                <strong>{plan.price}</strong>
+                <strong>
+                  {formatUsd(
+                    parsePriceUsd(
+                      plan.price,
+                    ),
+                  )}
+                </strong>
                 <small>{plan.period}</small>
               </div>
 

@@ -1,0 +1,47 @@
+.switcher {
+  position: relative;
+  display: flex;
+  min-height: 37px;
+  align-items: center;
+}
+
+.select {
+  appearance: none;
+  min-height: 37px;
+  padding: 0 30px 0 13px;
+  border: 1px solid rgba(123, 150, 218, 0.18);
+  border-radius: 999px;
+  color: #d9e3ff;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.select:hover {
+  border-color: rgba(123, 150, 218, 0.32);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.select:focus-visible {
+  outline: 2px solid rgba(70, 220, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.select option {
+  color: #0b1220;
+  background: #fff;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+  transform: translateY(-60%) rotate(45deg);
+  border-right: 1.5px solid rgba(217, 227, 255, 0.6);
+  border-bottom: 1.5px solid rgba(217, 227, 255, 0.6);
+}

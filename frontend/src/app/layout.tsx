@@ -9,6 +9,8 @@ import {
   Inter,
 } from "next/font/google";
 
+import { Providers } from "./providers";
+
 import "./globals.css";
 
 const inter = Inter({
@@ -57,7 +59,12 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${bricolage.variable}`}
     >
-      <body>{children}<MobileAppFloatingNav /></body>
+      <body>
+        <Providers>
+          {children}
+          <MobileAppFloatingNav />
+        </Providers>
+      </body>
     </html>
   );
 }

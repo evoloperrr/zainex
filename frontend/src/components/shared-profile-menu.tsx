@@ -19,6 +19,10 @@ import {
   useState,
 } from "react";
 
+import {
+  useCurrency,
+} from "./currency-provider";
+
 import styles from "./shared-profile-menu.module.css";
 
 type SessionResponse = {
@@ -43,31 +47,30 @@ type SharedProfileMenuProps = {
   className?: string;
 };
 
-function formatUsd(
-  value: number | null,
-): string {
-  if (
-    value === null ||
-    !Number.isFinite(value)
-  ) {
-    return "--";
-  }
-
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
-
 export function SharedProfileMenu({
   size = 43,
   className,
 }: SharedProfileMenuProps) {
   const router = useRouter();
+
+  const {
+    formatUsd: formatDisplayCurrency,
+  } = useCurrency();
+
+  function formatUsd(
+    value: number | null,
+  ): string {
+    if (
+      value === null ||
+      !Number.isFinite(value)
+    ) {
+      return "--";
+    }
+
+    return formatDisplayCurrency(
+      value,
+    );
+  }
 
   const [
     mounted,

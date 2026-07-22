@@ -16,6 +16,8 @@ import {
   SharedProfileMenu,
 } from "@/components/shared-profile-menu";
 
+import { CurrencySwitcher } from "@/components/currency-switcher";
+
 import chromeStyles from "../billing/billing.module.css";
 import styles from "./rewards.module.css";
 
@@ -194,6 +196,8 @@ function NetworkContent() {
         </Link>
 
         <div className={chromeStyles.headerRight}>
+          <CurrencySwitcher />
+
           <span className={chromeStyles.secure}>
             <i />
             Three-ring circle

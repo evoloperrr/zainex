@@ -9,6 +9,7 @@ import {
   DesktopSidebar,
 } from "../../components/market-dashboard";
 
+import { CurrencySwitcher } from "@/components/currency-switcher";
 import { SharedProfileMenu } from "@/components/shared-profile-menu";
 import { NeuralOrbit } from "@/components/neural-orbit";
 import { FuturesAiSignalPanel } from "@/components/futures-ai-signal-panel";
@@ -55,6 +56,8 @@ function AiSignalsContent() {
         </Link>
 
         <div className={styles.headerRight}>
+          <CurrencySwitcher />
+
           <span className={styles.secure}>
             <i />
             InteliBrain online

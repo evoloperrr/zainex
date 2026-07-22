@@ -13,6 +13,10 @@ import {
 } from "react-dom";
 
 import {
+  useCurrency,
+} from "@/components/currency-provider";
+
+import {
   CreditTransferPanel,
 } from "@/components/credit-transfer-panel";
 
@@ -82,24 +86,6 @@ type WalletActionCenterProps = {
   credits: number;
 };
 
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(
-    Number.isFinite(value)
-      ? value
-      : 0,
-  );
-}
-
 function formatCredits(
   value: number,
 ): string {
@@ -149,6 +135,9 @@ function formatDate(
 function combineLogs(
   conversions: ConversionLog[],
   transfers: TransferLog[],
+  formatUsd: (
+    value: number,
+  ) => string,
 ): ActivityRow[] {
   const conversionRows =
     conversions.map(
@@ -237,6 +226,20 @@ export function WalletActionCenter({
   availableBalance,
   credits,
 }: WalletActionCenterProps) {
+  const {
+    formatUsd: formatDisplayCurrency,
+  } = useCurrency();
+
+  function formatUsd(
+    value: number,
+  ): string {
+    return formatDisplayCurrency(
+      Number.isFinite(value)
+        ? value
+        : 0,
+    );
+  }
+
   const [
     openAction,
     setOpenAction,
@@ -466,10 +469,12 @@ export function WalletActionCenter({
       combineLogs(
         conversionLogs,
         transferLogs,
+        formatUsd,
       ),
     [
       conversionLogs,
       transferLogs,
+      formatUsd,
     ],
   );
 

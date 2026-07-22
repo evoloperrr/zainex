@@ -14,6 +14,8 @@ import {
   DesktopSidebar,
 } from "../../components/market-dashboard";
 
+import { CurrencySwitcher } from "@/components/currency-switcher";
+import { useCurrency } from "@/components/currency-provider";
 import { SharedProfileMenu } from "@/components/shared-profile-menu";
 import { WalletActionCenter } from "@/components/wallet-action-center";
 import { AdminWalletTransfer } from "@/components/admin-wallet-transfer";
@@ -61,26 +63,6 @@ type GoogleSessionResponse = {
     email?: string | null;
   };
 };
-function formatUsd(
-  value: number | null | undefined,
-): string {
-  const safeValue =
-    typeof value === "number" &&
-    Number.isFinite(value)
-      ? value
-      : 0;
-
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(safeValue);
-}
-
 function formatCredits(
   value: number | null | undefined,
 ): string {
@@ -120,6 +102,24 @@ function getInitials(
 }
 
 function WalletContent() {
+  const {
+    formatUsd: formatDisplayCurrency,
+  } = useCurrency();
+
+  function formatUsd(
+    value: number | null | undefined,
+  ): string {
+    const safeValue =
+      typeof value === "number" &&
+      Number.isFinite(value)
+        ? value
+        : 0;
+
+    return formatDisplayCurrency(
+      safeValue,
+    );
+  }
+
   const [account, setAccount] =
     useState<WalletAccount | null>(null);
 
@@ -282,6 +282,8 @@ function WalletContent() {
         </Link>
 
         <div className={styles.headerRight}>
+          <CurrencySwitcher />
+
           <span className={styles.connected}>
             <i />
             Database wallet connected

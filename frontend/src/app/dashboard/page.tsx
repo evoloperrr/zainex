@@ -17,6 +17,9 @@ import {
   SharedProfileMenu,
 } from "@/components/shared-profile-menu";
 
+import { CurrencySwitcher } from "@/components/currency-switcher";
+import { useCurrency } from "@/components/currency-provider";
+
 import chromeStyles from "../billing/billing.module.css";
 import styles from "./dashboard.module.css";
 
@@ -142,52 +145,6 @@ function displayText(
   return fallback;
 }
 
-function formatUsd(
-  value: number | null,
-): string {
-  if (value === null) {
-    return "--";
-  }
-
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
-
-function formatSignedUsd(
-  value: number | null,
-): string {
-  if (value === null) {
-    return "--";
-  }
-
-  const formatted =
-    new Intl.NumberFormat(
-      "en-US",
-      {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 2,
-      },
-    ).format(
-      Math.abs(value),
-    );
-
-  if (value > 0) {
-    return `+${formatted}`;
-  }
-
-  if (value < 0) {
-    return `-${formatted}`;
-  }
-
-  return formatted;
-}
 
 function formatPercent(
   value: number,
@@ -374,6 +331,36 @@ function parseChange(
 }
 
 export default function DashboardPage() {
+  const {
+    formatUsd: formatDisplayCurrency,
+    formatSignedUsd:
+      formatSignedDisplayCurrency,
+  } = useCurrency();
+
+  function formatUsd(
+    value: number | null,
+  ): string {
+    if (value === null) {
+      return "--";
+    }
+
+    return formatDisplayCurrency(
+      value,
+    );
+  }
+
+  function formatSignedUsd(
+    value: number | null,
+  ): string {
+    if (value === null) {
+      return "--";
+    }
+
+    return formatSignedDisplayCurrency(
+      value,
+    );
+  }
+
   const [
     market,
     setMarket,
@@ -766,6 +753,8 @@ export default function DashboardPage() {
           </Link>
 
           <div className={chromeStyles.headerRight}>
+            <CurrencySwitcher />
+
             <span className={chromeStyles.secure}>
               <i />
               {syncLabel}

@@ -12,6 +12,8 @@ import {
   DesktopSidebar,
 } from "../../components/market-dashboard";
 
+import { CurrencySwitcher } from "@/components/currency-switcher";
+import { useCurrency } from "@/components/currency-provider";
 import { SharedProfileMenu } from "@/components/shared-profile-menu";
 import { NeuralOrbit } from "@/components/neural-orbit";
 
@@ -29,28 +31,6 @@ type SpotTradeRecord = {
   realizedPnl: number;
 };
 
-function formatUsd(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
-function formatSignedUsd(value: number): string {
-  const formatted = formatUsd(Math.abs(value));
-
-  if (value > 0.000001) {
-    return `+${formatted}`;
-  }
-
-  if (value < -0.000001) {
-    return `-${formatted}`;
-  }
-
-  return formatted;
-}
-
 function pnlClass(value: number): string {
   if (value > 0.000001) {
     return styles.positive;
@@ -64,6 +44,11 @@ function pnlClass(value: number): string {
 }
 
 function AnalyticsContent() {
+  const {
+    formatUsd,
+    formatSignedUsd,
+  } = useCurrency();
+
   const [futuresTrades, setFuturesTrades] = useState<
     FuturesTradeRecord[]
   >([]);
@@ -219,6 +204,8 @@ function AnalyticsContent() {
         </Link>
 
         <div className={billingStyles.headerRight}>
+          <CurrencySwitcher />
+
           <span className={billingStyles.secure}>
             <i />
             {loading ? "Syncing" : "Analytics synced"}
