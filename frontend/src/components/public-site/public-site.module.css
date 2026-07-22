@@ -6116,77 +6116,10 @@ body[data-public-reveal="ready"]
   filter: drop-shadow(0 0 4px var(--hologram-accent));
 }
 
-.handHologramWrap {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.handHologramSvg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  overflow: visible;
-}
-
-.handHologramAmbient {
-  position: absolute;
-  inset: -8% -6% -4%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.24;
-  mix-blend-mode: screen;
-}
-
-.handBeam {
-  fill: url(#zainexBeamFade);
-  opacity: 0.8;
-}
-
-.handOrbMesh path {
-  fill: none;
-  stroke: var(--hologram-accent);
-  stroke-width: 1.5;
-  opacity: 0.6;
-  filter: drop-shadow(0 0 4px var(--hologram-accent));
-}
-
-.handOrbNodes circle {
-  fill: var(--hologram-accent);
-  filter: drop-shadow(0 0 6px var(--hologram-accent));
-  animation: publicHologramPulse 2.6s ease-in-out infinite;
-}
-
-.handOrbCore {
-  fill: var(--hologram-accent-2, #ff4dd8);
-  filter: drop-shadow(0 0 10px var(--hologram-accent-2, #ff4dd8))
-    drop-shadow(0 0 22px var(--hologram-accent-2, #ff4dd8));
-  animation: publicHologramPulse 2.2s ease-in-out infinite;
-}
-
-.handParticles circle {
-  fill: var(--hologram-accent-2, #ff4dd8);
-  opacity: 0.7;
-  filter: drop-shadow(0 0 4px var(--hologram-accent-2, #ff4dd8));
-  animation: publicHologramPulse 3s ease-in-out infinite;
-}
-
-.handSilhouette path,
-.handSilhouette rect {
-  fill: url(#zainexHandFill);
-  stroke: var(--hologram-accent);
-  stroke-width: 1;
-  opacity: 0.5;
-  filter: drop-shadow(0 0 6px var(--hologram-accent));
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hologramNodes circle,
   .hologramOrbit,
-  .hologramScan,
-  .handOrbNodes circle,
-  .handOrbCore,
-  .handParticles circle {
+  .hologramScan {
     animation: none;
   }
 }
@@ -6385,6 +6318,166 @@ body[data-public-reveal="ready"]
   .site[data-page="wallets"] .workflow,
   .site[data-page="security"] .workflow {
     max-width: none;
+  }
+}
+
+.site[data-page="home"] .featureCard {
+  transition: transform 260ms ease;
+}
+
+.site[data-page="home"] .featureCard[data-card-index="0"] {
+  transform: translateY(20px) rotate(-1.4deg);
+}
+
+.site[data-page="home"] .featureCard[data-card-index="1"] {
+  z-index: 2;
+  transform: translateY(-10px) scale(1.05);
+  border-color: rgba(70, 220, 255, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(70, 220, 255, 0.12),
+    0 34px 90px rgba(70, 220, 255, 0.16);
+}
+
+.site[data-page="home"] .featureCard[data-card-index="2"] {
+  transform: translateY(20px) rotate(1.4deg);
+}
+
+.site[data-page="home"] .workflow {
+  position: relative;
+}
+
+.site[data-page="home"] .workflow::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 1%;
+  right: 1%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(70, 220, 255, 0.05),
+    rgba(70, 220, 255, 0.45) 25%,
+    rgba(161, 93, 255, 0.45) 75%,
+    rgba(255, 77, 216, 0.05)
+  );
+}
+
+.site[data-page="home"] .workflow::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 1%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--public-cyan);
+  box-shadow:
+    0 0 10px var(--public-cyan),
+    0 0 20px var(--public-cyan);
+  animation: publicWorkflowPulseTravel 4.5s ease-in-out infinite;
+}
+
+@keyframes publicWorkflowPulseTravel {
+  0% {
+    left: 1%;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 97%;
+    opacity: 0;
+  }
+}
+
+.site[data-page="home"] .workflow article {
+  transition: transform 260ms ease;
+}
+
+.site[data-page="home"] .workflow article:nth-child(1) {
+  transform: translateY(0);
+}
+
+.site[data-page="home"] .workflow article:nth-child(2) {
+  transform: translateY(-10px);
+}
+
+.site[data-page="home"] .workflow article:nth-child(3) {
+  transform: translateY(-20px);
+}
+
+.site[data-page="home"] .workflow article:nth-child(4) {
+  transform: translateY(-30px);
+}
+
+.site[data-page="home"] .statement {
+  border-color: rgba(70, 220, 255, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(70, 220, 255, 0.08),
+    0 40px 110px rgba(70, 220, 255, 0.14);
+}
+
+.site[data-page="home"] .statementMark,
+.site[data-page="home"] .statement > p,
+.site[data-page="home"] .statement > a {
+  position: relative;
+  z-index: 1;
+}
+
+.site[data-page="home"] .statement::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    rgba(70, 220, 255, 0.5),
+    rgba(161, 93, 255, 0.4),
+    rgba(255, 77, 216, 0.35)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .site[data-page="home"]
+    .featureCard[data-card-index="0"],
+  .site[data-page="home"]
+    .featureCard[data-card-index="1"],
+  .site[data-page="home"]
+    .featureCard[data-card-index="2"] {
+    transform: none;
+  }
+
+  .site[data-page="home"] .workflow::before,
+  .site[data-page="home"] .workflow::after {
+    display: none;
+  }
+
+  .site[data-page="home"] .workflow article:nth-child(1),
+  .site[data-page="home"] .workflow article:nth-child(2),
+  .site[data-page="home"] .workflow article:nth-child(3),
+  .site[data-page="home"] .workflow article:nth-child(4) {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site[data-page="home"] .workflow::after {
+    animation: none;
   }
 }
 
