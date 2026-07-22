@@ -156,7 +156,20 @@ function readErrorMessage(
 }
 
 export function StrategyActivationGrid() {
-  const { formatUsd } = useCurrency();
+  const {
+    formatUsd,
+    currencySymbol,
+    convertUsd,
+    toUsd,
+  } = useCurrency();
+
+  function formatCreditsAmount(
+    value: number,
+  ): string {
+    return Math.round(
+      convertUsd(value),
+    ).toLocaleString("en-US");
+  }
 
   const [account, setAccount] =
     useState<AccountData | null>(null);
@@ -414,8 +427,9 @@ export function StrategyActivationGrid() {
     );
 
   const numericAmount = useMemo(
-    () => Number(amount),
-    [amount],
+    () =>
+      toUsd(Number(amount)),
+    [amount, toUsd],
   );
 
   const amountIsValid =
@@ -517,7 +531,8 @@ export function StrategyActivationGrid() {
           },
           body: JSON.stringify({
             tier: selected.tier,
-            amount: amount.trim(),
+            amount:
+              numericAmount.toFixed(2),
             clientRequestId,
           }),
         },
@@ -629,7 +644,10 @@ export function StrategyActivationGrid() {
               </span>
 
               <span className={styles.creditBadge}>
-                {strategy.creditCost} CREDITS
+                {formatCreditsAmount(
+                  strategy.creditCost,
+                )}{" "}
+                CREDITS
               </span>
             </div>
 
@@ -748,8 +766,8 @@ export function StrategyActivationGrid() {
                 <strong>
                   {accountLoading
                     ? "..."
-                    : currentCredits.toLocaleString(
-                        "en-US",
+                    : formatCreditsAmount(
+                        currentCredits,
                       )}
                 </strong>
               </div>
@@ -760,14 +778,16 @@ export function StrategyActivationGrid() {
                 <span>Trading amount</span>
 
                 <div className={styles.amountInputWrap}>
-                  <i>$</i>
+                  <i>{currencySymbol}</i>
 
                   <input
                     type="number"
                     min="0.01"
                     step="0.01"
                     inputMode="decimal"
-                    placeholder="500.00"
+                    placeholder={convertUsd(
+                      500,
+                    ).toFixed(2)}
                     value={amount}
                     disabled={submitting}
                     autoFocus
@@ -791,7 +811,10 @@ export function StrategyActivationGrid() {
                 <div>
                   <span>Credit cost</span>
                   <strong>
-                    {selected.creditCost} credits
+                    {formatCreditsAmount(
+                      selected.creditCost,
+                    )}{" "}
+                    credits
                   </strong>
                 </div>
 
@@ -827,10 +850,12 @@ export function StrategyActivationGrid() {
                 <div>
                   <span>Credits after</span>
                   <strong>
-                    {Math.max(
-                      0,
-                      creditsAfter,
-                    ).toLocaleString("en-US")}
+                    {formatCreditsAmount(
+                      Math.max(
+                        0,
+                        creditsAfter,
+                      ),
+                    )}
                   </strong>
                 </div>
               </div>
@@ -894,7 +919,9 @@ export function StrategyActivationGrid() {
                   >
                     {submitting
                       ? "Activating..."
-                      : `Activate for ${selected.creditCost} credits`}
+                      : `Activate for ${formatCreditsAmount(
+                          selected.creditCost,
+                        )} credits`}
                   </button>
                 ) : null}
               </div>

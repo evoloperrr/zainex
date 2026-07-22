@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import {
+  CURRENCY_SYMBOLS,
   CurrencyCode,
   FALLBACK_RATES,
   fetchLiveRates,
@@ -24,6 +25,8 @@ const STORAGE_KEY =
 
 type CurrencyContextValue = {
   currency: CurrencyCode;
+  currencySymbol: string;
+  rate: number;
   setCurrency: (
     code: CurrencyCode,
   ) => void;
@@ -33,6 +36,12 @@ type CurrencyContextValue = {
   formatSignedUsd: (
     amountUsd: number,
   ) => string;
+  convertUsd: (
+    amountUsd: number,
+  ) => number;
+  toUsd: (
+    displayAmount: number,
+  ) => number;
 };
 
 const CurrencyContext =
@@ -114,18 +123,44 @@ export function CurrencyProvider({
     [currency, rates],
   );
 
+  const rate =
+    rates[currency] ??
+    FALLBACK_RATES[currency];
+
+  const convertUsd = useCallback(
+    (amountUsd: number) =>
+      amountUsd * rate,
+    [rate],
+  );
+
+  const toUsd = useCallback(
+    (displayAmount: number) =>
+      rate === 0
+        ? 0
+        : displayAmount / rate,
+    [rate],
+  );
+
   const value = useMemo(
     () => ({
       currency,
+      currencySymbol:
+        CURRENCY_SYMBOLS[currency],
+      rate,
       setCurrency,
       formatUsd,
       formatSignedUsd,
+      convertUsd,
+      toUsd,
     }),
     [
       currency,
+      rate,
       setCurrency,
       formatUsd,
       formatSignedUsd,
+      convertUsd,
+      toUsd,
     ],
   );
 

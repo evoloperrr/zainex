@@ -16,6 +16,23 @@ export type CurrencyCode =
   | "INR"
   | "CNY";
 
+export const CURRENCY_SYMBOLS: Record<
+  CurrencyCode,
+  string
+> = {
+  USD: "$",
+  PHP: "₱",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+  AUD: "$",
+  CAD: "$",
+  SGD: "$",
+  HKD: "$",
+  INR: "₹",
+  CNY: "¥",
+};
+
 // Alphabetical by code — default currency is still forced to USD via
 // CurrencyProvider's initial state, regardless of this order.
 export const CURRENCIES: Array<{
