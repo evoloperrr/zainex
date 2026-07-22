@@ -63,20 +63,6 @@ type GoogleSessionResponse = {
     email?: string | null;
   };
 };
-function formatCredits(
-  value: number | null | undefined,
-): string {
-  const safeValue =
-    typeof value === "number" &&
-    Number.isFinite(value)
-      ? Math.max(0, Math.trunc(value))
-      : 0;
-
-  return new Intl.NumberFormat(
-    "en-US",
-  ).format(safeValue);
-}
-
 function getInitials(
   name: string | null | undefined,
 ): string {
@@ -104,6 +90,7 @@ function getInitials(
 function WalletContent() {
   const {
     formatUsd: formatDisplayCurrency,
+    formatCredits,
   } = useCurrency();
 
   function formatUsd(

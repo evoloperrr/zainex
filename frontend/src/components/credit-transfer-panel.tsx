@@ -11,6 +11,10 @@ import {
   useState,
 } from "react";
 
+import {
+  useCurrency,
+} from "@/components/currency-provider";
+
 import styles from "./credit-transfer-panel.module.css";
 
 type TransferLog = {
@@ -49,15 +53,6 @@ type CreditTransferPanelProps = {
   credits: number;
 };
 
-function formatCredits(
-  value: number,
-): string {
-  return Math.max(
-    0,
-    Math.trunc(value),
-  ).toLocaleString("en-US");
-}
-
 function formatDate(
   value: string,
 ): string {
@@ -86,6 +81,9 @@ function formatDate(
 export function CreditTransferPanel({
   credits,
 }: CreditTransferPanelProps) {
+  const { formatCredits } =
+    useCurrency();
+
   const [
     recipientEmail,
     setRecipientEmail,

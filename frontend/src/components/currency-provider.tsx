@@ -42,6 +42,9 @@ type CurrencyContextValue = {
   toUsd: (
     displayAmount: number,
   ) => number;
+  formatCredits: (
+    value: number | null | undefined,
+  ) => string;
 };
 
 const CurrencyContext =
@@ -141,6 +144,26 @@ export function CurrencyProvider({
     [rate],
   );
 
+  const formatCredits = useCallback(
+    (
+      value: number | null | undefined,
+    ) => {
+      const safeValue =
+        typeof value === "number" &&
+        Number.isFinite(value)
+          ? value
+          : 0;
+
+      return Math.max(
+        0,
+        Math.round(
+          safeValue * rate,
+        ),
+      ).toLocaleString("en-US");
+    },
+    [rate],
+  );
+
   const value = useMemo(
     () => ({
       currency,
@@ -152,6 +175,7 @@ export function CurrencyProvider({
       formatSignedUsd,
       convertUsd,
       toUsd,
+      formatCredits,
     }),
     [
       currency,
@@ -161,6 +185,7 @@ export function CurrencyProvider({
       formatSignedUsd,
       convertUsd,
       toUsd,
+      formatCredits,
     ],
   );
 

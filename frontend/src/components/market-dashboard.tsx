@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 
 import { SharedProfileMenu } from "@/components/shared-profile-menu";
+import { useCurrency } from "@/components/currency-provider";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { FuturesPaperTerminal } from "@/components/futures-paper-terminal";
 import { signOut } from "next-auth/react";
@@ -1785,26 +1786,6 @@ type ProfileMenuAccountResponse = {
   };
 };
 
-function formatProfileMenuUsd(
-  value: number | null,
-): string {
-  if (
-    value === null ||
-    !Number.isFinite(value)
-  ) {
-    return "--";
-  }
-
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
-
 function DesktopProfileMenu({
   anchor,
   open,
@@ -1817,6 +1798,26 @@ function DesktopProfileMenu({
   onClose: () => void;
 }) {
   const router = useRouter();
+
+  const {
+    formatUsd: formatDisplayCurrency,
+    formatCredits,
+  } = useCurrency();
+
+  function formatProfileMenuUsd(
+    value: number | null,
+  ): string {
+    if (
+      value === null ||
+      !Number.isFinite(value)
+    ) {
+      return "--";
+    }
+
+    return formatDisplayCurrency(
+      value,
+    );
+  }
 
   const menuRef =
     useRef<HTMLDivElement>(null);
@@ -2116,8 +2117,8 @@ function DesktopProfileMenu({
           <strong>
             {credits === null
               ? "--"
-              : credits.toLocaleString(
-                  "en-US",
+              : formatCredits(
+                  credits,
                 )}
           </strong>
         </div>

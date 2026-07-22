@@ -12,6 +12,10 @@ import {
   useState,
 } from "react";
 
+import {
+  useCurrency,
+} from "@/components/currency-provider";
+
 import styles from "./wallet-to-credits-converter.module.css";
 
 type ConversionState = {
@@ -54,33 +58,6 @@ type WalletToCreditsConverterProps = {
   credits: number;
 };
 
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(
-    Number.isFinite(value)
-      ? value
-      : 0,
-  );
-}
-
-function formatCredits(
-  value: number,
-): string {
-  return Math.max(
-    0,
-    Math.trunc(value),
-  ).toLocaleString("en-US");
-}
-
 function formatDate(
   value: string,
 ): string {
@@ -110,6 +87,11 @@ export function WalletToCreditsConverter({
   availableBalance,
   credits,
 }: WalletToCreditsConverterProps) {
+  const {
+    formatUsd,
+    formatCredits,
+  } = useCurrency();
+
   const [amount, setAmount] =
     useState("");
 

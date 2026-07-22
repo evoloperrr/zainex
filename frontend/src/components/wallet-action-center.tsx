@@ -86,15 +86,6 @@ type WalletActionCenterProps = {
   credits: number;
 };
 
-function formatCredits(
-  value: number,
-): string {
-  return Math.max(
-    0,
-    Math.trunc(value),
-  ).toLocaleString("en-US");
-}
-
 function dateValue(
   value: string,
 ): number {
@@ -136,6 +127,9 @@ function combineLogs(
   conversions: ConversionLog[],
   transfers: TransferLog[],
   formatUsd: (
+    value: number,
+  ) => string,
+  formatCredits: (
     value: number,
   ) => string,
 ): ActivityRow[] {
@@ -228,6 +222,7 @@ export function WalletActionCenter({
 }: WalletActionCenterProps) {
   const {
     formatUsd: formatDisplayCurrency,
+    formatCredits,
   } = useCurrency();
 
   function formatUsd(
@@ -470,11 +465,13 @@ export function WalletActionCenter({
         conversionLogs,
         transferLogs,
         formatUsd,
+        formatCredits,
       ),
     [
       conversionLogs,
       transferLogs,
       formatUsd,
+      formatCredits,
     ],
   );
 

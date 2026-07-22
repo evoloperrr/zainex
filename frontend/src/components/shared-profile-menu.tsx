@@ -55,6 +55,7 @@ export function SharedProfileMenu({
 
   const {
     formatUsd: formatDisplayCurrency,
+    formatCredits,
   } = useCurrency();
 
   function formatUsd(
@@ -431,8 +432,8 @@ export function SharedProfileMenu({
                     <strong>
                       {credits === null
                         ? "--"
-                        : credits.toLocaleString(
-                            "en-US",
+                        : formatCredits(
+                            credits,
                           )}
                     </strong>
                   </div>
