@@ -1825,17 +1825,17 @@ function SectionHologram({
         >
           <defs>
             <radialGradient
-              id="zainexHomeRadarWedge"
+              id="zainexHomeCoreGlow"
               cx="0"
               cy="0"
               r="1"
               gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(300 150) scale(210)"
+              gradientTransform="translate(300 150) scale(150)"
             >
               <stop
                 offset="0%"
                 stopColor="var(--hologram-accent)"
-                stopOpacity="0.9"
+                stopOpacity="0.55"
               />
               <stop
                 offset="100%"
@@ -1845,144 +1845,148 @@ function SectionHologram({
             </radialGradient>
           </defs>
 
-          <circle
-            className={
-              styles.hologramDashRing
-            }
-            cx="300"
-            cy="150"
-            r="210"
-          />
-
-          <circle
-            className={
-              styles.hologramRing
-            }
-            cx="300"
-            cy="150"
-            r="60"
-          />
-          <circle
-            className={
-              styles.hologramRing
-            }
-            cx="300"
-            cy="150"
-            r="115"
-          />
-          <circle
-            className={
-              styles.hologramRing
-            }
-            cx="300"
-            cy="150"
-            r="170"
-          />
-
           <g
             className={
-              styles.hologramTicks
+              styles.hologramDataStream
             }
           >
-            {[
-              0, 45, 90, 135, 180,
-              225, 270, 315,
-            ].map((angle) => {
-              const rad =
-                (angle *
-                  Math.PI) /
-                180;
-              const x1 =
-                300 +
-                Math.cos(rad) *
-                  178;
-              const y1 =
-                150 +
-                Math.sin(rad) *
-                  178;
-              const x2 =
-                300 +
-                Math.cos(rad) *
-                  196;
-              const y2 =
-                150 +
-                Math.sin(rad) *
-                  196;
-
-              return (
-                <line
-                  key={angle}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                />
-              );
-            })}
-          </g>
-
-          <g
-            className={
-              styles.hologramSweepGroup
-            }
-          >
-            <path
-              className={
-                styles.hologramSweepWedge
-              }
-              d="M300 150 L510 150 A210 210 0 0 1 471.9 265.4 Z"
-              fill="url(#zainexHomeRadarWedge)"
+            <line
+              x1="46"
+              x2="46"
+              y1="-20"
+              y2="320"
             />
             <line
-              className={
-                styles.hologramSweep
-              }
-              x1="300"
-              y1="150"
-              x2="510"
-              y2="150"
+              x1="118"
+              x2="118"
+              y1="-20"
+              y2="320"
+            />
+            <line
+              x1="482"
+              x2="482"
+              y1="-20"
+              y2="320"
+            />
+            <line
+              x1="554"
+              x2="554"
+              y1="-20"
+              y2="320"
             />
           </g>
 
           <g
             className={
-              styles.hologramBlips
+              styles.hologramBeams
             }
           >
-            <circle
-              cx="380"
-              cy="96"
-              r="4"
+            <line
+              x1="300"
+              y1="150"
+              x2="300"
+              y2="-90"
             />
-            <circle
-              cx="228"
-              cy="204"
-              r="3.5"
+            <line
+              x1="300"
+              y1="150"
+              x2="499"
+              y2="35"
             />
-            <circle
-              cx="352"
-              cy="232"
-              r="3"
+            <line
+              x1="300"
+              y1="150"
+              x2="499"
+              y2="265"
             />
-            <circle
-              cx="204"
-              cy="110"
-              r="4"
+            <line
+              x1="300"
+              y1="150"
+              x2="300"
+              y2="390"
             />
-            <circle
-              cx="418"
-              cy="182"
-              r="3"
+            <line
+              x1="300"
+              y1="150"
+              x2="101"
+              y2="265"
+            />
+            <line
+              x1="300"
+              y1="150"
+              x2="101"
+              y2="35"
             />
           </g>
 
           <circle
+            cx="300"
+            cy="150"
+            r="150"
+            fill="url(#zainexHomeCoreGlow)"
+          />
+
+          <polygon
+            className={
+              styles.hologramCrystalOuter
+            }
+            points="300,20 412.6,85 412.6,215 300,280 187.4,215 187.4,85"
+          />
+
+          <polygon
+            className={
+              styles.hologramCrystalInner
+            }
+            points="300,82 358.9,116 358.9,184 300,218 241.1,184 241.1,116"
+          />
+
+          <g
+            className={
+              styles.hologramDiamonds
+            }
+          >
+            <rect
+              x="446"
+              y="76"
+              width="14"
+              height="14"
+              transform="rotate(45 453 83)"
+            />
+            <rect
+              x="130"
+              y="206"
+              width="12"
+              height="12"
+              transform="rotate(45 136 212)"
+            />
+            <rect
+              x="462"
+              y="226"
+              width="10"
+              height="10"
+              transform="rotate(45 467 231)"
+            />
+            <rect
+              x="96"
+              y="70"
+              width="13"
+              height="13"
+              transform="rotate(45 102.5 76.5)"
+            />
+            <rect
+              x="284"
+              y="252"
+              width="11"
+              height="11"
+              transform="rotate(45 289.5 257.5)"
+            />
+          </g>
+
+          <polygon
             className={
               styles.hologramCore
             }
-            cx="300"
-            cy="150"
-            r="7"
+            points="300,136 314,150 300,164 286,150"
           />
         </svg>
       ) : null}
