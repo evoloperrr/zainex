@@ -170,6 +170,15 @@ Route::post(
     ],
 )->middleware('throttle:30,1');
 
+// ZAINEX_GENERAL_AI_ASSISTANT_V1
+Route::post(
+    '/ai-assistant/chat',
+    [
+        \App\Http\Controllers\Api\AiAssistantController::class,
+        'chat',
+    ],
+)->middleware('throttle:20,1');
+
 // ZAINEX_MERCHANT_CASHIN_V1
 Route::post(
     '/trading/futures/wallet/merchant-cashin',

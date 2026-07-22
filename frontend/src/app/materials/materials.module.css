@@ -1,0 +1,55 @@
+/* ZAINEX_MATERIALS_V1 */
+
+.wordmarkPreview {
+  display: flex;
+  align-items: center;
+  padding: 28px 24px;
+  margin: 20px 0 40px;
+  border: 1px solid var(--public-line);
+  border-radius: 14px;
+  background: var(--public-panel-strong);
+}
+
+.wordmarkPreview strong {
+  font-size: 28px;
+}
+
+.swatchGrid {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0 40px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--public-line);
+  border-radius: 12px;
+  background: var(--public-panel);
+}
+
+.swatchColor {
+  display: block;
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+}
+
+.swatchLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--public-text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.swatchLabel small {
+  color: var(--public-muted);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
