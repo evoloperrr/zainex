@@ -36,6 +36,7 @@ interface FuturesProxyOptions {
   method: FuturesProxyMethod;
   invalidJsonMessage?: string;
   requestTooLargeMessage?: string;
+  maxRequestBytes?: number;
 }
 
 function finalizeResponse(
@@ -93,6 +94,7 @@ async function readPostBody(
   session: DemoSession,
   invalidJsonMessage: string,
   requestTooLargeMessage: string,
+  maxRequestBytes: number,
 ): Promise<
   | {
       ok: true;
@@ -113,7 +115,7 @@ async function readPostBody(
   if (
     Number.isFinite(declaredLength) &&
     declaredLength >
-      MAX_REQUEST_BYTES
+      maxRequestBytes
   ) {
     return {
       ok: false,
@@ -136,7 +138,7 @@ async function readPostBody(
 
   if (
     actualLength >
-    MAX_REQUEST_BYTES
+    maxRequestBytes
   ) {
     return {
       ok: false,
@@ -212,6 +214,8 @@ export async function proxyFuturesToLaravel(
           "The futures request contains invalid JSON.",
         options.requestTooLargeMessage ??
           "The futures request is too large.",
+        options.maxRequestBytes ??
+          MAX_REQUEST_BYTES,
       );
 
     if (!parsed.ok) {

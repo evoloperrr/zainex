@@ -170,6 +170,15 @@ Route::post(
     ],
 )->middleware('throttle:30,1');
 
+// ZAINEX_MERCHANT_CASHIN_V1
+Route::post(
+    '/trading/futures/wallet/merchant-cashin',
+    [
+        \App\Http\Controllers\Api\MerchantCashinController::class,
+        'store',
+    ],
+)->middleware('throttle:20,1');
+
 // ZAINEX_ADMIN_CONSOLE_V1
 Route::controller(
     \App\Http\Controllers\Api\AdminController::class
@@ -192,4 +201,10 @@ Route::controller(
         ->middleware('throttle:60,1');
     Route::get('/credit-transfers', 'creditTransfers')
         ->middleware('throttle:60,1');
+    Route::get('/merchant-cashins', 'merchantCashins')
+        ->middleware('throttle:60,1');
+    Route::post('/merchant-cashins/{id}/approve', 'approveMerchantCashin')
+        ->middleware('throttle:20,1');
+    Route::post('/merchant-cashins/{id}/reject', 'rejectMerchantCashin')
+        ->middleware('throttle:20,1');
 });

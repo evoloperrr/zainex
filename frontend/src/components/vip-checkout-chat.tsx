@@ -82,6 +82,29 @@ type CryptoInvoiceState =
       status: string;
     };
 
+function fileToBase64(
+  file: File,
+): Promise<string> {
+  return new Promise(
+    (resolve, reject) => {
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+        resolve(
+          String(reader.result),
+        );
+      };
+
+      reader.onerror = () => {
+        reject(reader.error);
+      };
+
+      reader.readAsDataURL(file);
+    },
+  );
+}
+
 function parsePlanPriceUsd(
   price: string,
 ): number {
@@ -630,11 +653,20 @@ function AttachAndActions({
     event: React.ChangeEvent<HTMLInputElement>,
   ) => void;
   onSkip: () => void;
-  onSend: () => void;
+  onSend: () => Promise<
+    | { ok: true }
+    | { ok: false; message: string }
+  >;
   sendLabel: string;
 }) {
   const fileInputRef =
     useRef<HTMLInputElement>(null);
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const [sendError, setSendError] =
+    useState("");
 
   return (
     <>
@@ -704,11 +736,42 @@ function AttachAndActions({
           className={
             styles.primaryAction
           }
-          onClick={onSend}
+          disabled={submitting}
+          onClick={() => {
+            setSubmitting(true);
+            setSendError("");
+
+            void onSend().then(
+              (result) => {
+                setSubmitting(
+                  false,
+                );
+
+                if (!result.ok) {
+                  setSendError(
+                    result.message,
+                  );
+                }
+              },
+            );
+          }}
         >
-          {sendLabel}
+          {submitting
+            ? "Sending…"
+            : sendLabel}
         </button>
       </div>
+
+      {sendError ? (
+        <p
+          className={`${styles.feedback} ${styles.feedbackError}`}
+          style={{
+            padding: "0 18px 12px",
+          }}
+        >
+          {sendError}
+        </p>
+      ) : null}
     </>
   );
 }
@@ -859,19 +922,20 @@ export function VipCheckoutChat({
       },
     ];
 
-    if (walletMethod === "merchant") {
-      script = [
-        ...script,
-        ...walletMethodSteps.merchant,
-      ];
-    } else if (
-      walletMethod === "crypto" &&
-      walletFundAmount !== null
-    ) {
-      script = [
-        ...script,
-        ...walletMethodSteps.crypto,
-      ];
+    if (walletFundAmount !== null) {
+      if (walletMethod === "merchant") {
+        script = [
+          ...script,
+          ...walletMethodSteps.merchant,
+        ];
+      } else if (
+        walletMethod === "crypto"
+      ) {
+        script = [
+          ...script,
+          ...walletMethodSteps.crypto,
+        ];
+      }
     }
 
     if (walletSent) {
@@ -966,6 +1030,67 @@ export function VipCheckoutChat({
       );
     };
   }, [onClose]);
+
+  async function submitMerchantCashin(
+    purpose: PaymentContext,
+    planName: string | null,
+    amount: number,
+    proofFile: File | null,
+  ): Promise<
+    | { ok: true }
+    | { ok: false; message: string }
+  > {
+    try {
+      const proofImage = proofFile
+        ? await fileToBase64(
+            proofFile,
+          )
+        : undefined;
+
+      const response = await fetch(
+        "/api/trading/futures/wallet/merchant-cashin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            purpose,
+            planName:
+              planName ??
+              undefined,
+            amount,
+            proofImage,
+          }),
+        },
+      );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !data?.ok
+      ) {
+        return {
+          ok: false,
+          message:
+            data?.error
+              ?.message ??
+            "Could not submit your payment confirmation.",
+        };
+      }
+
+      return { ok: true };
+    } catch {
+      return {
+        ok: false,
+        message:
+          "Network error while submitting your payment confirmation.",
+      };
+    }
+  }
 
   const hasGotymeQr =
     GOTYME_QR_IMAGE_SRC.trim() !==
@@ -1186,7 +1311,10 @@ export function VipCheckoutChat({
 
               const amountLabel =
                 step.forWallet
-                  ? "Any amount you choose"
+                  ? `$${(
+                      walletFundAmount ??
+                      0
+                    ).toFixed(2)}`
                   : `${plan.price} ${plan.period}`;
 
               return (
@@ -1359,8 +1487,7 @@ export function VipCheckoutChat({
           ) : null}
 
           {!typing &&
-          walletMethod ===
-            "crypto" &&
+          walletMethod !== null &&
           walletFundAmount ===
             null ? (
             <WalletAmountForm
@@ -1385,8 +1512,22 @@ export function VipCheckoutChat({
               vipProof.onFileChange
             }
             onSkip={onClose}
-            onSend={() => {
-              setSent(true);
+            onSend={async () => {
+              const result =
+                await submitMerchantCashin(
+                  "subscription",
+                  plan.name,
+                  parsePlanPriceUsd(
+                    plan.price,
+                  ),
+                  vipProof.file,
+                );
+
+              if (result.ok) {
+                setSent(true);
+              }
+
+              return result;
             }}
             sendLabel="I’ve sent it"
           />
@@ -1429,8 +1570,23 @@ export function VipCheckoutChat({
               walletProof.onFileChange
             }
             onSkip={onClose}
-            onSend={() => {
-              setWalletSent(true);
+            onSend={async () => {
+              const result =
+                await submitMerchantCashin(
+                  "wallet",
+                  null,
+                  walletFundAmount ??
+                    0,
+                  walletProof.file,
+                );
+
+              if (result.ok) {
+                setWalletSent(
+                  true,
+                );
+              }
+
+              return result;
             }}
             sendLabel="I’ve added it"
           />
