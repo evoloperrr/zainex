@@ -520,6 +520,112 @@ final class AdminController extends Controller
             ->header('Cache-Control', 'no-store');
     }
 
+    public function adminWalletTransfers(Request $request): JsonResponse
+    {
+        $guard = $this->authorize($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        [$page, $perPage] = $this->pagination($request);
+
+        $query = DB::table('admin_wallet_transfers as awt')
+            ->leftJoin('users as sender', 'sender.id', '=', 'awt.sender_user_id')
+            ->leftJoin('users as recipient', 'recipient.id', '=', 'awt.recipient_user_id')
+            ->select(
+                'awt.id',
+                'awt.amount',
+                'awt.status',
+                'awt.reference_key',
+                'awt.occurred_at',
+                'sender.email as sender_email',
+                'recipient.email as recipient_email',
+            );
+
+        $total = (clone $query)->count();
+
+        $rows = $query
+            ->orderByDesc('awt.occurred_at')
+            ->orderByDesc('awt.id')
+            ->forPage($page, $perPage)
+            ->get()
+            ->map(fn (object $row): array => [
+                'id' => (int) $row->id,
+                'senderEmail' => $row->sender_email,
+                'recipientEmail' => $row->recipient_email,
+                'amount' => (float) $row->amount,
+                'status' => (string) $row->status,
+                'referenceKey' => (string) $row->reference_key,
+                'occurredAt' => (string) $row->occurred_at,
+            ])
+            ->values()
+            ->all();
+
+        return response()
+            ->json([
+                'ok' => true,
+                'page' => $page,
+                'perPage' => $perPage,
+                'total' => $total,
+                'transfers' => $rows,
+            ])
+            ->header('Cache-Control', 'no-store');
+    }
+
+    public function creditTransfers(Request $request): JsonResponse
+    {
+        $guard = $this->authorize($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        [$page, $perPage] = $this->pagination($request);
+
+        $query = DB::table('credit_transfers as ct')
+            ->leftJoin('users as sender', 'sender.id', '=', 'ct.sender_user_id')
+            ->leftJoin('users as recipient', 'recipient.id', '=', 'ct.recipient_user_id')
+            ->select(
+                'ct.id',
+                'ct.amount',
+                'ct.status',
+                'ct.reference_key',
+                'ct.occurred_at',
+                'sender.email as sender_email',
+                'recipient.email as recipient_email',
+            );
+
+        $total = (clone $query)->count();
+
+        $rows = $query
+            ->orderByDesc('ct.occurred_at')
+            ->orderByDesc('ct.id')
+            ->forPage($page, $perPage)
+            ->get()
+            ->map(fn (object $row): array => [
+                'id' => (int) $row->id,
+                'senderEmail' => $row->sender_email,
+                'recipientEmail' => $row->recipient_email,
+                'amount' => (int) $row->amount,
+                'status' => (string) $row->status,
+                'referenceKey' => (string) $row->reference_key,
+                'occurredAt' => (string) $row->occurred_at,
+            ])
+            ->values()
+            ->all();
+
+        return response()
+            ->json([
+                'ok' => true,
+                'page' => $page,
+                'perPage' => $perPage,
+                'total' => $total,
+                'transfers' => $rows,
+            ])
+            ->header('Cache-Control', 'no-store');
+    }
+
     /**
      * @return array{int, int}
      */

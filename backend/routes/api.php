@@ -186,4 +186,8 @@ Route::controller(
         ->middleware('throttle:60,1');
     Route::get('/wallet-ledger', 'walletLedger')
         ->middleware('throttle:60,1');
+    Route::get('/admin-wallet-transfers', 'adminWalletTransfers')
+        ->middleware('throttle:60,1');
+    Route::get('/credit-transfers', 'creditTransfers')
+        ->middleware('throttle:60,1');
 });

@@ -43,6 +43,14 @@ const TABS = [
     href: "/admin/wallet-ledger",
     label: "Wallet ledger",
   },
+  {
+    href: "/admin/wallet-transfers",
+    label: "Admin transfers",
+  },
+  {
+    href: "/admin/credit-transfers",
+    label: "Credit transfers",
+  },
 ];
 
 export default function AdminLayout({
