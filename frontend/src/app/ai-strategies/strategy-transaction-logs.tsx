@@ -26,18 +26,44 @@ type StrategyLog = {
   status?: string | null;
   direction?: string | null;
   dayNumber?: number | null;
+  payoutNumber?: number | null;
   paidDays?: number | null;
   termDays?: number | null;
+  windowDays?: number | null;
+  cadence?: "RANDOM_15_OF_30" | "EVERY_24_HOURS" | null;
   description?: string | null;
   occurredAt?: string | null;
+};
+
+type NextPayout = {
+  activationId: number;
+  tier: string;
+  cadence: "RANDOM_15_OF_30" | "EVERY_24_HOURS";
+  scheduledAt: string;
+  expectedAmount: number | string;
+  principalBasis: number | string;
+  dailyRate: number | string;
+  payoutNumber: number;
+  totalPayouts: number;
+  calendarDay?: number | null;
+  windowDays: number;
 };
 
 type LogsPayload = {
   ok?: boolean;
   logs?: StrategyLog[];
+  nextPayout?: NextPayout | null;
   error?: {
     message?: string;
   };
+};
+
+type CountdownParts = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  due: boolean;
 };
 
 function toNumber(
@@ -64,6 +90,15 @@ function formatUsd(
   ).format(
     toNumber(value),
   );
+}
+
+function formatPercent(
+  value: unknown,
+): string {
+  return `${(toNumber(value) * 100)
+    .toFixed(2)
+    .replace(/\.00$/, "")
+    .replace(/(\.\d)0$/, "$1")}%`;
 }
 
 function formatDateTime(
@@ -132,6 +167,9 @@ function eventDetail(
   const termDays =
     log.termDays ?? 30;
 
+  const windowDays =
+    log.windowDays ?? 30;
+
   switch (log.eventType) {
     case "STRATEGY_ACTIVATED":
       return [
@@ -144,12 +182,16 @@ function eventDetail(
 
     case "STRATEGY_DAILY_PROFIT":
       return [
-        `${tier} • Day ` +
-          `${log.dayNumber ?? log.paidDays ?? 0}/` +
-          `${termDays}`,
+        log.cadence === "RANDOM_15_OF_30"
+          ? `${tier} • Random drop ` +
+            `${log.payoutNumber ?? log.paidDays ?? 0}/${termDays}` +
+            ` • Day ${log.dayNumber ?? 0}/${windowDays}`
+          : `${tier} • Drop ` +
+            `${log.payoutNumber ?? log.dayNumber ?? log.paidDays ?? 0}/` +
+            `${termDays}`,
         log.dailyRate == null
           ? null
-          : `${toNumber(log.dailyRate) * 100}% daily`,
+          : `${formatPercent(log.dailyRate)} daily`,
         log.principalBasis == null
           ? null
           : `${formatUsd(log.principalBasis)} trading amount`,
@@ -160,14 +202,14 @@ function eventDetail(
     case "STRATEGY_PRINCIPAL_RELEASED":
       return (
         `${tier} • Principal returned after ` +
-        `${termDays} days`
+        `${windowDays} days`
       );
 
     case "STRATEGY_COMPLETED":
       return (
         `${tier} • ` +
         `${log.paidDays ?? termDays}/` +
-        `${termDays} days completed`
+        `${termDays} drops completed`
       );
 
     default:
@@ -176,6 +218,49 @@ function eventDetail(
         tier
       );
   }
+}
+
+function countdownParts(
+  scheduledAt: string,
+  now: number,
+): CountdownParts {
+  const target = new Date(
+    scheduledAt,
+  ).getTime();
+
+  const remaining =
+    Number.isFinite(target)
+      ? Math.max(0, target - now)
+      : 0;
+
+  return {
+    days: Math.floor(
+      remaining / 86_400_000,
+    ),
+    hours: Math.floor(
+      (remaining % 86_400_000) /
+        3_600_000,
+    ),
+    minutes: Math.floor(
+      (remaining % 3_600_000) /
+        60_000,
+    ),
+    seconds: Math.floor(
+      (remaining % 60_000) / 1000,
+    ),
+    due:
+      Number.isFinite(target) &&
+      target <= now,
+  };
+}
+
+function padCountdown(
+  value: number,
+): string {
+  return String(value).padStart(
+    2,
+    "0",
+  );
 }
 
 function eventDescription(
@@ -239,6 +324,12 @@ export function StrategyTransactionLogs() {
   const [logs, setLogs] =
     useState<StrategyLog[]>([]);
 
+  const [nextPayout, setNextPayout] =
+    useState<NextPayout | null>(null);
+
+  const [now, setNow] =
+    useState(() => Date.now());
+
   const [loading, setLoading] =
     useState(true);
 
@@ -273,6 +364,12 @@ export function StrategyTransactionLogs() {
             ? payload.logs.slice(0, 10)
             : [],
         );
+
+        setNextPayout(
+          payload.nextPayout ?? null,
+        );
+
+        setNow(Date.now());
 
         setError("");
       } catch (loadError) {
@@ -328,11 +425,115 @@ export function StrategyTransactionLogs() {
     };
   }, [loadLogs]);
 
+  useEffect(() => {
+    const countdownTimer =
+      window.setInterval(
+        () => {
+          setNow(Date.now());
+        },
+        1000,
+      );
+
+    return () => {
+      window.clearInterval(
+        countdownTimer,
+      );
+    };
+  }, []);
+
+  const countdown =
+    nextPayout === null
+      ? null
+      : countdownParts(
+          nextPayout.scheduledAt,
+          now,
+        );
+
   return (
-    <section
-      className={styles.logsPanel}
-      aria-label="Strategy transaction logs"
-    >
+    <>
+      {nextPayout && countdown ? (
+        <section
+          className={styles.profitDropPanel}
+          aria-label="Next strategy profit drop"
+        >
+          <div
+            className={styles.profitDropAura}
+            aria-hidden="true"
+          />
+
+          <div className={styles.profitDropIntro}>
+            <span className={styles.profitDropEyebrow}>
+              <i /> LIVE PROFIT STREAM
+            </span>
+
+            <h2>
+              Next profit
+              <strong> drop.</strong>
+            </h2>
+
+            <p>
+              {nextPayout.cadence ===
+              "RANDOM_15_OF_30"
+                ? "Free random schedule • 15 drops across 30 days"
+                : "VIP fixed schedule • every 24 hours from activation"}
+            </p>
+          </div>
+
+          <div className={styles.profitDropClock}>
+            {[
+              [countdown.days, "DAYS"],
+              [countdown.hours, "HRS"],
+              [countdown.minutes, "MIN"],
+              [countdown.seconds, "SEC"],
+            ].map(([value, label]) => (
+              <div key={String(label)}>
+                <strong>
+                  {padCountdown(
+                    Number(value),
+                  )}
+                </strong>
+                <span>{label}</span>
+              </div>
+            ))}
+
+            {countdown.due ? (
+              <small>
+                Processing wallet credit…
+              </small>
+            ) : null}
+          </div>
+
+          <div className={styles.profitDropValue}>
+            <span>{nextPayout.tier}</span>
+            <strong>
+              +{formatUsd(
+                nextPayout.expectedAmount,
+              )}
+            </strong>
+            <small>
+              {formatPercent(nextPayout.dailyRate)} of {formatUsd(nextPayout.principalBasis)}
+            </small>
+            <em>
+              Drop {nextPayout.payoutNumber}/{nextPayout.totalPayouts}
+              {nextPayout.cadence ===
+                "RANDOM_15_OF_30" &&
+              nextPayout.calendarDay
+                ? ` • Random day ${nextPayout.calendarDay}/${nextPayout.windowDays}`
+                : ""}
+            </em>
+            <time dateTime={nextPayout.scheduledAt}>
+              {formatDateTime(
+                nextPayout.scheduledAt,
+              )}
+            </time>
+          </div>
+        </section>
+      ) : null}
+
+      <section
+        className={styles.logsPanel}
+        aria-label="Strategy transaction logs"
+      >
       <header className={styles.logsHeader}>
         <div>
           <span>
@@ -418,6 +619,7 @@ export function StrategyTransactionLogs() {
           ))}
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }

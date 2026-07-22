@@ -470,6 +470,338 @@
 }
 /* ZAINEX_STRATEGY_LOGS_BELOW_CARDS_V1_1 */
 
+.profitDropPanel {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1.1fr)
+    minmax(390px, 1.55fr)
+    minmax(210px, 0.85fr);
+  align-items: center;
+  gap: 28px;
+  margin-top: 30px;
+  overflow: hidden;
+  padding: 28px;
+  border: 1px solid rgba(77, 228, 255, 0.3);
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      circle at 74% 35%,
+      rgba(117, 66, 255, 0.22),
+      transparent 32%
+    ),
+    linear-gradient(
+      125deg,
+      rgba(8, 17, 43, 0.98),
+      rgba(13, 13, 42, 0.98) 55%,
+      rgba(18, 9, 40, 0.98)
+    );
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 45px rgba(53, 211, 255, 0.08);
+}
+
+.profitDropPanel::after {
+  position: absolute;
+  right: -80px;
+  bottom: -120px;
+  width: 290px;
+  height: 290px;
+  border: 1px solid rgba(178, 79, 255, 0.18);
+  border-radius: 50%;
+  content: "";
+  box-shadow:
+    0 0 0 35px rgba(108, 87, 255, 0.035),
+    0 0 0 75px rgba(60, 216, 255, 0.025);
+  pointer-events: none;
+}
+
+.profitDropAura {
+  position: absolute;
+  z-index: 0;
+  top: -2px;
+  left: 7%;
+  width: 44%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #58e7ff,
+    #b05cff,
+    transparent
+  );
+  box-shadow: 0 0 22px #65dfff;
+  animation: profitDropScan 4s ease-in-out infinite;
+}
+
+.profitDropIntro,
+.profitDropClock,
+.profitDropValue {
+  position: relative;
+  z-index: 1;
+}
+
+.profitDropEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #72e8ff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.profitDropEyebrow i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5dffd0;
+  box-shadow: 0 0 14px #5dffd0;
+  animation: profitDropPulse 1.35s ease-in-out infinite;
+}
+
+.profitDropIntro h2 {
+  margin: 10px 0 7px;
+  color: #f3f6ff;
+  font-size: clamp(24px, 2.5vw, 36px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.profitDropIntro h2 strong {
+  color: #7deaff;
+  font-weight: 650;
+  text-shadow: 0 0 24px rgba(77, 224, 255, 0.22);
+}
+
+.profitDropIntro p {
+  max-width: 310px;
+  margin: 0;
+  color: #7f8db6;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.profitDropClock {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(64px, 1fr));
+  gap: 9px;
+}
+
+.profitDropClock > div {
+  position: relative;
+  display: grid;
+  min-height: 88px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(95, 195, 255, 0.16);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(28, 38, 79, 0.82),
+      rgba(8, 13, 35, 0.88)
+    );
+  box-shadow: inset 0 -18px 30px rgba(0, 0, 0, 0.18);
+}
+
+.profitDropClock > div::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(119, 153, 226, 0.11);
+  content: "";
+}
+
+.profitDropClock strong,
+.profitDropClock span {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.profitDropClock strong {
+  align-self: end;
+  color: #eff5ff;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(25px, 3vw, 39px);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.profitDropClock span {
+  align-self: start;
+  margin-top: 8px;
+  color: #6577a7;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.profitDropClock > small {
+  grid-column: 1 / -1;
+  color: #67f0cf;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.profitDropValue {
+  min-width: 0;
+  text-align: right;
+}
+
+.profitDropValue > span,
+.profitDropValue > strong,
+.profitDropValue > small,
+.profitDropValue > em,
+.profitDropValue > time {
+  display: block;
+}
+
+.profitDropValue > span {
+  color: #b5a4ff;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+}
+
+.profitDropValue > strong {
+  margin-top: 6px;
+  color: #73f1c7;
+  font-size: clamp(27px, 3vw, 43px);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  text-shadow: 0 0 25px rgba(81, 244, 195, 0.16);
+}
+
+.profitDropValue > small {
+  margin-top: 3px;
+  color: #8795bd;
+  font-size: 11px;
+}
+
+.profitDropValue > em {
+  margin-top: 13px;
+  color: #c5ccef;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.profitDropValue > time {
+  margin-top: 5px;
+  color: #6877a0;
+  font-size: 11px;
+}
+
+@keyframes profitDropPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.84);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes profitDropScan {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateX(-14%);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(110%);
+  }
+}
+
+@media (max-width: 1040px) {
+  .profitDropPanel {
+    grid-template-columns: minmax(200px, 0.8fr) minmax(390px, 1.5fr);
+  }
+
+  .profitDropValue {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+    text-align: left;
+  }
+
+  .profitDropValue > strong,
+  .profitDropValue > small {
+    grid-column: 1;
+  }
+
+  .profitDropValue > em,
+  .profitDropValue > time {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .profitDropValue > em {
+    grid-row: 1 / span 2;
+    align-self: end;
+  }
+}
+
+@media (max-width: 720px) {
+  .profitDropPanel {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 21px;
+  }
+
+  .profitDropClock {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .profitDropClock > div {
+    min-height: 75px;
+  }
+
+  .profitDropValue {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 460px) {
+  .profitDropClock {
+    gap: 5px;
+  }
+
+  .profitDropClock > div {
+    min-height: 68px;
+    border-radius: 10px;
+  }
+
+  .profitDropValue {
+    display: block;
+  }
+
+  .profitDropValue > em,
+  .profitDropValue > time {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profitDropAura,
+  .profitDropEyebrow i {
+    animation: none;
+  }
+}
+
 .logsPanel {
   margin-top: 28px;
   padding: 22px;

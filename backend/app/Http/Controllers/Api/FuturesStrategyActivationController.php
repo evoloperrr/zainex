@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Exceptions\FuturesTradingException;
 use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
+use App\Services\Trading\StrategyPayoutSchedule;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Http\JsonResponse;
@@ -24,44 +25,28 @@ final class FuturesStrategyActivationController extends Controller
 
     private const STRATEGIES = [
         'FREE TIER' => [
-            'name' =>
-                'Guarantrade Variable Rate Strategy',
-            'rateType' =>
-                'VARIABLE RATE',
-            'displayRate' =>
-                '1%',
-            'creditCost' =>
-                0,
+            'name' => 'Guarantrade Variable Rate Strategy',
+            'rateType' => 'VARIABLE RATE',
+            'displayRate' => '1%',
+            'creditCost' => 0,
         ],
         'VIP 1' => [
-            'name' =>
-                'Guarantrade Fix Rate Strategy',
-            'rateType' =>
-                'FIX RATE',
-            'displayRate' =>
-                '1%',
-            'creditCost' =>
-                5,
+            'name' => 'Guarantrade Fix Rate Strategy',
+            'rateType' => 'FIX RATE',
+            'displayRate' => '1%',
+            'creditCost' => 5,
         ],
         'VIP 2' => [
-            'name' =>
-                'Guarantrade Fix Rate Strategy',
-            'rateType' =>
-                'FIX RATE',
-            'displayRate' =>
-                '2%',
-            'creditCost' =>
-                15,
+            'name' => 'Guarantrade Fix Rate Strategy',
+            'rateType' => 'FIX RATE',
+            'displayRate' => '2%',
+            'creditCost' => 15,
         ],
         'VIP 3' => [
-            'name' =>
-                'Guarantrade Fix Rate Strategy',
-            'rateType' =>
-                'FIX RATE',
-            'displayRate' =>
-                '3%',
-            'creditCost' =>
-                45,
+            'name' => 'Guarantrade Fix Rate Strategy',
+            'rateType' => 'FIX RATE',
+            'displayRate' => '3%',
+            'creditCost' => 45,
         ],
     ];
 
@@ -132,10 +117,8 @@ final class FuturesStrategyActivationController extends Controller
             FuturesTradingException $exception
         ) {
             $error = [
-                'code' =>
-                    $exception->errorCode,
-                'message' =>
-                    $exception->getMessage(),
+                'code' => $exception->errorCode,
+                'message' => $exception->getMessage(),
             ];
 
             if ($exception->details !== []) {
@@ -163,10 +146,8 @@ final class FuturesStrategyActivationController extends Controller
             Log::error(
                 'ZAINEX strategy activation failed.',
                 [
-                    'exception' =>
-                        $exception::class,
-                    'message' =>
-                        $exception->getMessage(),
+                    'exception' => $exception::class,
+                    'message' => $exception->getMessage(),
                 ],
             );
 
@@ -175,10 +156,8 @@ final class FuturesStrategyActivationController extends Controller
                     [
                         'ok' => false,
                         'error' => [
-                            'code' =>
-                                'STRATEGY_ACTIVATION_ERROR',
-                            'message' =>
-                                'The strategy activation could not be completed.',
+                            'code' => 'STRATEGY_ACTIVATION_ERROR',
+                            'message' => 'The strategy activation could not be completed.',
                         ],
                     ],
                     500,
@@ -191,7 +170,7 @@ final class FuturesStrategyActivationController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $body
+     * @param  array<string, mixed>  $body
      * @return array<string, mixed>
      */
     private function activate(
@@ -286,10 +265,8 @@ final class FuturesStrategyActivationController extends Controller
             'sha256',
             json_encode(
                 [
-                    'tier' =>
-                        $tier,
-                    'amount' =>
-                        (string) $amount,
+                    'tier' => $tier,
+                    'amount' => (string) $amount,
                 ],
                 JSON_THROW_ON_ERROR,
             ),
@@ -444,21 +421,16 @@ final class FuturesStrategyActivationController extends Controller
                     }
 
                     return [
-                        'idempotentReplay' =>
-                            true,
-                        'activation' =>
-                            $this->activationResource(
-                                $existing,
-                            ),
-                        'account' =>
-                            $this->accountResource(
-                                $user,
-                                $balance,
-                            ),
-                        'autoTradingEnabled' =>
-                            false,
-                        'automaticOrderCreated' =>
-                            false,
+                        'idempotentReplay' => true,
+                        'activation' => $this->activationResource(
+                            $existing,
+                        ),
+                        'account' => $this->accountResource(
+                            $user,
+                            $balance,
+                        ),
+                        'autoTradingEnabled' => false,
+                        'automaticOrderCreated' => false,
                     ];
                 }
 
@@ -499,12 +471,9 @@ final class FuturesStrategyActivationController extends Controller
                         'Close all open positions and cancel all pending orders before activating or adding a strategy.',
                         409,
                         [
-                            'openPositions' =>
-                                $openPositionCount,
-                            'pendingOrders' =>
-                                $pendingOrderCount,
-                            'activationAllowed' =>
-                                false,
+                            'openPositions' => $openPositionCount,
+                            'pendingOrders' => $pendingOrderCount,
+                            'activationAllowed' => false,
                         ],
                     );
                 }
@@ -559,13 +528,11 @@ final class FuturesStrategyActivationController extends Controller
                         'The amount exceeds your available trading balance.',
                         422,
                         [
-                            'availableBalance' =>
-                                (float)
+                            'availableBalance' => (float)
                                     (string) $available,
                         ],
                     );
                 }
-
 
                 if ($currentCredits < $creditCost) {
                     throw new FuturesTradingException(
@@ -573,10 +540,8 @@ final class FuturesStrategyActivationController extends Controller
                         'You do not have enough AI credits for this strategy.',
                         422,
                         [
-                            'requiredCredits' =>
-                                $creditCost,
-                            'availableCredits' =>
-                                $currentCredits,
+                            'requiredCredits' => $creditCost,
+                            'availableCredits' => $currentCredits,
                         ],
                     );
                 }
@@ -609,10 +574,8 @@ final class FuturesStrategyActivationController extends Controller
                         $user->id,
                     )
                     ->update([
-                        'ai_credits' =>
-                            $newCredits,
-                        'updated_at' =>
-                            $now,
+                        'ai_credits' => $newCredits,
+                        'updated_at' => $now,
                     ]);
 
                 DB::table('trading_balances')
@@ -621,125 +584,98 @@ final class FuturesStrategyActivationController extends Controller
                         $balance->id,
                     )
                     ->update([
-                        'available_balance' =>
-                            (string) $newAvailable,
-                        'strategy_locked_balance' =>
-                            (string) $newStrategyLocked,
-                        'updated_at' =>
-                            $now,
+                        'available_balance' => (string) $newAvailable,
+                        'strategy_locked_balance' => (string) $newStrategyLocked,
+                        'updated_at' => $now,
                     ]);
+
+                $payoutDays =
+                    $tier === 'FREE TIER'
+                        ? StrategyPayoutSchedule::randomFreeDays()
+                        : null;
+
+                $payoutCount =
+                    $tier === 'FREE TIER'
+                        ? StrategyPayoutSchedule::FREE_PAYOUT_COUNT
+                        : 30;
+
+                $firstPayoutDay =
+                    $payoutDays[0] ?? 1;
 
                 $activationId =
                     DB::table(
                         'strategy_activations',
                     )->insertGetId([
-                        'trading_account_id' =>
-                            $account->id,
-                        'user_id' =>
-                            $user->id,
-                        'client_request_id' =>
-                            $clientRequestId,
-                        'request_id' =>
-                            $requestId,
-                        'request_hash' =>
-                            $requestHash,
-                        'tier' =>
-                            $tier,
-                        'strategy_name' =>
-                            $strategy['name'],
-                        'rate_type' =>
-                            $strategy['rateType'],
-                        'display_rate' =>
-                            $strategy['displayRate'],
-                        'allocated_amount' =>
-                            (string) $amount,
-                        'credit_cost' =>
-                            $creditCost,
-                        'status' =>
-                            'ACTIVE',
-                        'daily_rate' =>
-                            match ($tier) {
-                                'VIP 3' =>
-                                    '0.0300000000',
-                                'VIP 2' =>
-                                    '0.0200000000',
-                                default =>
-                                    '0.0100000000',
-                            },
-                        'term_days' =>
-                            30,
-                        'paid_days' =>
-                            0,
-                        'accrued_profit' =>
-                            '0.00000000',
-                        'started_at' =>
-                            $now,
-                        'next_accrual_at' =>
-                            $now->copy()->addDay(),
-                        'last_accrual_at' =>
-                            null,
-                        'matures_at' =>
-                            $now->copy()->addDays(30),
-                        'principal_released_at' =>
-                            null,
-                        'completed_at' =>
-                            null,
-                        'created_at' =>
-                            $now,
-                        'updated_at' =>
-                            $now,
+                        'trading_account_id' => $account->id,
+                        'user_id' => $user->id,
+                        'client_request_id' => $clientRequestId,
+                        'request_id' => $requestId,
+                        'request_hash' => $requestHash,
+                        'tier' => $tier,
+                        'strategy_name' => $strategy['name'],
+                        'rate_type' => $strategy['rateType'],
+                        'display_rate' => $strategy['displayRate'],
+                        'allocated_amount' => (string) $amount,
+                        'credit_cost' => $creditCost,
+                        'status' => 'ACTIVE',
+                        'daily_rate' => match ($tier) {
+                            'VIP 3' => '0.0300000000',
+                            'VIP 2' => '0.0200000000',
+                            default => '0.0100000000',
+                        },
+                        'term_days' => $payoutCount,
+                        'paid_days' => 0,
+                        'payout_days' => $payoutDays === null
+                                ? null
+                                : json_encode(
+                                    $payoutDays,
+                                    JSON_THROW_ON_ERROR,
+                                ),
+                        'accrued_profit' => '0.00000000',
+                        'started_at' => $now,
+                        'next_accrual_at' => $now
+                            ->copy()
+                            ->addDays($firstPayoutDay),
+                        'last_accrual_at' => null,
+                        'matures_at' => $now
+                            ->copy()
+                            ->addDays(30),
+                        'principal_released_at' => null,
+                        'completed_at' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
                     ]);
 
                 DB::table('wallet_transactions')
                     ->insert([
-                        'trading_account_id' =>
-                            $account->id,
-                        'user_id' =>
-                            $user->id,
-                        'strategy_activation_id' =>
-                            $activationId,
-                        'event_type' =>
-                            'STRATEGY_ACTIVATED',
-                        'direction' =>
-                            'LOCK',
-                        'asset' =>
-                            $account->base_asset,
-                        'amount' =>
-                            (string) $amount,
-                        'wallet_balance_before' =>
-                            (string) $wallet,
-                        'wallet_balance_after' =>
-                            (string) $wallet,
-                        'available_balance_before' =>
-                            (string) $available,
-                        'available_balance_after' =>
-                            (string) $newAvailable,
-                        'strategy_locked_before' =>
-                            (string) $strategyLocked,
-                        'strategy_locked_after' =>
-                            (string) $newStrategyLocked,
-                        'ai_credits_before' =>
-                            $currentCredits,
-                        'ai_credits_after' =>
-                            $newCredits,
-                        'reference_key' =>
-                            'strategy:' .
-                            $activationId .
+                        'trading_account_id' => $account->id,
+                        'user_id' => $user->id,
+                        'strategy_activation_id' => $activationId,
+                        'event_type' => 'STRATEGY_ACTIVATED',
+                        'direction' => 'LOCK',
+                        'asset' => $account->base_asset,
+                        'amount' => (string) $amount,
+                        'wallet_balance_before' => (string) $wallet,
+                        'wallet_balance_after' => (string) $wallet,
+                        'available_balance_before' => (string) $available,
+                        'available_balance_after' => (string) $newAvailable,
+                        'strategy_locked_before' => (string) $strategyLocked,
+                        'strategy_locked_after' => (string) $newStrategyLocked,
+                        'ai_credits_before' => $currentCredits,
+                        'ai_credits_after' => $newCredits,
+                        'reference_key' => 'strategy:'.
+                            $activationId.
                             ':activated',
-                        'description' =>
-                            'Paper strategy principal allocated from available trading balance.',
-                        'metadata' =>
-                            json_encode(
-                                [
-                                    'paper' => true,
-                                    'autoTrading' => false,
-                                ],
-                                JSON_THROW_ON_ERROR,
-                            ),
-                        'occurred_at' =>
-                            $now,
-                        'created_at' =>
-                            $now,
+                        'description' => 'Paper strategy principal allocated from available trading balance.',
+                        'metadata' => json_encode(
+                            [
+                                'paper' => true,
+                                'autoTrading' => false,
+                            ],
+                            JSON_THROW_ON_ERROR,
+                        ),
+                        'occurred_at' => $now,
+                        'created_at' => $now,
                     ]);
 
                 $activation = DB::table(
@@ -767,21 +703,16 @@ final class FuturesStrategyActivationController extends Controller
                     (string) $newStrategyLocked;
 
                 return [
-                    'idempotentReplay' =>
-                        false,
-                    'activation' =>
-                        $this->activationResource(
-                            $activation,
-                        ),
-                    'account' =>
-                        $this->accountResource(
-                            $user,
-                            $balance,
-                        ),
-                    'autoTradingEnabled' =>
-                        false,
-                    'automaticOrderCreated' =>
-                        false,
+                    'idempotentReplay' => false,
+                    'activation' => $this->activationResource(
+                        $activation,
+                    ),
+                    'account' => $this->accountResource(
+                        $user,
+                        $balance,
+                    ),
+                    'autoTradingEnabled' => false,
+                    'automaticOrderCreated' => false,
                 ];
             },
             5,
@@ -795,26 +726,17 @@ final class FuturesStrategyActivationController extends Controller
         object $activation,
     ): array {
         return [
-            'id' =>
-                (int) $activation->id,
-            'tier' =>
-                $activation->tier,
-            'strategyName' =>
-                $activation->strategy_name,
-            'rateType' =>
-                $activation->rate_type,
-            'displayRate' =>
-                $activation->display_rate,
-            'allocatedAmount' =>
-                (float)
+            'id' => (int) $activation->id,
+            'tier' => $activation->tier,
+            'strategyName' => $activation->strategy_name,
+            'rateType' => $activation->rate_type,
+            'displayRate' => $activation->display_rate,
+            'allocatedAmount' => (float)
                     $activation->allocated_amount,
-            'creditCost' =>
-                (int)
+            'creditCost' => (int)
                     $activation->credit_cost,
-            'status' =>
-                $activation->status,
-            'createdAt' =>
-                $activation->created_at,
+            'status' => $activation->status,
+            'createdAt' => $activation->created_at,
         ];
     }
 
@@ -826,20 +748,15 @@ final class FuturesStrategyActivationController extends Controller
         object $balance,
     ): array {
         return [
-            'walletBalance' =>
-                (float)
+            'walletBalance' => (float)
                     $user->wallet_balance,
-            'availableBalance' =>
-                (float)
+            'availableBalance' => (float)
                     $balance->available_balance,
-            'lockedBalance' =>
-                (float)
+            'lockedBalance' => (float)
                     $balance->locked_balance,
-            'strategyLockedBalance' =>
-                (float)
+            'strategyLockedBalance' => (float)
                     $balance->strategy_locked_balance,
-            'credits' =>
-                (int)
+            'credits' => (int)
                     $user->ai_credits,
         ];
     }

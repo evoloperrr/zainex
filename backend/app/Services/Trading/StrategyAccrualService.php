@@ -42,32 +42,25 @@ final class StrategyAccrualService
             ->orderBy('id')
             ->pluck('id')
             ->map(
-                static fn (mixed $id): int =>
-                    (int) $id,
+                static fn (mixed $id): int => (int) $id,
             )
             ->all();
 
         $summary = [
-            'dueActivations' =>
-                count($activationIds),
-            'processedActivations' =>
-                0,
-            'creditedDays' =>
-                0,
-            'completedActivations' =>
-                0,
-            'profitCredited' =>
-                BigDecimal::zero()
-                    ->toScale(
-                        8,
-                        RoundingMode::Down,
-                    ),
-            'principalReleased' =>
-                BigDecimal::zero()
-                    ->toScale(
-                        8,
-                        RoundingMode::Down,
-                    ),
+            'dueActivations' => count($activationIds),
+            'processedActivations' => 0,
+            'creditedDays' => 0,
+            'completedActivations' => 0,
+            'profitCredited' => BigDecimal::zero()
+                ->toScale(
+                    8,
+                    RoundingMode::Down,
+                ),
+            'principalReleased' => BigDecimal::zero()
+                ->toScale(
+                    8,
+                    RoundingMode::Down,
+                ),
         ];
 
         foreach ($activationIds as $activationId) {
@@ -108,20 +101,14 @@ final class StrategyAccrualService
         }
 
         return [
-            'dueActivations' =>
-                $summary['dueActivations'],
-            'processedActivations' =>
-                $summary['processedActivations'],
-            'creditedDays' =>
-                $summary['creditedDays'],
-            'completedActivations' =>
-                $summary['completedActivations'],
-            'profitCredited' =>
-                (float)
+            'dueActivations' => $summary['dueActivations'],
+            'processedActivations' => $summary['processedActivations'],
+            'creditedDays' => $summary['creditedDays'],
+            'completedActivations' => $summary['completedActivations'],
+            'profitCredited' => (float)
                     (string)
                         $summary['profitCredited'],
-            'principalReleased' =>
-                (float)
+            'principalReleased' => (float)
                     (string)
                         $summary['principalReleased'],
         ];
@@ -268,9 +255,32 @@ final class StrategyAccrualService
                 $paidDays =
                     (int) $activation->paid_days;
 
-                $termDays = max(
-                    1,
-                    (int) $activation->term_days,
+                $isFreeTier =
+                    $activation->tier === 'FREE TIER';
+
+                $payoutDays =
+                    $isFreeTier
+                        ? StrategyPayoutSchedule::normalizeFreeDays(
+                            $activation->payout_days ?? null,
+                        )
+                        : [];
+
+                $termDays =
+                    $isFreeTier
+                        ? StrategyPayoutSchedule::FREE_PAYOUT_COUNT
+                        : max(
+                            1,
+                            (int) $activation->term_days,
+                        );
+
+                $windowDays =
+                    $isFreeTier
+                        ? StrategyPayoutSchedule::FREE_WINDOW_DAYS
+                        : $termDays;
+
+                $startedAt = Carbon::parse(
+                    (string)
+                        ($activation->started_at ?? $activation->created_at),
                 );
 
                 $nextAccrualAt = Carbon::parse(
@@ -292,7 +302,19 @@ final class StrategyAccrualService
                         $asOf,
                     )
                 ) {
-                    $dayNumber = $paidDays + 1;
+                    $payoutNumber = $paidDays + 1;
+
+                    $dayNumber =
+                        $isFreeTier
+                            ? ($payoutDays[$paidDays] ?? null)
+                            : $payoutNumber;
+
+                    if ($dayNumber === null) {
+                        throw new \RuntimeException(
+                            'Free strategy payout schedule is incomplete.',
+                        );
+                    }
+
                     $scheduledFor =
                         $nextAccrualAt->copy();
 
@@ -345,94 +367,62 @@ final class StrategyAccrualService
                         DB::table(
                             'wallet_transactions',
                         )->insertGetId([
-                            'trading_account_id' =>
-                                $account->id,
-                            'user_id' =>
-                                $user->id,
-                            'strategy_activation_id' =>
-                                $activation->id,
-                            'event_type' =>
-                                'STRATEGY_DAILY_PROFIT',
-                            'direction' =>
-                                'CREDIT',
-                            'asset' =>
-                                $account->base_asset,
-                            'amount' =>
-                                (string) $profit,
-                            'wallet_balance_before' =>
-                                (string) $walletBefore,
-                            'wallet_balance_after' =>
-                                (string) $wallet,
-                            'available_balance_before' =>
-                                (string) $availableBefore,
-                            'available_balance_after' =>
-                                (string) $available,
-                            'strategy_locked_before' =>
-                                (string) $strategyBefore,
-                            'strategy_locked_after' =>
-                                (string) $strategyLocked,
-                            'ai_credits_before' =>
-                                (int) $user->ai_credits,
-                            'ai_credits_after' =>
-                                (int) $user->ai_credits,
-                            'reference_key' =>
-                                'strategy:' .
-                                $activation->id .
-                                ':day:' .
-                                $dayNumber .
+                            'trading_account_id' => $account->id,
+                            'user_id' => $user->id,
+                            'strategy_activation_id' => $activation->id,
+                            'event_type' => 'STRATEGY_DAILY_PROFIT',
+                            'direction' => 'CREDIT',
+                            'asset' => $account->base_asset,
+                            'amount' => (string) $profit,
+                            'wallet_balance_before' => (string) $walletBefore,
+                            'wallet_balance_after' => (string) $wallet,
+                            'available_balance_before' => (string) $availableBefore,
+                            'available_balance_after' => (string) $available,
+                            'strategy_locked_before' => (string) $strategyBefore,
+                            'strategy_locked_after' => (string) $strategyLocked,
+                            'ai_credits_before' => (int) $user->ai_credits,
+                            'ai_credits_after' => (int) $user->ai_credits,
+                            'reference_key' => 'strategy:'.
+                                $activation->id.
+                                ':day:'.
+                                $dayNumber.
                                 ':profit',
-                            'description' =>
-                                'Paper strategy daily profit credited.',
-                            'metadata' =>
-                                json_encode(
-                                    [
-                                        'paper' => true,
-                                        'dayNumber' =>
-                                            $dayNumber,
-                                        'termDays' =>
-                                            $termDays,
-                                        'dailyRate' =>
-                                            (string) $dailyRate,
-                                        'principal' =>
-                                            (string) $principal,
-                                    ],
-                                    JSON_THROW_ON_ERROR,
-                                ),
-                            'occurred_at' =>
-                                $asOf,
-                            'created_at' =>
-                                $asOf,
+                            'description' => 'Paper strategy daily profit credited.',
+                            'metadata' => json_encode(
+                                [
+                                    'paper' => true,
+                                    'dayNumber' => $dayNumber,
+                                    'payoutNumber' => $payoutNumber,
+                                    'termDays' => $termDays,
+                                    'windowDays' => $windowDays,
+                                    'cadence' => $isFreeTier
+                                            ? 'RANDOM_15_OF_30'
+                                            : 'EVERY_24_HOURS',
+                                    'dailyRate' => (string) $dailyRate,
+                                    'principal' => (string) $principal,
+                                ],
+                                JSON_THROW_ON_ERROR,
+                            ),
+                            'occurred_at' => $asOf,
+                            'created_at' => $asOf,
                         ]);
 
                     DB::table(
                         'strategy_daily_accruals',
                     )->insert([
-                        'strategy_activation_id' =>
-                            $activation->id,
-                        'wallet_transaction_id' =>
-                            $profitTransactionId,
-                        'day_number' =>
-                            $dayNumber,
-                        'scheduled_for' =>
-                            $scheduledFor,
-                        'principal_basis' =>
-                            (string) $principal,
-                        'daily_rate' =>
-                            (string) $dailyRate,
-                        'profit_amount' =>
-                            (string) $profit,
-                        'wallet_balance_before' =>
-                            (string) $walletBefore,
-                        'wallet_balance_after' =>
-                            (string) $wallet,
-                        'available_balance_before' =>
-                            (string) $availableBefore,
-                        'available_balance_after' =>
-                            (string) $available,
-                        'credited_at' =>
-                            $asOf,
-                        'created_at' =>
-                            $asOf,
+                        'strategy_activation_id' => $activation->id,
+                        'wallet_transaction_id' => $profitTransactionId,
+                        'day_number' => $dayNumber,
+                        'scheduled_for' => $scheduledFor,
+                        'principal_basis' => (string) $principal,
+                        'daily_rate' => (string) $dailyRate,
+                        'profit_amount' => (string) $profit,
+                        'wallet_balance_before' => (string) $walletBefore,
+                        'wallet_balance_after' => (string) $wallet,
+                        'available_balance_before' => (string) $availableBefore,
+                        'available_balance_after' => (string) $available,
+                        'credited_at' => $asOf,
+                        'created_at' => $asOf,
                     ]);
 
                     $paidDays++;
@@ -493,60 +483,43 @@ final class StrategyAccrualService
                         DB::table(
                             'wallet_transactions',
                         )->insert([
-                            'trading_account_id' =>
-                                $account->id,
-                            'user_id' =>
-                                $user->id,
-                            'strategy_activation_id' =>
-                                $activation->id,
-                            'event_type' =>
-                                'STRATEGY_PRINCIPAL_RELEASED',
-                            'direction' =>
-                                'UNLOCK',
-                            'asset' =>
-                                $account->base_asset,
-                            'amount' =>
-                                (string) $principal,
-                            'wallet_balance_before' =>
-                                (string) $wallet,
-                            'wallet_balance_after' =>
-                                (string) $wallet,
-                            'available_balance_before' =>
-                                (string)
+                            'trading_account_id' => $account->id,
+                            'user_id' => $user->id,
+                            'strategy_activation_id' => $activation->id,
+                            'event_type' => 'STRATEGY_PRINCIPAL_RELEASED',
+                            'direction' => 'UNLOCK',
+                            'asset' => $account->base_asset,
+                            'amount' => (string) $principal,
+                            'wallet_balance_before' => (string) $wallet,
+                            'wallet_balance_after' => (string) $wallet,
+                            'available_balance_before' => (string)
                                     $releaseAvailableBefore,
-                            'available_balance_after' =>
-                                (string) $available,
-                            'strategy_locked_before' =>
-                                (string)
+                            'available_balance_after' => (string) $available,
+                            'strategy_locked_before' => (string)
                                     $releaseStrategyBefore,
-                            'strategy_locked_after' =>
-                                (string)
+                            'strategy_locked_after' => (string)
                                     $strategyLocked,
-                            'ai_credits_before' =>
-                                (int) $user->ai_credits,
-                            'ai_credits_after' =>
-                                (int) $user->ai_credits,
-                            'reference_key' =>
-                                'strategy:' .
-                                $activation->id .
+                            'ai_credits_before' => (int) $user->ai_credits,
+                            'ai_credits_after' => (int) $user->ai_credits,
+                            'reference_key' => 'strategy:'.
+                                $activation->id.
                                 ':principal-release',
-                            'description' =>
-                                'Paper strategy principal released after the 30-day term.',
-                            'metadata' =>
-                                json_encode(
-                                    [
-                                        'paper' => true,
-                                        'completedDay' =>
-                                            $dayNumber,
-                                        'termDays' =>
-                                            $termDays,
-                                    ],
-                                    JSON_THROW_ON_ERROR,
-                                ),
-                            'occurred_at' =>
-                                $asOf,
-                            'created_at' =>
-                                $asOf,
+                            'description' => 'Paper strategy principal released after the 30-day term.',
+                            'metadata' => json_encode(
+                                [
+                                    'paper' => true,
+                                    'completedDay' => $dayNumber,
+                                    'payoutNumber' => $payoutNumber,
+                                    'termDays' => $termDays,
+                                    'windowDays' => $windowDays,
+                                    'cadence' => $isFreeTier
+                                            ? 'RANDOM_15_OF_30'
+                                            : 'EVERY_24_HOURS',
+                                ],
+                                JSON_THROW_ON_ERROR,
+                            ),
+                            'occurred_at' => $asOf,
+                            'created_at' => $asOf,
                         ]);
 
                         $principalReleased =
@@ -558,10 +531,21 @@ final class StrategyAccrualService
                         break;
                     }
 
+                    $nextDay =
+                        $isFreeTier
+                            ? ($payoutDays[$paidDays] ?? null)
+                            : $paidDays + 1;
+
+                    if ($nextDay === null) {
+                        throw new \RuntimeException(
+                            'Strategy payout schedule ended before completion.',
+                        );
+                    }
+
                     $nextAccrualAt =
-                        $scheduledFor
+                        $startedAt
                             ->copy()
-                            ->addDay();
+                            ->addDays($nextDay);
                 }
 
                 if ($creditedDays === 0) {
@@ -576,21 +560,16 @@ final class StrategyAccrualService
                 DB::table('users')
                     ->where('id', $user->id)
                     ->update([
-                        'wallet_balance' =>
-                            (string) $wallet,
-                        'updated_at' =>
-                            $asOf,
+                        'wallet_balance' => (string) $wallet,
+                        'updated_at' => $asOf,
                     ]);
 
                 DB::table('trading_balances')
                     ->where('id', $balance->id)
                     ->update([
-                        'available_balance' =>
-                            (string) $available,
-                        'strategy_locked_balance' =>
-                            (string) $strategyLocked,
-                        'updated_at' =>
-                            $asOf,
+                        'available_balance' => (string) $available,
+                        'strategy_locked_balance' => (string) $strategyLocked,
+                        'updated_at' => $asOf,
                     ]);
 
                 DB::table(
@@ -601,41 +580,29 @@ final class StrategyAccrualService
                         $activation->id,
                     )
                     ->update([
-                        'status' =>
-                            $completed
+                        'status' => $completed
                                 ? 'COMPLETED'
                                 : 'ACTIVE',
-                        'paid_days' =>
-                            $paidDays,
-                        'accrued_profit' =>
-                            (string) $accruedProfit,
-                        'last_accrual_at' =>
-                            $lastAccrualAt,
-                        'next_accrual_at' =>
-                            $completed
+                        'paid_days' => $paidDays,
+                        'accrued_profit' => (string) $accruedProfit,
+                        'last_accrual_at' => $lastAccrualAt,
+                        'next_accrual_at' => $completed
                                 ? null
                                 : $nextAccrualAt,
-                        'principal_released_at' =>
-                            $completed
+                        'principal_released_at' => $completed
                                 ? $asOf
                                 : null,
-                        'completed_at' =>
-                            $completed
+                        'completed_at' => $completed
                                 ? $asOf
                                 : null,
-                        'updated_at' =>
-                            $asOf,
+                        'updated_at' => $asOf,
                     ]);
 
                 return [
-                    'creditedDays' =>
-                        $creditedDays,
-                    'completed' =>
-                        $completed,
-                    'profitCredited' =>
-                        $profitCredited,
-                    'principalReleased' =>
-                        $principalReleased,
+                    'creditedDays' => $creditedDays,
+                    'completed' => $completed,
+                    'profitCredited' => $profitCredited,
+                    'principalReleased' => $principalReleased,
                 ];
             },
             5,

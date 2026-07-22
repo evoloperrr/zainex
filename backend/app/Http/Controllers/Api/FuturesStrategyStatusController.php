@@ -7,8 +7,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Exceptions\FuturesTradingException;
 use App\Http\Controllers\Controller;
+use App\Services\Trading\StrategyPayoutSchedule;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -79,6 +83,76 @@ final class FuturesStrategyStatusController extends Controller
                 )
                 ->orderByDesc('id')
                 ->first();
+
+            $nextPayoutActivation = DB::table(
+                'strategy_activations',
+            )
+                ->where(
+                    'trading_account_id',
+                    $account->id,
+                )
+                ->where('status', 'ACTIVE')
+                ->whereNotNull('next_accrual_at')
+                ->orderBy('next_accrual_at')
+                ->orderBy('id')
+                ->first();
+
+            $nextPayout = null;
+
+            if ($nextPayoutActivation !== null) {
+                $isFreeTier =
+                    $nextPayoutActivation->tier ===
+                    'FREE TIER';
+
+                $payoutNumber =
+                    (int) $nextPayoutActivation->paid_days + 1;
+
+                $totalPayouts =
+                    $isFreeTier
+                        ? StrategyPayoutSchedule::FREE_PAYOUT_COUNT
+                        : (int) $nextPayoutActivation->term_days;
+
+                $calendarDay =
+                    $isFreeTier
+                        ? (
+                            StrategyPayoutSchedule::normalizeFreeDays(
+                                $nextPayoutActivation->payout_days ?? null,
+                            )[$payoutNumber - 1] ?? null
+                        )
+                        : $payoutNumber;
+
+                $expectedAmount = BigDecimal::of(
+                    (string) $nextPayoutActivation->allocated_amount,
+                )
+                    ->multipliedBy(
+                        BigDecimal::of(
+                            (string) $nextPayoutActivation->daily_rate,
+                        ),
+                    )
+                    ->toScale(8, RoundingMode::Down);
+
+                $nextPayout = [
+                    'activationId' => (int) $nextPayoutActivation->id,
+                    'tier' => (string) $nextPayoutActivation->tier,
+                    'cadence' => $isFreeTier
+                            ? 'RANDOM_15_OF_30'
+                            : 'EVERY_24_HOURS',
+                    'scheduledAt' => Carbon::parse(
+                        (string) $nextPayoutActivation->next_accrual_at,
+                    )
+                        ->utc()
+                        ->toIso8601String(),
+                    'expectedAmount' => (float) (string) $expectedAmount,
+                    'principalBasis' => (float) $nextPayoutActivation->allocated_amount,
+                    'dailyRate' => (float) $nextPayoutActivation->daily_rate,
+                    'payoutNumber' => $payoutNumber,
+                    'totalPayouts' => $totalPayouts,
+                    'calendarDay' => $calendarDay,
+                    'windowDays' => $isFreeTier
+                            ? StrategyPayoutSchedule::FREE_WINDOW_DAYS
+                            : $totalPayouts,
+                ];
+            }
 
             $openPositionCount = DB::table(
                 'futures_positions',
@@ -182,49 +256,36 @@ final class FuturesStrategyStatusController extends Controller
                                 : $sourceEventType;
 
                         $priority = match ($eventType) {
-                            'STRATEGY_PRINCIPAL_RELEASED' =>
-                                30,
-                            'STRATEGY_DAILY_PROFIT' =>
-                                20,
-                            'STRATEGY_ACTIVATED' =>
-                                11,
-                            default =>
-                                5,
+                            'STRATEGY_PRINCIPAL_RELEASED' => 30,
+                            'STRATEGY_DAILY_PROFIT' => 20,
+                            'STRATEGY_ACTIVATED' => 11,
+                            default => 5,
                         };
 
                         return [
-                            'id' =>
-                                (int)
+                            'id' => (int)
                                     $row->transaction_id,
-                            'activationId' =>
-                                $row
-                                    ->strategy_activation_id ===
+                            'activationId' => $row
+                                ->strategy_activation_id ===
                                     null
                                     ? null
                                     : (int)
                                         $row
                                             ->strategy_activation_id,
-                            'eventType' =>
-                                $eventType,
-                            'sourceEventType' =>
-                                $sourceEventType,
-                            'tier' =>
-                                $row->tier ??
+                            'eventType' => $eventType,
+                            'sourceEventType' => $sourceEventType,
+                            'tier' => $row->tier ??
                                 'FREE TIER',
-                            'amount' =>
-                                (float) $row->amount,
-                            'walletBalanceBefore' =>
-                                (float)
+                            'amount' => (float) $row->amount,
+                            'walletBalanceBefore' => (float)
                                     $row
                                         ->wallet_balance_before,
-                            'walletBalanceAfter' =>
-                                (float)
+                            'walletBalanceAfter' => (float)
                                     $row
                                         ->wallet_balance_after,
-                            'principalBasis' =>
-                                isset(
-                                    $metadata['principal'],
-                                )
+                            'principalBasis' => isset(
+                                $metadata['principal'],
+                            )
                                     ? (float)
                                         $metadata['principal']
                                     : (
@@ -236,10 +297,9 @@ final class FuturesStrategyStatusController extends Controller
                                                 $row
                                                     ->allocated_amount
                                     ),
-                            'dailyRate' =>
-                                isset(
-                                    $metadata['dailyRate'],
-                                )
+                            'dailyRate' => isset(
+                                $metadata['dailyRate'],
+                            )
                                     ? (float)
                                         $metadata['dailyRate']
                                     : (
@@ -249,19 +309,14 @@ final class FuturesStrategyStatusController extends Controller
                                             : (float)
                                                 $row->daily_rate
                                     ),
-                            'creditCost' =>
-                                (int)
+                            'creditCost' => (int)
                                     ($row->credit_cost ?? 0),
-                            'rate' =>
-                                $row->display_rate,
-                            'status' =>
-                                $row->activation_status,
-                            'direction' =>
-                                $row->direction,
-                            'dayNumber' =>
-                                isset(
-                                    $metadata['dayNumber'],
-                                )
+                            'rate' => $row->display_rate,
+                            'status' => $row->activation_status,
+                            'direction' => $row->direction,
+                            'dayNumber' => isset(
+                                $metadata['dayNumber'],
+                            )
                                     ? (int)
                                         $metadata['dayNumber']
                                     : (
@@ -276,15 +331,19 @@ final class FuturesStrategyStatusController extends Controller
                                                 ]
                                             : null
                                     ),
-                            'paidDays' =>
-                                $row->paid_days === null
+                            'payoutNumber' => isset(
+                                $metadata['payoutNumber'],
+                            )
+                                    ? (int)
+                                        $metadata['payoutNumber']
+                                    : null,
+                            'paidDays' => $row->paid_days === null
                                     ? null
                                     : (int)
                                         $row->paid_days,
-                            'termDays' =>
-                                isset(
-                                    $metadata['termDays'],
-                                )
+                            'termDays' => isset(
+                                $metadata['termDays'],
+                            )
                                     ? (int)
                                         $metadata['termDays']
                                     : (
@@ -293,14 +352,24 @@ final class FuturesStrategyStatusController extends Controller
                                             : (int)
                                                 $row->term_days
                                     ),
-                            'description' =>
-                                $row->description,
-                            'occurredAt' =>
-                                $row->occurred_at,
-                            '_priority' =>
-                                $priority,
-                            '_sequence' =>
-                                (int)
+                            'windowDays' => isset(
+                                $metadata['windowDays'],
+                            )
+                                    ? (int)
+                                        $metadata['windowDays']
+                                    : 30,
+                            'cadence' => isset($metadata['cadence'])
+                                    ? (string)
+                                        $metadata['cadence']
+                                    : (
+                                        $row->tier === 'FREE TIER'
+                                            ? 'RANDOM_15_OF_30'
+                                            : 'EVERY_24_HOURS'
+                                    ),
+                            'description' => $row->description,
+                            'occurredAt' => $row->occurred_at,
+                            '_priority' => $priority,
+                            '_sequence' => (int)
                                     $row->transaction_id,
                         ];
                     },
@@ -322,44 +391,31 @@ final class FuturesStrategyStatusController extends Controller
                         object $row,
                     ): array {
                         return [
-                            'id' =>
-                                (int) $row->id,
-                            'activationId' =>
-                                (int) $row->id,
-                            'eventType' =>
-                                'STRATEGY_ACTIVATED',
-                            'sourceEventType' =>
-                                'STRATEGY_ACTIVATED',
-                            'tier' =>
-                                $row->tier,
-                            'amount' =>
-                                (float)
+                            'id' => (int) $row->id,
+                            'activationId' => (int) $row->id,
+                            'eventType' => 'STRATEGY_ACTIVATED',
+                            'sourceEventType' => 'STRATEGY_ACTIVATED',
+                            'tier' => $row->tier,
+                            'amount' => (float)
                                     $row->allocated_amount,
-                            'creditCost' =>
-                                (int)
+                            'creditCost' => (int)
                                     $row->credit_cost,
-                            'rate' =>
-                                $row->display_rate,
-                            'status' =>
-                                $row->status,
-                            'direction' =>
-                                'LOCK',
-                            'dayNumber' =>
-                                null,
-                            'paidDays' =>
-                                (int)
+                            'rate' => $row->display_rate,
+                            'status' => $row->status,
+                            'direction' => 'LOCK',
+                            'dayNumber' => null,
+                            'paidDays' => (int)
                                     ($row->paid_days ?? 0),
-                            'termDays' =>
-                                (int)
+                            'termDays' => (int)
                                     ($row->term_days ?? 30),
-                            'description' =>
-                                'Paper strategy activated.',
-                            'occurredAt' =>
-                                $row->created_at,
-                            '_priority' =>
-                                10,
-                            '_sequence' =>
-                                (int) $row->id,
+                            'windowDays' => 30,
+                            'cadence' => $row->tier === 'FREE TIER'
+                                    ? 'RANDOM_15_OF_30'
+                                    : 'EVERY_24_HOURS',
+                            'description' => 'Paper strategy activated.',
+                            'occurredAt' => $row->created_at,
+                            '_priority' => 10,
+                            '_sequence' => (int) $row->id,
                         ];
                     },
                 );
@@ -382,46 +438,33 @@ final class FuturesStrategyStatusController extends Controller
                         object $row,
                     ): array {
                         return [
-                            'id' =>
-                                'completion-' .
+                            'id' => 'completion-'.
                                 $row->id,
-                            'activationId' =>
-                                (int) $row->id,
-                            'eventType' =>
-                                'STRATEGY_COMPLETED',
-                            'sourceEventType' =>
-                                'STRATEGY_COMPLETED',
-                            'tier' =>
-                                $row->tier,
-                            'amount' =>
-                                (float)
+                            'activationId' => (int) $row->id,
+                            'eventType' => 'STRATEGY_COMPLETED',
+                            'sourceEventType' => 'STRATEGY_COMPLETED',
+                            'tier' => $row->tier,
+                            'amount' => (float)
                                     $row->allocated_amount,
-                            'creditCost' =>
-                                (int)
+                            'creditCost' => (int)
                                     $row->credit_cost,
-                            'rate' =>
-                                $row->display_rate,
-                            'status' =>
-                                'COMPLETED',
-                            'direction' =>
-                                'STATUS',
-                            'dayNumber' =>
-                                (int)
+                            'rate' => $row->display_rate,
+                            'status' => 'COMPLETED',
+                            'direction' => 'STATUS',
+                            'dayNumber' => (int)
                                     $row->paid_days,
-                            'paidDays' =>
-                                (int)
+                            'paidDays' => (int)
                                     $row->paid_days,
-                            'termDays' =>
-                                (int)
+                            'termDays' => (int)
                                     $row->term_days,
-                            'description' =>
-                                'Paper strategy completed its term.',
-                            'occurredAt' =>
-                                $row->completed_at,
-                            '_priority' =>
-                                40,
-                            '_sequence' =>
-                                (int) $row->id,
+                            'windowDays' => 30,
+                            'cadence' => $row->tier === 'FREE TIER'
+                                    ? 'RANDOM_15_OF_30'
+                                    : 'EVERY_24_HOURS',
+                            'description' => 'Paper strategy completed its term.',
+                            'occurredAt' => $row->completed_at,
+                            '_priority' => 40,
+                            '_sequence' => (int) $row->id,
                         ];
                     },
                 );
@@ -432,12 +475,11 @@ final class FuturesStrategyStatusController extends Controller
                 ->unique(
                     static fn (
                         array $log,
-                    ): string =>
-                        (string) $log['eventType'] .
-                        '|' .
+                    ): string => (string) $log['eventType'].
+                        '|'.
                         (string)
-                            ($log['activationId'] ?? '') .
-                        '|' .
+                            ($log['activationId'] ?? '').
+                        '|'.
                         (string)
                             ($log['dayNumber'] ?? ''),
                 )
@@ -498,27 +540,20 @@ final class FuturesStrategyStatusController extends Controller
                     'mode' => 'paper-futures',
                     'liveTrading' => false,
                     'currentStrategy' => [
-                        'tier' =>
-                            $latest?->tier ??
+                        'tier' => $latest?->tier ??
                             'FREE TIER',
-                        'defaulted' =>
-                            $latest === null,
-                        'activationId' =>
-                            $latest === null
+                        'defaulted' => $latest === null,
+                        'activationId' => $latest === null
                                 ? null
                                 : (int) $latest->id,
-                        'activatedAt' =>
-                            $latest?->created_at,
+                        'activatedAt' => $latest?->created_at,
                     ],
+                    'nextPayout' => $nextPayout,
                     'tradingExposure' => [
-                        'activationAllowed' =>
-                            $activationAllowed,
-                        'openPositions' =>
-                            $openPositionCount,
-                        'pendingOrders' =>
-                            $pendingOrderCount,
-                        'note' =>
-                            $activationAllowed
+                        'activationAllowed' => $activationAllowed,
+                        'openPositions' => $openPositionCount,
+                        'pendingOrders' => $pendingOrderCount,
+                        'note' => $activationAllowed
                                 ? null
                                 : 'Close all open positions and cancel all pending orders before activating or adding a strategy.',
                     ],
@@ -534,10 +569,8 @@ final class FuturesStrategyStatusController extends Controller
             FuturesTradingException $exception
         ) {
             $error = [
-                'code' =>
-                    $exception->errorCode,
-                'message' =>
-                    $exception->getMessage(),
+                'code' => $exception->errorCode,
+                'message' => $exception->getMessage(),
             ];
 
             if ($exception->details !== []) {
@@ -565,10 +598,8 @@ final class FuturesStrategyStatusController extends Controller
             Log::error(
                 'ZAINEX current strategy lookup failed.',
                 [
-                    'exception' =>
-                        $exception::class,
-                    'message' =>
-                        $exception->getMessage(),
+                    'exception' => $exception::class,
+                    'message' => $exception->getMessage(),
                 ],
             );
 
@@ -577,10 +608,8 @@ final class FuturesStrategyStatusController extends Controller
                     [
                         'ok' => false,
                         'error' => [
-                            'code' =>
-                                'CURRENT_STRATEGY_ERROR',
-                            'message' =>
-                                'The current strategy could not be loaded.',
+                            'code' => 'CURRENT_STRATEGY_ERROR',
+                            'message' => 'The current strategy could not be loaded.',
                         ],
                     ],
                     500,
