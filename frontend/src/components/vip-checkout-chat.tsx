@@ -12,6 +12,12 @@ import QRCode from "qrcode";
 
 import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
+import {
+  useCurrency,
+} from "@/components/currency-provider";
+
+import type { CurrencyCode } from "@/lib/currency";
+
 import styles from "./vip-checkout-chat.module.css";
 
 // ZAINEX_GOTYME_PAYMENT_DETAILS
@@ -85,6 +91,19 @@ const MERCHANT_REGION_CONFIG: Record<
     appNote:
       "Send via a GoTyme bank transfer.",
   },
+};
+
+// The country the buyer names also drives which display currency the
+// whole billing chat switches to, so the amount they see matches the
+// merchant rail they're about to pay through.
+const MERCHANT_REGION_CURRENCY: Record<
+  MerchantRegion,
+  CurrencyCode
+> = {
+  north_america: "USD",
+  south_asia: "INR",
+  east_asia: "HKD",
+  philippines: "PHP",
 };
 
 // Explicit country/keyword matches, checked first.
@@ -1015,6 +1034,11 @@ export function VipCheckoutChat({
 }: VipCheckoutChatProps) {
   useBodyScrollLock(true);
 
+  const {
+    formatUsd,
+    setCurrency,
+  } = useCurrency();
+
   const [introScript] = useState(
     () => buildIntro(plan),
   );
@@ -1028,10 +1052,21 @@ export function VipCheckoutChat({
 
   const [
     merchantRegion,
-    setMerchantRegion,
+    setMerchantRegionState,
   ] = useState<MerchantRegion | null>(
     null,
   );
+
+  function setMerchantRegion(
+    region: MerchantRegion,
+  ): void {
+    setMerchantRegionState(region);
+    setCurrency(
+      MERCHANT_REGION_CURRENCY[
+        region
+      ],
+    );
+  }
 
   const [methodSteps] = useState<
     Record<PaymentMethod, ScriptStep[]>
@@ -1074,10 +1109,23 @@ export function VipCheckoutChat({
 
   const [
     walletMerchantRegion,
-    setWalletMerchantRegion,
+    setWalletMerchantRegionState,
   ] = useState<MerchantRegion | null>(
     null,
   );
+
+  function setWalletMerchantRegion(
+    region: MerchantRegion,
+  ): void {
+    setWalletMerchantRegionState(
+      region,
+    );
+    setCurrency(
+      MERCHANT_REGION_CURRENCY[
+        region
+      ],
+    );
+  }
 
   const [walletMethodSteps] =
     useState<
@@ -1594,11 +1642,15 @@ export function VipCheckoutChat({
 
               const amountLabel =
                 step.forWallet
-                  ? `$${(
+                  ? formatUsd(
                       walletFundAmount ??
-                      0
-                    ).toFixed(2)}`
-                  : `${plan.price} ${plan.period}`;
+                        0,
+                    )
+                  : `${formatUsd(
+                      parsePlanPriceUsd(
+                        plan.price,
+                      ),
+                    )} ${plan.period}`;
 
               const region =
                 (step.forWallet
