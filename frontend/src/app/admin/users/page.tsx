@@ -710,36 +710,39 @@ export default function AdminUsersPage() {
                             Edit name
                           </button>
 
-                          <button
-                            type="button"
-                            className={
-                              styles.rowActionButton
-                            }
-                            onClick={() => {
-                              setRowFeedback(
-                                null,
-                              );
-                              setRoleValue(
-                                user.isAdmin
-                                  ? user.role
-                                  : "ADMIN",
-                              );
-                              setOpenAction(
-                                openAction?.userId ===
-                                  user.id &&
-                                openAction.kind ===
-                                  "role"
-                                  ? null
-                                  : {
-                                      userId:
-                                        user.id,
-                                      kind: "role",
-                                    },
-                              );
-                            }}
-                          >
-                            Change role
-                          </button>
+                          {user.role !==
+                          "ROOT" ? (
+                            <button
+                              type="button"
+                              className={
+                                styles.rowActionButton
+                              }
+                              onClick={() => {
+                                setRowFeedback(
+                                  null,
+                                );
+                                setRoleValue(
+                                  user.isAdmin
+                                    ? user.role
+                                    : "ADMIN",
+                                );
+                                setOpenAction(
+                                  openAction?.userId ===
+                                    user.id &&
+                                  openAction.kind ===
+                                    "role"
+                                    ? null
+                                    : {
+                                        userId:
+                                          user.id,
+                                        kind: "role",
+                                      },
+                                );
+                              }}
+                            >
+                              Change role
+                            </button>
+                          ) : null}
 
                           <button
                             type="button"
@@ -908,11 +911,11 @@ export default function AdminUsersPage() {
                                 (remove
                                 admin)
                               </option>
+                              <option value="WORKER">
+                                WORKER
+                              </option>
                               <option value="ADMIN">
                                 ADMIN
-                              </option>
-                              <option value="ROOT">
-                                ROOT
                               </option>
                             </select>
 

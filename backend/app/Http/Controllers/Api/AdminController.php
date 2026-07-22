@@ -200,13 +200,15 @@ final class AdminController extends Controller
             return $guard;
         }
 
-        if ((string) ($actor->role ?? '') !== 'ROOT') {
-            return $this->error(403, 'ROOT_PERMISSION_REQUIRED', 'Only a ROOT administrator can change admin roles.');
+        $actorRole = (string) ($actor->role ?? '');
+
+        if (! in_array($actorRole, ['ROOT', 'ADMIN'], true)) {
+            return $this->error(403, 'ADMIN_PERMISSION_REQUIRED', 'Administrator permission is required.');
         }
 
         $validator = Validator::make($request->all(), [
             'targetEmail' => ['required', 'string', 'email:rfc', 'max:255'],
-            'role' => ['required', 'string', 'in:USER,ADMIN,ROOT'],
+            'role' => ['required', 'string', 'in:USER,WORKER,ADMIN'],
         ]);
 
         if ($validator->fails()) {
@@ -217,12 +219,22 @@ final class AdminController extends Controller
         $targetEmail = strtolower(trim((string) $validated['targetEmail']));
         $role = (string) $validated['role'];
 
+        // Only ROOT may grant or revoke the ADMIN tier itself. A plain ADMIN
+        // may only assign WORKER access or demote back to USER.
+        if ($role === 'ADMIN' && $actorRole !== 'ROOT') {
+            return $this->error(403, 'ROOT_PERMISSION_REQUIRED', 'Only a ROOT administrator can grant admin access.');
+        }
+
         $target = DB::table('users')
             ->whereRaw('LOWER(email) = ?', [$targetEmail])
             ->first();
 
         if ($target === null) {
             return $this->error(404, 'TARGET_USER_NOT_FOUND', 'No user was found with that email.');
+        }
+
+        if ((string) ($target->role ?? '') === 'ROOT') {
+            return $this->error(422, 'CANNOT_CHANGE_ROOT', 'The ROOT account cannot be changed here.');
         }
 
         if (
