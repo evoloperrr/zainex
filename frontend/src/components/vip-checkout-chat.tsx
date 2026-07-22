@@ -27,6 +27,189 @@ const GOTYME_ACCOUNT_NUMBER =
 const MIN_WALLET_FUNDING_USD = 1;
 const MAX_WALLET_FUNDING_USD = 10_000;
 
+// ZAINEX_MERCHANT_REGION_PAYMENT_DETAILS
+// Country the buyer names in the billing chat resolves to one of these
+// regional merchant rails. Add a new region here (image + recipient name)
+// and extend COUNTRY_TO_REGION / the continent fallback below to route
+// countries to it — no other change needed.
+type MerchantRegion =
+  | "north_america"
+  | "south_asia"
+  | "east_asia"
+  | "philippines";
+
+type MerchantRegionConfig = {
+  rail: string;
+  qrImageSrc: string;
+  recipientName: string;
+  recipientLabel: string;
+  accountNumber?: string;
+  appNote: string;
+};
+
+const MERCHANT_REGION_CONFIG: Record<
+  MerchantRegion,
+  MerchantRegionConfig
+> = {
+  north_america: {
+    rail: "ZELLE",
+    qrImageSrc: "/merchants/zelle-qr.png",
+    recipientName: "MALIC EASTON",
+    recipientLabel: "Recipient name",
+    appNote:
+      "Scan or send within your bank's Zelle® feature.",
+  },
+  south_asia: {
+    rail: "PAYTM",
+    qrImageSrc: "/merchants/paytm-qr.png",
+    recipientName: "Khari Akshat",
+    recipientLabel: "Recipient name",
+    appNote:
+      "Scan in the Paytm app — Wallet, Card, or UPI.",
+  },
+  east_asia: {
+    rail: "ALIPAY HK",
+    qrImageSrc: "/merchants/alipay-qr.png",
+    recipientName: "Liu Zhu Wu",
+    recipientLabel: "Recipient name",
+    appNote:
+      "Scan in the Alipay HK app.",
+  },
+  philippines: {
+    rail: "GOTYME",
+    qrImageSrc: GOTYME_QR_IMAGE_SRC,
+    recipientName: GOTYME_ACCOUNT_NAME,
+    recipientLabel: "Account name",
+    accountNumber:
+      GOTYME_ACCOUNT_NUMBER,
+    appNote:
+      "Send via a GoTyme bank transfer.",
+  },
+};
+
+// Explicit country/keyword matches, checked first.
+const COUNTRY_TO_REGION: Array<{
+  region: MerchantRegion;
+  keywords: string[];
+}> = [
+  {
+    region: "philippines",
+    keywords: [
+      "philippines",
+      "pilipinas",
+      "ph",
+    ],
+  },
+  {
+    region: "north_america",
+    keywords: [
+      "united states",
+      "usa",
+      "u.s.",
+      "us",
+      "america",
+      "canada",
+      "mexico",
+    ],
+  },
+  {
+    region: "south_asia",
+    keywords: [
+      "india",
+      "nepal",
+      "bangladesh",
+      "sri lanka",
+      "pakistan",
+      "bhutan",
+      "maldives",
+    ],
+  },
+  {
+    region: "east_asia",
+    keywords: [
+      "china",
+      "hong kong",
+      "hongkong",
+      "hk",
+      "macau",
+      "macao",
+      "taiwan",
+      "mongolia",
+    ],
+  },
+];
+
+// Broad continent/region fallback for a country we don't recognize by
+// name — picks whichever existing rail is geographically nearest.
+// NOTE: Europe doesn't have a dedicated rail yet, so it currently falls
+// back to Zelle (North America) until a Europe rail is added.
+const CONTINENT_FALLBACK: Array<{
+  region: MerchantRegion;
+  keywords: string[];
+}> = [
+  {
+    region: "north_america",
+    keywords: [
+      "north america",
+      "south america",
+      "latin america",
+      "caribbean",
+      "europe",
+    ],
+  },
+  {
+    region: "south_asia",
+    keywords: [
+      "south asia",
+      "central asia",
+      "southeast asia",
+      "middle east",
+      "africa",
+    ],
+  },
+  {
+    region: "east_asia",
+    keywords: [
+      "east asia",
+      "asia pacific",
+      "oceania",
+      "australia",
+      "pacific",
+    ],
+  },
+];
+
+function resolveMerchantRegion(
+  countryInput: string,
+): MerchantRegion {
+  const normalized = countryInput
+    .trim()
+    .toLowerCase();
+
+  for (const entry of COUNTRY_TO_REGION) {
+    if (
+      entry.keywords.some((keyword) =>
+        normalized.includes(keyword),
+      )
+    ) {
+      return entry.region;
+    }
+  }
+
+  for (const entry of CONTINENT_FALLBACK) {
+    if (
+      entry.keywords.some((keyword) =>
+        normalized.includes(keyword),
+      )
+    ) {
+      return entry.region;
+    }
+  }
+
+  // Ultimate catch-all for anything unrecognized.
+  return "north_america";
+}
+
 type VipPlan = {
   name: string;
   price: string;
@@ -175,26 +358,20 @@ function buildMethodSteps(
     ];
   }
 
-  const outro =
-    context === "wallet"
-      ? "Once you've sent the funds, attach a screenshot below and tap “I've added it.” Our team credits your trading wallet manually — usually within a few hours."
-      : "Once you've sent the payment, attach a screenshot of the transfer below and tap “I've sent it.” Our team verifies transfers manually and activates your VIP access shortly after — usually within a few hours.";
-
   return [
     {
       kind: "message",
-      text: "Got it — the fastest way is a manual GoTyme transfer. Here's how:",
-    },
-    {
-      kind: "payment",
-      method: "merchant",
-      forWallet: context === "wallet",
-    },
-    {
-      kind: "message",
-      text: outro,
+      text: "Got it — the fastest way is a manual merchant transfer. Which country are you paying from?",
     },
   ];
+}
+
+function merchantOutro(
+  context: PaymentContext,
+): string {
+  return context === "wallet"
+    ? "Once you've sent the funds, attach a screenshot below and tap “I've added it.” Our team credits your trading wallet manually — usually within a few hours."
+    : "Once you've sent the payment, attach a screenshot of the transfer below and tap “I've sent it.” Our team verifies transfers manually and activates your VIP access shortly after — usually within a few hours.";
 }
 
 function useProofUpload() {
@@ -639,6 +816,62 @@ function WalletAmountForm({
   );
 }
 
+function MerchantCountryForm({
+  onSubmit,
+}: {
+  onSubmit: (
+    region: MerchantRegion,
+  ) => void;
+}) {
+  const [value, setValue] =
+    useState("");
+
+  const valid = value.trim() !== "";
+
+  return (
+    <form
+      className={
+        styles.amountForm
+      }
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        if (valid) {
+          onSubmit(
+            resolveMerchantRegion(
+              value,
+            ),
+          );
+        }
+      }}
+    >
+      <input
+        type="text"
+        placeholder="Country you're paying from"
+        className={
+          styles.amountInput
+        }
+        value={value}
+        onChange={(event) => {
+          setValue(
+            event.target.value,
+          );
+        }}
+      />
+
+      <button
+        type="submit"
+        className={
+          styles.primaryAction
+        }
+        disabled={!valid}
+      >
+        Continue
+      </button>
+    </form>
+  );
+}
+
 function AttachAndActions({
   proofFile,
   previewUrl,
@@ -793,6 +1026,13 @@ export function VipCheckoutChat({
     null,
   );
 
+  const [
+    merchantRegion,
+    setMerchantRegion,
+  ] = useState<MerchantRegion | null>(
+    null,
+  );
+
   const [methodSteps] = useState<
     Record<PaymentMethod, ScriptStep[]>
   >(() => ({
@@ -829,6 +1069,13 @@ export function VipCheckoutChat({
     walletFundAmount,
     setWalletFundAmount,
   ] = useState<number | null>(
+    null,
+  );
+
+  const [
+    walletMerchantRegion,
+    setWalletMerchantRegion,
+  ] = useState<MerchantRegion | null>(
     null,
   );
 
@@ -889,6 +1136,26 @@ export function VipCheckoutChat({
     ];
   }
 
+  if (
+    method === "merchant" &&
+    merchantRegion !== null
+  ) {
+    script = [
+      ...script,
+      {
+        kind: "payment",
+        method: "merchant",
+        forWallet: false,
+      },
+      {
+        kind: "message",
+        text: merchantOutro(
+          "subscription",
+        ),
+      },
+    ];
+  }
+
   if (sent) {
     script = [
       ...script,
@@ -928,6 +1195,26 @@ export function VipCheckoutChat({
           ...script,
           ...walletMethodSteps.merchant,
         ];
+
+        if (
+          walletMerchantRegion !==
+          null
+        ) {
+          script = [
+            ...script,
+            {
+              kind: "payment",
+              method: "merchant",
+              forWallet: true,
+            },
+            {
+              kind: "message",
+              text: merchantOutro(
+                "wallet",
+              ),
+            },
+          ];
+        }
       } else if (
         walletMethod === "crypto"
       ) {
@@ -1091,10 +1378,6 @@ export function VipCheckoutChat({
       };
     }
   }
-
-  const hasGotymeQr =
-    GOTYME_QR_IMAGE_SRC.trim() !==
-    "";
 
   if (typeof document === "undefined") {
     return null;
@@ -1317,6 +1600,21 @@ export function VipCheckoutChat({
                     ).toFixed(2)}`
                   : `${plan.price} ${plan.period}`;
 
+              const region =
+                (step.forWallet
+                  ? walletMerchantRegion
+                  : merchantRegion) ??
+                "north_america";
+
+              const regionConfig =
+                MERCHANT_REGION_CONFIG[
+                  region
+                ];
+
+              const hasQr =
+                regionConfig.qrImageSrc.trim() !==
+                "";
+
               return (
                 <div
                   key={index}
@@ -1329,8 +1627,8 @@ export function VipCheckoutChat({
                       styles.paymentLabel
                     }
                   >
-                    SCAN TO PAY ·
-                    GOTYME
+                    SCAN TO PAY ·{" "}
+                    {regionConfig.rail}
                   </span>
 
                   <span
@@ -1343,13 +1641,13 @@ export function VipCheckoutChat({
                     company account
                   </span>
 
-                  {hasGotymeQr ? (
+                  {hasQr ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={
-                        GOTYME_QR_IMAGE_SRC
+                        regionConfig.qrImageSrc
                       }
-                      alt="GoTyme QR code"
+                      alt={`${regionConfig.rail} QR code`}
                       className={
                         styles.qrImage
                       }
@@ -1372,32 +1670,38 @@ export function VipCheckoutChat({
                   >
                     <div>
                       <span>
-                        Account name
+                        {
+                          regionConfig.recipientLabel
+                        }
                       </span>
                       <strong>
-                        {GOTYME_ACCOUNT_NAME ||
+                        {regionConfig.recipientName ||
                           "To be added"}
                       </strong>
                     </div>
 
-                    <div>
-                      <span>
-                        Account
-                        number
-                      </span>
-                      <strong>
-                        {GOTYME_ACCOUNT_NUMBER ||
-                          "To be added"}
-                      </strong>
-                    </div>
+                    {regionConfig.accountNumber ? (
+                      <div>
+                        <span>
+                          Account
+                          number
+                        </span>
+                        <strong>
+                          {
+                            regionConfig.accountNumber
+                          }
+                        </strong>
+                      </div>
+                    ) : null}
 
                     <div>
                       <span>
-                        Account type
+                        How to pay
                       </span>
                       <strong>
-                        Merchant
-                        (individual)
+                        {
+                          regionConfig.appNote
+                        }
                       </strong>
                     </div>
 
@@ -1433,6 +1737,16 @@ export function VipCheckoutChat({
           method === null ? (
             <MethodChoiceButtons
               onPick={setMethod}
+            />
+          ) : null}
+
+          {!typing &&
+          method === "merchant" &&
+          merchantRegion === null ? (
+            <MerchantCountryForm
+              onSubmit={
+                setMerchantRegion
+              }
             />
           ) : null}
 
@@ -1496,10 +1810,25 @@ export function VipCheckoutChat({
               }
             />
           ) : null}
+
+          {!typing &&
+          walletMethod ===
+            "merchant" &&
+          walletFundAmount !==
+            null &&
+          walletMerchantRegion ===
+            null ? (
+            <MerchantCountryForm
+              onSubmit={
+                setWalletMerchantRegion
+              }
+            />
+          ) : null}
         </div>
 
         {!typing &&
         method === "merchant" &&
+        merchantRegion !== null &&
         !sent ? (
           <AttachAndActions
             proofFile={
@@ -1558,6 +1887,8 @@ export function VipCheckoutChat({
           "yes" &&
         walletMethod ===
           "merchant" &&
+        walletMerchantRegion !==
+          null &&
         !walletSent ? (
           <AttachAndActions
             proofFile={
