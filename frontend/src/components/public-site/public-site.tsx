@@ -1818,7 +1818,7 @@ function SectionHologram({
       {page === "home" ? (
         <svg
           viewBox="0 0 600 300"
-          preserveAspectRatio="none"
+          preserveAspectRatio="xMidYMid meet"
           className={
             styles.hologramSvg
           }
@@ -1830,12 +1830,12 @@ function SectionHologram({
               cy="0"
               r="1"
               gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(300 130) scale(150)"
+              gradientTransform="translate(300 140) scale(110)"
             >
               <stop
                 offset="0%"
                 stopColor="var(--hologram-accent)"
-                stopOpacity="0.5"
+                stopOpacity="0.4"
               />
               <stop
                 offset="100%"
@@ -1849,12 +1849,12 @@ function SectionHologram({
               cy="0"
               r="1"
               gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(300 252) scale(46)"
+              gradientTransform="translate(300 226) scale(36)"
             >
               <stop
                 offset="0%"
                 stopColor="var(--hologram-accent-2, #ff4dd8)"
-                stopOpacity="0.9"
+                stopOpacity="0.85"
               />
               <stop
                 offset="100%"
@@ -1866,8 +1866,8 @@ function SectionHologram({
 
           <circle
             cx="300"
-            cy="130"
-            r="150"
+            cy="140"
+            r="110"
             fill="url(#zainexHomeAmbientGlow)"
           />
 
@@ -1875,7 +1875,7 @@ function SectionHologram({
             className={
               styles.hologramBrainOutline
             }
-            d="M300,40 L280,26 L254,22 L232,34 L238,54 L214,50 L196,66 L204,88 L178,92 L168,116 L182,132 L172,156 L192,172 L206,192 L238,200 L300,210 L362,200 L394,192 L408,172 L428,156 L418,132 L432,116 L422,92 L396,88 L404,66 L386,50 L362,54 L368,34 L346,22 L320,26 Z"
+            d="M300,66 L274,54 L250,60 L236,78 L228,100 L234,122 L224,146 L236,168 L258,184 L300,192 L342,184 L364,168 L376,146 L366,122 L372,100 L364,78 L350,60 L326,54 Z"
           />
 
           <g
@@ -1883,12 +1883,10 @@ function SectionHologram({
               styles.hologramBrainTraces
             }
           >
-            <path d="M254,22 L254,4" />
-            <path d="M346,22 L346,4" />
-            <path d="M178,92 L150,92 L150,112" />
-            <path d="M422,92 L450,92 L450,112" />
-            <path d="M172,156 L146,156" />
-            <path d="M428,156 L454,156" />
+            <path d="M250,60 L250,44" />
+            <path d="M350,60 L350,44" />
+            <path d="M224,146 L204,146" />
+            <path d="M376,146 L396,146" />
           </g>
 
           <g
@@ -1896,15 +1894,13 @@ function SectionHologram({
               styles.hologramBrainNodes
             }
           >
-            <circle cx="254" cy="4" r="3.4" />
-            <circle cx="346" cy="4" r="3.4" />
-            <circle cx="150" cy="112" r="3.4" />
-            <circle cx="450" cy="112" r="3.4" />
-            <circle cx="146" cy="156" r="3.4" />
-            <circle cx="454" cy="156" r="3.4" />
-            <circle cx="272" cy="86" r="3" />
-            <circle cx="328" cy="86" r="3" />
-            <circle cx="300" cy="130" r="3.6" />
+            <circle cx="250" cy="44" r="3" />
+            <circle cx="350" cy="44" r="3" />
+            <circle cx="204" cy="146" r="3" />
+            <circle cx="396" cy="146" r="3" />
+            <circle cx="280" cy="100" r="2.6" />
+            <circle cx="320" cy="100" r="2.6" />
+            <circle cx="300" cy="140" r="3.2" />
           </g>
 
           <line
@@ -1912,9 +1908,9 @@ function SectionHologram({
               styles.hologramBrainStem
             }
             x1="300"
-            y1="210"
+            y1="192"
             x2="300"
-            y2="248"
+            y2="222"
           />
 
           <circle
@@ -1922,8 +1918,8 @@ function SectionHologram({
               styles.hologramBrainCore
             }
             cx="300"
-            cy="252"
-            r="7"
+            cy="226"
+            r="6"
           />
         </svg>
       ) : null}
