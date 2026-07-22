@@ -1823,6 +1823,37 @@ function SectionHologram({
             styles.hologramSvg
           }
         >
+          <defs>
+            <radialGradient
+              id="zainexHomeRadarWedge"
+              cx="0"
+              cy="0"
+              r="1"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform="translate(300 150) scale(210)"
+            >
+              <stop
+                offset="0%"
+                stopColor="var(--hologram-accent)"
+                stopOpacity="0.9"
+              />
+              <stop
+                offset="100%"
+                stopColor="var(--hologram-accent)"
+                stopOpacity="0"
+              />
+            </radialGradient>
+          </defs>
+
+          <circle
+            className={
+              styles.hologramDashRing
+            }
+            cx="300"
+            cy="150"
+            r="210"
+          />
+
           <circle
             className={
               styles.hologramRing
@@ -1837,7 +1868,7 @@ function SectionHologram({
             }
             cx="300"
             cy="150"
-            r="120"
+            r="115"
           />
           <circle
             className={
@@ -1845,16 +1876,113 @@ function SectionHologram({
             }
             cx="300"
             cy="150"
-            r="180"
+            r="170"
           />
-          <line
+
+          <g
             className={
-              styles.hologramSweep
+              styles.hologramTicks
             }
-            x1="300"
-            y1="150"
-            x2="300"
-            y2="-30"
+          >
+            {[
+              0, 45, 90, 135, 180,
+              225, 270, 315,
+            ].map((angle) => {
+              const rad =
+                (angle *
+                  Math.PI) /
+                180;
+              const x1 =
+                300 +
+                Math.cos(rad) *
+                  178;
+              const y1 =
+                150 +
+                Math.sin(rad) *
+                  178;
+              const x2 =
+                300 +
+                Math.cos(rad) *
+                  196;
+              const y2 =
+                150 +
+                Math.sin(rad) *
+                  196;
+
+              return (
+                <line
+                  key={angle}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                />
+              );
+            })}
+          </g>
+
+          <g
+            className={
+              styles.hologramSweepGroup
+            }
+          >
+            <path
+              className={
+                styles.hologramSweepWedge
+              }
+              d="M300 150 L510 150 A210 210 0 0 1 471.9 265.4 Z"
+              fill="url(#zainexHomeRadarWedge)"
+            />
+            <line
+              className={
+                styles.hologramSweep
+              }
+              x1="300"
+              y1="150"
+              x2="510"
+              y2="150"
+            />
+          </g>
+
+          <g
+            className={
+              styles.hologramBlips
+            }
+          >
+            <circle
+              cx="380"
+              cy="96"
+              r="4"
+            />
+            <circle
+              cx="228"
+              cy="204"
+              r="3.5"
+            />
+            <circle
+              cx="352"
+              cy="232"
+              r="3"
+            />
+            <circle
+              cx="204"
+              cy="110"
+              r="4"
+            />
+            <circle
+              cx="418"
+              cy="182"
+              r="3"
+            />
+          </g>
+
+          <circle
+            className={
+              styles.hologramCore
+            }
+            cx="300"
+            cy="150"
+            r="7"
           />
         </svg>
       ) : null}
