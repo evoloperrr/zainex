@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -241,11 +243,137 @@ final class ReferralNetworkController extends Controller
                 'totalMembers' =>
                     $totalMembers,
                 'levels' => $levels,
+                'strategyIncomeReport' =>
+                    $this->strategyIncomeReport(
+                        (int) $currentUser->id,
+                    ),
             ])
             ->header(
                 'Cache-Control',
                 'no-store',
             );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function strategyIncomeReport(
+        int $userId,
+    ): array {
+        $baseQuery = DB::table(
+            'wallet_transactions',
+        )
+            ->where('user_id', $userId)
+            ->where(
+                'event_type',
+                'STRATEGY_REFERRAL_INCOME',
+            );
+
+        $totalIncome = BigDecimal::of(
+            (string) ((clone $baseQuery)->sum('amount') ?? 0),
+        )->toScale(8, RoundingMode::Down);
+
+        $recent = DB::table(
+            'wallet_transactions as income',
+        )
+            ->leftJoin(
+                'strategy_activations as activation',
+                'activation.id',
+                '=',
+                'income.strategy_activation_id',
+            )
+            ->leftJoin(
+                'users as source_user',
+                'source_user.id',
+                '=',
+                'activation.user_id',
+            )
+            ->where('income.user_id', $userId)
+            ->where(
+                'income.event_type',
+                'STRATEGY_REFERRAL_INCOME',
+            )
+            ->orderByDesc('income.occurred_at')
+            ->orderByDesc('income.id')
+            ->limit(10)
+            ->get([
+                'income.id',
+                'income.strategy_activation_id',
+                'income.amount',
+                'income.wallet_balance_after',
+                'income.metadata',
+                'income.occurred_at',
+                'activation.tier',
+                'activation.allocated_amount',
+                'source_user.id as source_user_id',
+                'source_user.name as source_user_name',
+                'source_user.email as source_user_email',
+            ])
+            ->map(function (object $row): array {
+                $metadata = [];
+
+                if (
+                    is_string($row->metadata) &&
+                    $row->metadata !== ''
+                ) {
+                    $decoded = json_decode(
+                        $row->metadata,
+                        true,
+                    );
+
+                    if (is_array($decoded)) {
+                        $metadata = $decoded;
+                    }
+                }
+
+                $sourceAmount = $metadata['tradingAmount'] ??
+                    $row->allocated_amount ??
+                    0;
+
+                $percentage = $metadata['percentage'] ??
+                    (int) config(
+                        'referral_rewards.strategy_trading_amount_rate_bps',
+                        1000,
+                    ) / 100;
+
+                return [
+                    'id' => (int) $row->id,
+                    'activationId' => $row->strategy_activation_id === null
+                        ? null
+                        : (int) $row->strategy_activation_id,
+                    'sourceUser' => $row->source_user_id === null
+                        ? null
+                        : [
+                            'id' => (int) $row->source_user_id,
+                            'name' => (string) $row->source_user_name,
+                            'email' => $this->maskedEmail(
+                                (string) $row->source_user_email,
+                            ),
+                        ],
+                    'tier' => $row->tier === null
+                        ? null
+                        : (string) $row->tier,
+                    'tradingAmount' => (float) $sourceAmount,
+                    'percentage' => (float) $percentage,
+                    'incomeAmount' => (float) $row->amount,
+                    'walletBalanceAfter' => (float)
+                        $row->wallet_balance_after,
+                    'creditedAt' => $row->occurred_at,
+                ];
+            })
+            ->values()
+            ->all();
+
+        return [
+            'ratePercentage' => (int) config(
+                'referral_rewards.strategy_trading_amount_rate_bps',
+                1000,
+            ) / 100,
+            'totalIncome' => (float) (string) $totalIncome,
+            'creditedActivations' => (clone $baseQuery)->count(),
+            'currency' => 'USDT',
+            'recent' => $recent,
+        ];
     }
 
     /**

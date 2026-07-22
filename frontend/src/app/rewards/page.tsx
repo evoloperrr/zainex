@@ -17,6 +17,7 @@ import {
 } from "@/components/shared-profile-menu";
 
 import { CurrencySwitcher } from "@/components/currency-switcher";
+import { useCurrency } from "@/components/currency-provider";
 
 import chromeStyles from "../billing/billing.module.css";
 import styles from "./rewards.module.css";
@@ -35,6 +36,30 @@ type ReferralLevel = {
   members: ReferralMember[];
 };
 
+type StrategyIncomeEntry = {
+  id: number;
+  activationId: number | null;
+  sourceUser: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  tier: string | null;
+  tradingAmount: number;
+  percentage: number;
+  incomeAmount: number;
+  walletBalanceAfter: number;
+  creditedAt: string | null;
+};
+
+type StrategyIncomeReport = {
+  ratePercentage: number;
+  totalIncome: number;
+  creditedActivations: number;
+  currency: string;
+  recent: StrategyIncomeEntry[];
+};
+
 type ReferralPayload = {
   ok?: boolean;
   maxDepth?: number;
@@ -48,12 +73,15 @@ type ReferralPayload = {
     email: string;
   } | null;
   levels?: ReferralLevel[];
+  strategyIncomeReport?: StrategyIncomeReport;
   error?: {
     message?: string;
   };
 };
 
 function NetworkContent() {
+  const { formatUsd } = useCurrency();
+
   const [
     payload,
     setPayload,
@@ -230,7 +258,9 @@ function NetworkContent() {
               Share your permanent invite link and
               view referrals through Ring 1,
               Ring 2, and Ring 3. Members beyond
-              Ring 3 are never included.
+              Ring 3 are never included. Direct
+              inviters earn 10% of every referred
+              strategy trading amount.
             </p>
           </div>
 
@@ -323,6 +353,127 @@ function NetworkContent() {
                   Rings 1-3 only
                 </small>
               </article>
+            </section>
+
+            <section className={styles.incomeReport}>
+              <header className={styles.incomeHeader}>
+                <div>
+                  <span>STRATEGY REFERRAL INCOME</span>
+                  <h2>Direct inviter earnings</h2>
+                  <p>
+                    One-time 10% wallet income from each new
+                    strategy activation made by your direct
+                    referrals.
+                  </p>
+                </div>
+
+                <b>LIVE WALLET LEDGER</b>
+              </header>
+
+              <div className={styles.incomeSummary}>
+                <article>
+                  <span>TOTAL INCOME</span>
+                  <strong>
+                    {formatUsd(
+                      payload.strategyIncomeReport?.totalIncome ?? 0,
+                    )}
+                  </strong>
+                  <small>Credited to your wallet</small>
+                </article>
+
+                <article>
+                  <span>PAID ACTIVATIONS</span>
+                  <strong>
+                    {payload.strategyIncomeReport
+                      ?.creditedActivations ?? 0}
+                  </strong>
+                  <small>Duplicate-protected rewards</small>
+                </article>
+
+                <article>
+                  <span>DIRECT RATE</span>
+                  <strong>
+                    {payload.strategyIncomeReport
+                      ?.ratePercentage ?? 10}%
+                  </strong>
+                  <small>Based on trading amount</small>
+                </article>
+              </div>
+
+              <div className={styles.incomeLedger}>
+                <div className={styles.incomeLedgerHead}>
+                  <strong>Recent income</strong>
+                  <span>Latest 10 credits</span>
+                </div>
+
+                {(payload.strategyIncomeReport?.recent ?? [])
+                  .length === 0 ? (
+                  <p className={styles.incomeEmpty}>
+                    No strategy referral income yet. A report
+                    will appear here after a direct referral
+                    activates a strategy.
+                  </p>
+                ) : (
+                  <div className={styles.incomeRows}>
+                    {(payload.strategyIncomeReport?.recent ?? []).map(
+                      (entry) => (
+                        <article key={entry.id}>
+                          <div className={styles.incomeMember}>
+                            <i>
+                              {(entry.sourceUser?.name ?? "R")
+                                .slice(0, 1)
+                                .toUpperCase()}
+                            </i>
+
+                            <div>
+                              <strong>
+                                {entry.sourceUser?.name ??
+                                  "Referral member"}
+                              </strong>
+                              <small>
+                                {entry.sourceUser?.email ??
+                                  "Account unavailable"}
+                              </small>
+                            </div>
+                          </div>
+
+                          <div className={styles.incomeBasis}>
+                            <span>{entry.tier ?? "STRATEGY"}</span>
+                            <strong>
+                              {entry.percentage}% of {formatUsd(
+                                entry.tradingAmount,
+                              )}
+                            </strong>
+                          </div>
+
+                          <div className={styles.incomeCredit}>
+                            <strong>
+                              +{formatUsd(entry.incomeAmount)}
+                            </strong>
+                            <small>
+                              Wallet {formatUsd(
+                                entry.walletBalanceAfter,
+                              )}
+                            </small>
+                          </div>
+
+                          <time>
+                            {entry.creditedAt
+                              ? new Intl.DateTimeFormat("en-US", {
+                                  month: "short",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }).format(new Date(entry.creditedAt))
+                              : "--"}
+                          </time>
+                        </article>
+                      ),
+                    )}
+                  </div>
+                )}
+              </div>
             </section>
 
             <section className={styles.network}>
@@ -439,11 +590,12 @@ function NetworkContent() {
               <div>
                 <span>03</span>
                 <strong>
-                  Rewards rules later
+                  10% direct strategy income
                 </strong>
                 <p>
-                  No commission rate has been assumed
-                  or credited in this first scope.
+                  New strategy activations credit 10%
+                  of the trading amount to the direct
+                  inviter wallet once.
                 </p>
               </div>
             </section>

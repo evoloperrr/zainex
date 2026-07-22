@@ -309,6 +309,257 @@
   font-size: 13px;
 }
 
+.incomeReport {
+  position: relative;
+  overflow: hidden;
+  margin-top: 42px;
+  border: 1px solid rgba(86, 221, 255, 0.16);
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      circle at 88% 2%,
+      rgba(68, 255, 190, 0.11),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(13, 30, 53, 0.92),
+      rgba(12, 12, 35, 0.95) 58%,
+      rgba(31, 15, 48, 0.9)
+    );
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.24),
+    inset 0 1px rgba(255, 255, 255, 0.025);
+}
+
+.incomeReport::before {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 42%;
+  height: 2px;
+  content: "";
+  background: linear-gradient(90deg, #58e4ff, #65ffc5, transparent);
+  box-shadow: 0 0 22px rgba(91, 242, 220, 0.7);
+}
+
+.incomeHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 29px 30px 24px;
+  border-bottom: 1px solid rgba(121, 143, 209, 0.12);
+}
+
+.incomeHeader span {
+  color: #63f1cd;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.15em;
+}
+
+.incomeHeader h2 {
+  margin: 8px 0 0;
+  font-size: 27px;
+  font-weight: 490;
+  letter-spacing: -0.025em;
+}
+
+.incomeHeader p {
+  max-width: 670px;
+  margin: 10px 0 0;
+  color: #7d89a6;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.incomeHeader b {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border: 1px solid rgba(91, 242, 205, 0.18);
+  border-radius: 999px;
+  color: #67ecc9;
+  background: rgba(47, 217, 174, 0.055);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+}
+
+.incomeSummary {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  border-bottom: 1px solid rgba(121, 143, 209, 0.12);
+}
+
+.incomeSummary article {
+  padding: 25px 30px;
+  border-right: 1px solid rgba(121, 143, 209, 0.1);
+}
+
+.incomeSummary article:last-child {
+  border-right: 0;
+}
+
+.incomeSummary span,
+.incomeSummary strong,
+.incomeSummary small {
+  display: block;
+}
+
+.incomeSummary span {
+  color: #6f7c9a;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.incomeSummary strong {
+  margin-top: 9px;
+  color: #f6f8ff;
+  font-size: 29px;
+  font-weight: 490;
+}
+
+.incomeSummary article:first-child strong {
+  color: #72f5d2;
+  text-shadow: 0 0 24px rgba(72, 237, 192, 0.22);
+}
+
+.incomeSummary small {
+  margin-top: 7px;
+  color: #697590;
+  font-size: 11px;
+}
+
+.incomeLedger {
+  padding: 25px 30px 29px;
+}
+
+.incomeLedgerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.incomeLedgerHead strong {
+  font-size: 14px;
+  font-weight: 560;
+}
+
+.incomeLedgerHead span {
+  color: #65708c;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.incomeEmpty {
+  margin: 0;
+  padding: 25px;
+  border: 1px dashed rgba(104, 135, 199, 0.16);
+  border-radius: 14px;
+  color: #717d99;
+  background: rgba(5, 9, 25, 0.35);
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.incomeRows {
+  display: grid;
+  gap: 8px;
+}
+
+.incomeRows > article {
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 1.25fr)
+    minmax(180px, 1fr)
+    minmax(145px, 0.8fr)
+    155px;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 16px;
+  border: 1px solid rgba(113, 137, 200, 0.11);
+  border-radius: 14px;
+  background: rgba(5, 9, 25, 0.36);
+}
+
+.incomeMember {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+.incomeMember i {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(88, 237, 202, 0.16);
+  border-radius: 12px;
+  color: #72f0d0;
+  background: linear-gradient(
+    145deg,
+    rgba(70, 224, 190, 0.1),
+    rgba(92, 97, 244, 0.08)
+  );
+  font-size: 13px;
+  font-style: normal;
+}
+
+.incomeMember div,
+.incomeBasis,
+.incomeCredit {
+  min-width: 0;
+}
+
+.incomeMember strong,
+.incomeMember small,
+.incomeBasis span,
+.incomeBasis strong,
+.incomeCredit strong,
+.incomeCredit small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.incomeMember strong,
+.incomeBasis strong {
+  font-size: 12px;
+  font-weight: 540;
+}
+
+.incomeMember small,
+.incomeCredit small {
+  margin-top: 4px;
+  color: #687590;
+  font-size: 10px;
+}
+
+.incomeBasis span {
+  margin-bottom: 5px;
+  color: #66dfff;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.incomeCredit strong {
+  color: #70f0ca;
+  font-size: 14px;
+  font-weight: 620;
+}
+
+.incomeRows time {
+  color: #6b7793;
+  font-size: 11px;
+  text-align: right;
+}
+
 .network {
   margin-top: 43px;
 }
@@ -589,6 +840,18 @@
   .rules {
     grid-template-columns: 1fr;
   }
+
+  .incomeRows > article {
+    grid-template-columns:
+      minmax(180px, 1fr)
+      minmax(170px, 1fr)
+      minmax(135px, 0.7fr);
+  }
+
+  .incomeRows time {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
 }
 
 @media (max-width: 540px) {
@@ -616,5 +879,42 @@
 
   .member time {
     grid-column: 2;
+  }
+
+  .incomeHeader {
+    display: block;
+    padding: 24px 18px 20px;
+  }
+
+  .incomeHeader b {
+    display: inline-block;
+    margin-top: 18px;
+  }
+
+  .incomeSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .incomeSummary article {
+    padding: 20px 18px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(121, 143, 209, 0.1);
+  }
+
+  .incomeSummary article:last-child {
+    border-bottom: 0;
+  }
+
+  .incomeLedger {
+    padding: 22px 18px;
+  }
+
+  .incomeRows > article {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .incomeRows time {
+    grid-column: auto;
   }
 }

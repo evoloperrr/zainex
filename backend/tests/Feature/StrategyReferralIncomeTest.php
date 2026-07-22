@@ -124,6 +124,45 @@ final class StrategyReferralIncomeTest extends TestCase
             ->assertJsonPath('logs.0.referralSourceAmount', 500);
 
         $this
+            ->withHeaders([
+                'X-Zainex-Internal-Token' => 'strategy-referral-test-token',
+                'X-Zainex-Session-Id' => $inviterSession,
+                'X-Zainex-Request-Id' => (string) Str::uuid(),
+            ])
+            ->getJson('/api/referrals/network')
+            ->assertOk()
+            ->assertJsonPath('strategyIncomeReport.ratePercentage', 10)
+            ->assertJsonPath('strategyIncomeReport.totalIncome', 50)
+            ->assertJsonPath(
+                'strategyIncomeReport.creditedActivations',
+                1,
+            )
+            ->assertJsonPath(
+                'strategyIncomeReport.recent.0.sourceUser.id',
+                $sourceUserId,
+            )
+            ->assertJsonPath(
+                'strategyIncomeReport.recent.0.tier',
+                'VIP 1',
+            )
+            ->assertJsonPath(
+                'strategyIncomeReport.recent.0.tradingAmount',
+                500,
+            )
+            ->assertJsonPath(
+                'strategyIncomeReport.recent.0.percentage',
+                10,
+            )
+            ->assertJsonPath(
+                'strategyIncomeReport.recent.0.incomeAmount',
+                50,
+            )
+            ->assertJsonPath(
+                'strategyIncomeReport.recent.0.walletBalanceAfter',
+                150,
+            );
+
+        $this
             ->withHeaders($this->headers())
             ->postJson(
                 '/api/trading/futures/strategies/activate',
