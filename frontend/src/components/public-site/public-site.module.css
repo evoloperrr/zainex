@@ -6424,11 +6424,242 @@ body[data-public-reveal="ready"]
     0 40px 110px rgba(70, 220, 255, 0.14);
 }
 
-.site[data-page="home"] .statementMark,
-.site[data-page="home"] .statement > p,
-.site[data-page="home"] .statement > a {
+.statementMark,
+.statement > p,
+.statement > a {
   position: relative;
   z-index: 1;
+}
+
+.site[data-page="platform"] .statement {
+  border-color: rgba(70, 140, 255, 0.28);
+}
+
+.site[data-page="platform"] .statement::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    linear-gradient(
+        var(--hologram-accent),
+        var(--hologram-accent)
+      )
+      top left / 26px 1px
+      no-repeat,
+    linear-gradient(
+        var(--hologram-accent),
+        var(--hologram-accent)
+      )
+      top left / 1px 26px
+      no-repeat,
+    linear-gradient(
+        var(--hologram-accent),
+        var(--hologram-accent)
+      )
+      bottom right / 26px 1px
+      no-repeat,
+    linear-gradient(
+        var(--hologram-accent),
+        var(--hologram-accent)
+      )
+      bottom right / 1px 26px
+      no-repeat;
+}
+
+.site[data-page="markets"] .statement {
+  border-color: rgba(70, 220, 255, 0.28);
+}
+
+.site[data-page="markets"] .statement::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 6%;
+  right: 6%;
+  z-index: 0;
+  height: 1px;
+  pointer-events: none;
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--hologram-accent) 0 6px,
+    transparent 6px 16px
+  );
+}
+
+.site[data-page="markets"] .statement > a {
+  position: relative;
+}
+
+.site[data-page="markets"] .statement > a::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -16px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--public-green);
+  box-shadow: 0 0 8px var(--public-green);
+  transform: translateY(-50%);
+  animation: publicHologramPulse 2s ease-in-out infinite;
+}
+
+.site[data-page="intellibrain"] .statement {
+  border-color: rgba(161, 93, 255, 0.3);
+}
+
+.site[data-page="intellibrain"] .statement::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 12% 50%,
+    rgba(161, 93, 255, 0.22),
+    transparent 45%
+  );
+}
+
+.site[data-page="intellibrain"] .statementMark {
+  position: relative;
+  width: 66px;
+  height: 66px;
+}
+
+.site[data-page="intellibrain"] .statementMark::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border: 1px solid
+    rgba(161, 93, 255, 0.35);
+  border-radius: 20px;
+  animation: publicHologramPulse 2.4s ease-in-out infinite;
+}
+
+.site[data-page="strategies"] .statement {
+  border-color: rgba(161, 93, 255, 0.3);
+}
+
+.site[data-page="strategies"] .statement::before {
+  content: "05";
+  position: absolute;
+  top: 22px;
+  right: 26px;
+  z-index: 0;
+  color: var(--hologram-accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.4;
+}
+
+.site[data-page="strategies"] .statement::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 64px;
+  width: 1px;
+  height: 46px;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    var(--hologram-accent),
+    transparent
+  );
+  opacity: 0.4;
+}
+
+.site[data-page="wallets"] .statement {
+  overflow: visible;
+}
+
+.site[data-page="wallets"] .statement::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: translate(14px, 14px);
+  border: 1px solid
+    rgba(93, 188, 255, 0.12);
+  border-radius: inherit;
+  background: rgba(8, 12, 26, 0.5);
+}
+
+.site[data-page="security"] .statement {
+  border-color: rgba(98, 239, 189, 0.3);
+}
+
+.site[data-page="security"] .statement::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    linear-gradient(
+        var(--public-green),
+        var(--public-green)
+      )
+      top left / 26px 1px
+      no-repeat,
+    linear-gradient(
+        var(--public-green),
+        var(--public-green)
+      )
+      top left / 1px 26px
+      no-repeat,
+    linear-gradient(
+        var(--public-green),
+        var(--public-green)
+      )
+      bottom right / 26px 1px
+      no-repeat,
+    linear-gradient(
+        var(--public-green),
+        var(--public-green)
+      )
+      bottom right / 1px 26px
+      no-repeat;
+}
+
+.site[data-page="security"] .statementMark {
+  position: relative;
+}
+
+.site[data-page="security"] .statementMark::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--public-green);
+  box-shadow: 0 0 8px var(--public-green);
+  animation: publicHologramPulse 2.2s ease-in-out infinite;
+}
+
+.site[data-page="company"] .statement {
+  width: 100%;
+  border-radius: 0;
+  border-right: 0;
+  border-left: 0;
+  border-color: rgba(183, 194, 230, 0.18);
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(183, 194, 230, 0.06),
+      transparent
+    );
+  box-shadow: none;
 }
 
 .site[data-page="home"] .statement::before {
