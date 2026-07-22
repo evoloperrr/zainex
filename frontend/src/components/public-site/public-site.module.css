@@ -5913,6 +5913,10 @@ body[data-public-reveal="ready"]
   --hologram-accent: var(--public-cyan);
 }
 
+.site[data-page="home"] {
+  --hologram-accent-2: #ff4dd8;
+}
+
 .site[data-page="platform"] {
   --hologram-accent: var(--public-blue);
 }
@@ -6112,62 +6116,63 @@ body[data-public-reveal="ready"]
   filter: drop-shadow(0 0 4px var(--hologram-accent));
 }
 
-.hologramSweepGroup {
-  transform-box: view-box;
-  transform-origin: 300px 150px;
-  animation: publicHologramSpin 9s linear infinite;
-}
-
-.hologramSweepWedge {
-  opacity: 0.9;
-}
-
-.hologramSweep {
-  stroke: var(--hologram-accent);
-  stroke-width: 2.5;
-  filter: drop-shadow(0 0 10px var(--hologram-accent))
-    drop-shadow(0 0 20px var(--hologram-accent));
-}
-
-.hologramDashRing {
+.hologramBrainOutline {
   fill: none;
   stroke: var(--hologram-accent);
-  stroke-width: 1;
-  stroke-dasharray: 3 10;
-  opacity: 0.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: publicHologramSpin 90s linear infinite reverse;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px var(--hologram-accent))
+    drop-shadow(0 0 16px var(--hologram-accent));
 }
 
-.hologramTicks line {
+.hologramBrainTraces path {
+  fill: none;
   stroke: var(--hologram-accent);
-  stroke-width: 1.5;
-  opacity: 0.6;
+  stroke-width: 1.25;
+  opacity: 0.5;
+  filter: drop-shadow(0 0 3px var(--hologram-accent));
 }
 
-.hologramBlips circle {
-  fill: var(--hologram-accent);
-  filter: drop-shadow(0 0 6px var(--hologram-accent));
+.hologramBrainNodes circle {
+  fill: var(--hologram-accent-2, #ff4dd8);
+  filter: drop-shadow(0 0 8px var(--hologram-accent-2, #ff4dd8));
   transform-box: fill-box;
   transform-origin: center;
-  animation: publicHologramBlip 2.4s ease-in-out infinite;
+  animation: publicHologramBlip 2.6s ease-in-out infinite;
 }
 
-.hologramBlips circle:nth-child(2) {
-  animation-delay: 0.4s;
+.hologramBrainNodes circle:nth-child(2) {
+  animation-delay: 0.25s;
 }
 
-.hologramBlips circle:nth-child(3) {
-  animation-delay: 0.8s;
+.hologramBrainNodes circle:nth-child(3) {
+  animation-delay: 0.5s;
 }
 
-.hologramBlips circle:nth-child(4) {
-  animation-delay: 1.2s;
+.hologramBrainNodes circle:nth-child(4) {
+  animation-delay: 0.75s;
 }
 
-.hologramBlips circle:nth-child(5) {
-  animation-delay: 1.6s;
+.hologramBrainNodes circle:nth-child(5) {
+  animation-delay: 1s;
+}
+
+.hologramBrainNodes circle:nth-child(6) {
+  animation-delay: 1.25s;
+}
+
+.hologramBrainNodes circle:nth-child(7) {
+  animation-delay: 1.5s;
+}
+
+.hologramBrainNodes circle:nth-child(8) {
+  animation-delay: 1.75s;
+}
+
+.hologramBrainNodes circle:nth-child(9) {
+  animation-delay: 2s;
 }
 
 @keyframes publicHologramBlip {
@@ -6183,151 +6188,26 @@ body[data-public-reveal="ready"]
   }
 }
 
-.hologramCore {
-  fill: var(--hologram-accent);
-  filter: drop-shadow(0 0 10px var(--hologram-accent))
-    drop-shadow(0 0 22px var(--hologram-accent));
-  animation: publicHologramPulse 2.6s ease-in-out infinite;
-}
-
-.hologramCrystalOuter {
-  fill: none;
-  stroke: var(--hologram-accent);
+.hologramBrainStem {
+  stroke: var(--hologram-accent-2, #ff4dd8);
   stroke-width: 2;
-  opacity: 0.75;
-  filter: drop-shadow(0 0 8px var(--hologram-accent));
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: publicHologramSpin 34s linear infinite;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 6px var(--hologram-accent-2, #ff4dd8));
 }
 
-.hologramCrystalInner {
-  fill: none;
-  stroke: var(--hologram-accent);
-  stroke-width: 1.25;
-  opacity: 0.55;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: publicHologramSpin 22s linear infinite reverse;
-}
-
-.hologramBeams line {
-  stroke: var(--hologram-accent);
-  stroke-width: 1.5;
-  opacity: 0.4;
-  filter: drop-shadow(0 0 4px var(--hologram-accent));
-  animation: publicHologramBeamPulse 3.2s ease-in-out infinite;
-}
-
-.hologramBeams line:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.hologramBeams line:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-.hologramBeams line:nth-child(4) {
-  animation-delay: 0.9s;
-}
-
-.hologramBeams line:nth-child(5) {
-  animation-delay: 1.2s;
-}
-
-.hologramBeams line:nth-child(6) {
-  animation-delay: 1.5s;
-}
-
-@keyframes publicHologramBeamPulse {
-  0%,
-  100% {
-    opacity: 0.22;
-  }
-
-  50% {
-    opacity: 0.6;
-  }
-}
-
-.hologramDataStream line {
-  stroke: var(--hologram-accent);
-  stroke-width: 1.5;
-  stroke-dasharray: 6 14;
-  opacity: 0.4;
-  animation: publicDataStreamFall 3.5s linear infinite;
-}
-
-.hologramDataStream line:nth-child(2) {
-  animation-duration: 4.2s;
-}
-
-.hologramDataStream line:nth-child(3) {
-  animation-duration: 3.8s;
-  animation-direction: reverse;
-}
-
-.hologramDataStream line:nth-child(4) {
-  animation-duration: 4.6s;
-  animation-direction: reverse;
-}
-
-@keyframes publicDataStreamFall {
-  from {
-    stroke-dashoffset: 0;
-  }
-
-  to {
-    stroke-dashoffset: -40;
-  }
-}
-
-.hologramDiamonds rect {
-  fill: var(--hologram-accent);
-  filter: drop-shadow(0 0 6px var(--hologram-accent));
-  animation: publicHologramDiamondPulse 2.4s ease-in-out infinite;
-}
-
-.hologramDiamonds rect:nth-child(2) {
-  animation-delay: 0.4s;
-}
-
-.hologramDiamonds rect:nth-child(3) {
-  animation-delay: 0.8s;
-}
-
-.hologramDiamonds rect:nth-child(4) {
-  animation-delay: 1.2s;
-}
-
-.hologramDiamonds rect:nth-child(5) {
-  animation-delay: 1.6s;
-}
-
-@keyframes publicHologramDiamondPulse {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-
-  50% {
-    opacity: 1;
-  }
+.hologramBrainCore {
+  fill: var(--hologram-accent-2, #ff4dd8);
+  filter: drop-shadow(0 0 12px var(--hologram-accent-2, #ff4dd8))
+    drop-shadow(0 0 26px var(--hologram-accent-2, #ff4dd8));
+  animation: publicHologramPulse 2.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hologramNodes circle,
   .hologramOrbit,
   .hologramScan,
-  .hologramSweepGroup,
-  .hologramDashRing,
-  .hologramBlips circle,
-  .hologramCore,
-  .hologramCrystalOuter,
-  .hologramCrystalInner,
-  .hologramBeams line,
-  .hologramDataStream line,
-  .hologramDiamonds rect {
+  .hologramBrainNodes circle,
+  .hologramBrainCore {
     animation: none;
   }
 }

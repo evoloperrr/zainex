@@ -1825,17 +1825,17 @@ function SectionHologram({
         >
           <defs>
             <radialGradient
-              id="zainexHomeCoreGlow"
+              id="zainexHomeAmbientGlow"
               cx="0"
               cy="0"
               r="1"
               gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(300 150) scale(150)"
+              gradientTransform="translate(300 130) scale(150)"
             >
               <stop
                 offset="0%"
                 stopColor="var(--hologram-accent)"
-                stopOpacity="0.55"
+                stopOpacity="0.5"
               />
               <stop
                 offset="100%"
@@ -1843,150 +1843,87 @@ function SectionHologram({
                 stopOpacity="0"
               />
             </radialGradient>
+            <radialGradient
+              id="zainexHomeCoreGlow"
+              cx="0"
+              cy="0"
+              r="1"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform="translate(300 252) scale(46)"
+            >
+              <stop
+                offset="0%"
+                stopColor="var(--hologram-accent-2, #ff4dd8)"
+                stopOpacity="0.9"
+              />
+              <stop
+                offset="100%"
+                stopColor="var(--hologram-accent-2, #ff4dd8)"
+                stopOpacity="0"
+              />
+            </radialGradient>
           </defs>
-
-          <g
-            className={
-              styles.hologramDataStream
-            }
-          >
-            <line
-              x1="46"
-              x2="46"
-              y1="-20"
-              y2="320"
-            />
-            <line
-              x1="118"
-              x2="118"
-              y1="-20"
-              y2="320"
-            />
-            <line
-              x1="482"
-              x2="482"
-              y1="-20"
-              y2="320"
-            />
-            <line
-              x1="554"
-              x2="554"
-              y1="-20"
-              y2="320"
-            />
-          </g>
-
-          <g
-            className={
-              styles.hologramBeams
-            }
-          >
-            <line
-              x1="300"
-              y1="150"
-              x2="300"
-              y2="-90"
-            />
-            <line
-              x1="300"
-              y1="150"
-              x2="499"
-              y2="35"
-            />
-            <line
-              x1="300"
-              y1="150"
-              x2="499"
-              y2="265"
-            />
-            <line
-              x1="300"
-              y1="150"
-              x2="300"
-              y2="390"
-            />
-            <line
-              x1="300"
-              y1="150"
-              x2="101"
-              y2="265"
-            />
-            <line
-              x1="300"
-              y1="150"
-              x2="101"
-              y2="35"
-            />
-          </g>
 
           <circle
             cx="300"
-            cy="150"
+            cy="130"
             r="150"
-            fill="url(#zainexHomeCoreGlow)"
+            fill="url(#zainexHomeAmbientGlow)"
           />
 
-          <polygon
+          <path
             className={
-              styles.hologramCrystalOuter
+              styles.hologramBrainOutline
             }
-            points="300,20 412.6,85 412.6,215 300,280 187.4,215 187.4,85"
-          />
-
-          <polygon
-            className={
-              styles.hologramCrystalInner
-            }
-            points="300,82 358.9,116 358.9,184 300,218 241.1,184 241.1,116"
+            d="M300,40 L280,26 L254,22 L232,34 L238,54 L214,50 L196,66 L204,88 L178,92 L168,116 L182,132 L172,156 L192,172 L206,192 L238,200 L300,210 L362,200 L394,192 L408,172 L428,156 L418,132 L432,116 L422,92 L396,88 L404,66 L386,50 L362,54 L368,34 L346,22 L320,26 Z"
           />
 
           <g
             className={
-              styles.hologramDiamonds
+              styles.hologramBrainTraces
             }
           >
-            <rect
-              x="446"
-              y="76"
-              width="14"
-              height="14"
-              transform="rotate(45 453 83)"
-            />
-            <rect
-              x="130"
-              y="206"
-              width="12"
-              height="12"
-              transform="rotate(45 136 212)"
-            />
-            <rect
-              x="462"
-              y="226"
-              width="10"
-              height="10"
-              transform="rotate(45 467 231)"
-            />
-            <rect
-              x="96"
-              y="70"
-              width="13"
-              height="13"
-              transform="rotate(45 102.5 76.5)"
-            />
-            <rect
-              x="284"
-              y="252"
-              width="11"
-              height="11"
-              transform="rotate(45 289.5 257.5)"
-            />
+            <path d="M254,22 L254,4" />
+            <path d="M346,22 L346,4" />
+            <path d="M178,92 L150,92 L150,112" />
+            <path d="M422,92 L450,92 L450,112" />
+            <path d="M172,156 L146,156" />
+            <path d="M428,156 L454,156" />
           </g>
 
-          <polygon
+          <g
             className={
-              styles.hologramCore
+              styles.hologramBrainNodes
             }
-            points="300,136 314,150 300,164 286,150"
+          >
+            <circle cx="254" cy="4" r="3.4" />
+            <circle cx="346" cy="4" r="3.4" />
+            <circle cx="150" cy="112" r="3.4" />
+            <circle cx="450" cy="112" r="3.4" />
+            <circle cx="146" cy="156" r="3.4" />
+            <circle cx="454" cy="156" r="3.4" />
+            <circle cx="272" cy="86" r="3" />
+            <circle cx="328" cy="86" r="3" />
+            <circle cx="300" cy="130" r="3.6" />
+          </g>
+
+          <line
+            className={
+              styles.hologramBrainStem
+            }
+            x1="300"
+            y1="210"
+            x2="300"
+            y2="248"
+          />
+
+          <circle
+            className={
+              styles.hologramBrainCore
+            }
+            cx="300"
+            cy="252"
+            r="7"
           />
         </svg>
       ) : null}
