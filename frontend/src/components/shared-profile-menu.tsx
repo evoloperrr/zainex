@@ -314,6 +314,12 @@ export function SharedProfileMenu({
       hint: "Subscription settings",
       route: "/billing",
     },
+    {
+      icon: "◈",
+      label: "AI Assistant",
+      hint: "Ask about billing, wallet, or strategies",
+      route: "/assistant",
+    },
   ];
 
   return (
