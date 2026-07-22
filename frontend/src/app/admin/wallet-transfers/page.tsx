@@ -93,6 +93,30 @@ export default function AdminWalletTransfersPage() {
   const [error, setError] =
     useState("");
 
+  const [refreshKey, setRefreshKey] =
+    useState(0);
+
+  const [
+    recipientEmail,
+    setRecipientEmail,
+  ] = useState("");
+
+  const [
+    sendAmount,
+    setSendAmount,
+  ] = useState("");
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const [
+    sendFeedback,
+    setSendFeedback,
+  ] = useState<{
+    ok: boolean;
+    message: string;
+  } | null>(null);
+
   useEffect(() => {
     let disposed = false;
 
@@ -146,7 +170,105 @@ export default function AdminWalletTransfersPage() {
     return () => {
       disposed = true;
     };
-  }, [page]);
+  }, [page, refreshKey]);
+
+  async function submitTransfer() {
+    const email = recipientEmail
+      .trim()
+      .toLowerCase();
+
+    const amount = Number(
+      sendAmount,
+    );
+
+    if (email === "") {
+      setSendFeedback({
+        ok: false,
+        message:
+          "Enter a recipient email.",
+      });
+      return;
+    }
+
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
+      setSendFeedback({
+        ok: false,
+        message:
+          "Enter a valid amount.",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    setSendFeedback(null);
+
+    try {
+      const response = await fetch(
+        "/api/trading/futures/wallet/admin-transfers",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            recipientEmail: email,
+            amount:
+              sendAmount.trim(),
+            clientRequestId:
+              crypto.randomUUID(),
+          }),
+        },
+      );
+
+      const payload =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !payload.ok
+      ) {
+        setSendFeedback({
+          ok: false,
+          message:
+            payload.error
+              ?.message ??
+            "Could not send the transfer.",
+        });
+        return;
+      }
+
+      setSendFeedback({
+        ok: true,
+        message: `Sent ${
+          payload.transfer
+            ?.amount ?? sendAmount
+        } to ${
+          payload.transfer
+            ?.recipient?.email ??
+          email
+        }.`,
+      });
+
+      setRecipientEmail("");
+      setSendAmount("");
+      setPage(1);
+      setRefreshKey(
+        (value) => value + 1,
+      );
+    } catch {
+      setSendFeedback({
+        ok: false,
+        message:
+          "Network error while sending the transfer.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   const totalPages = data
     ? Math.max(
@@ -165,10 +287,75 @@ export default function AdminWalletTransfersPage() {
         }
       >
         Root admin → user manual
-        wallet transfers (sent
-        from the Wallet page's
-        admin panel).
+        wallet transfers.
       </p>
+
+      <div
+        className={
+          styles.inlineForm
+        }
+        style={{
+          marginBottom: "20px",
+          borderTop: "none",
+          borderRadius: "14px",
+          border:
+            "1px solid var(--z-border)",
+        }}
+      >
+        <input
+          type="email"
+          placeholder="Recipient email"
+          value={recipientEmail}
+          onChange={(event) => {
+            setRecipientEmail(
+              event.target.value,
+            );
+          }}
+          style={{
+            minWidth: "220px",
+          }}
+        />
+
+        <input
+          type="number"
+          min="0.01"
+          step="0.00000001"
+          placeholder="Amount (USD)"
+          value={sendAmount}
+          onChange={(event) => {
+            setSendAmount(
+              event.target.value,
+            );
+          }}
+          style={{
+            width: "150px",
+          }}
+        />
+
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => {
+            void submitTransfer();
+          }}
+        >
+          Send transfer
+        </button>
+
+        {sendFeedback ? (
+          <span
+            className={`${
+              styles.feedback
+            } ${
+              sendFeedback.ok
+                ? styles.feedbackOk
+                : styles.feedbackError
+            }`}
+          >
+            {sendFeedback.message}
+          </span>
+        ) : null}
+      </div>
 
       {error ? (
         <p
