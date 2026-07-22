@@ -4,13 +4,23 @@ import type {
   Metadata,
 } from "next";
 
-import { Inter } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Inter,
+} from "next/font/google";
 
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+// ZAINEX_PUBLIC_SITE_DISPLAY_TYPEFACE_V1
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -43,7 +53,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${bricolage.variable}`}
+    >
       <body>{children}<MobileAppFloatingNav /></body>
     </html>
   );

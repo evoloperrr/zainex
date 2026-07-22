@@ -31,10 +31,11 @@
 .title {
   margin: 0 0 22px;
   color: var(--public-text);
-  font-size: clamp(2rem, 5.4vw, 3.1rem);
-  font-weight: 720;
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), var(--font-inter), sans-serif;
+  font-size: clamp(2rem, 5.4vw, 3.4rem);
+  font-weight: 460;
+  line-height: 1.06;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
