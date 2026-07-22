@@ -26,6 +26,7 @@ export default function robots(): MetadataRoute.Robots {
         "/analytics",
         "/premium",
         "/auth",
+        "/assistant",
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
