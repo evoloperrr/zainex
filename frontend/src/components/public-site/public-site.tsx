@@ -2292,9 +2292,52 @@ export function PublicSite({
       />
 
       <section
-        className={styles.hero}
+        className={`${styles.hero} ${
+          page === "home"
+            ? styles.heroSpotlight
+            : ""
+        }`}
         data-reveal="hero"
+        onMouseMove={
+          page === "home"
+            ? (event) => {
+                const rect =
+                  event.currentTarget.getBoundingClientRect();
+
+                const x =
+                  ((event.clientX -
+                    rect.left) /
+                    rect.width) *
+                  100;
+
+                const y =
+                  ((event.clientY -
+                    rect.top) /
+                    rect.height) *
+                  100;
+
+                event.currentTarget.style.setProperty(
+                  "--spot-x",
+                  `${x}%`,
+                );
+
+                event.currentTarget.style.setProperty(
+                  "--spot-y",
+                  `${y}%`,
+                );
+              }
+            : undefined
+        }
       >
+        {page === "home" ? (
+          <div
+            className={
+              styles.heroStarfield
+            }
+            aria-hidden="true"
+          />
+        ) : null}
+
         <div className={styles.heroCopy}>
           <div className={styles.pageIndex}>
             <span>{pageNumber}</span>
