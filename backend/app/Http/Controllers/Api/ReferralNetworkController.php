@@ -247,11 +247,120 @@ final class ReferralNetworkController extends Controller
                     $this->strategyIncomeReport(
                         (int) $currentUser->id,
                     ),
+                'creditIncomeReport' =>
+                    $this->creditIncomeReport(
+                        (int) $currentUser->id,
+                    ),
             ])
             ->header(
                 'Cache-Control',
                 'no-store',
             );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function creditIncomeReport(
+        int $userId,
+    ): array {
+        $baseQuery = DB::table(
+            'referral_rewards',
+        )
+            ->where(
+                'beneficiary_user_id',
+                $userId,
+            )
+            ->where(
+                'source_type',
+                'STRATEGY_ACTIVATION',
+            )
+            ->whereNull('reversed_at');
+
+        $totalEarned = BigDecimal::of(
+            (string) ((clone $baseQuery)->sum('reward_credits') ?? 0),
+        )->toScale(8, RoundingMode::Down);
+
+        $balance = BigDecimal::of(
+            (string) (
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->value('referral_credit_balance') ?? 0
+            ),
+        )->toScale(8, RoundingMode::Down);
+
+        $recent = DB::table(
+            'referral_rewards as reward',
+        )
+            ->leftJoin(
+                'users as source_user',
+                'source_user.id',
+                '=',
+                'reward.source_user_id',
+            )
+            ->where(
+                'reward.beneficiary_user_id',
+                $userId,
+            )
+            ->where(
+                'reward.source_type',
+                'STRATEGY_ACTIVATION',
+            )
+            ->whereNull('reward.reversed_at')
+            ->orderByDesc('reward.occurred_at')
+            ->orderByDesc('reward.id')
+            ->limit(10)
+            ->get([
+                'reward.id',
+                'reward.level',
+                'reward.rate_bps',
+                'reward.base_credits',
+                'reward.reward_credits',
+                'reward.balance_after',
+                'reward.source_type',
+                'reward.occurred_at',
+                'source_user.id as source_user_id',
+                'source_user.name as source_user_name',
+                'source_user.email as source_user_email',
+            ])
+            ->map(fn (object $row): array => [
+                'id' => (int) $row->id,
+                'sourceUser' => $row->source_user_id === null
+                    ? null
+                    : [
+                        'id' => (int) $row->source_user_id,
+                        'name' => (string) $row->source_user_name,
+                        'email' => $this->maskedEmail(
+                            (string) $row->source_user_email,
+                        ),
+                    ],
+                'level' => (int) $row->level,
+                'percentage' => (float) $row->rate_bps / 100,
+                'baseCredits' => (float) $row->base_credits,
+                'rewardCredits' => (float) $row->reward_credits,
+                'balanceAfter' => (float) $row->balance_after,
+                'sourceType' => (string) $row->source_type,
+                'creditedAt' => $row->occurred_at,
+            ])
+            ->values()
+            ->all();
+
+        $configuredRates = (array) config(
+            'referral_rewards.level_rates_bps',
+            [],
+        );
+
+        return [
+            'balance' => (float) (string) $balance,
+            'totalEarned' => (float) (string) $totalEarned,
+            'rewardCount' => (clone $baseQuery)->count(),
+            'rates' => [
+                'level1' => (int) ($configuredRates[1] ?? 0) / 100,
+                'level2' => (int) ($configuredRates[2] ?? 0) / 100,
+                'level3' => (int) ($configuredRates[3] ?? 0) / 100,
+            ],
+            'recent' => $recent,
+        ];
     }
 
     /**

@@ -60,6 +60,34 @@ type StrategyIncomeReport = {
   recent: StrategyIncomeEntry[];
 };
 
+type CreditIncomeEntry = {
+  id: number;
+  sourceUser: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  level: number;
+  percentage: number;
+  baseCredits: number;
+  rewardCredits: number;
+  balanceAfter: number;
+  sourceType: string;
+  creditedAt: string | null;
+};
+
+type CreditIncomeReport = {
+  balance: number;
+  totalEarned: number;
+  rewardCount: number;
+  rates: {
+    level1: number;
+    level2: number;
+    level3: number;
+  };
+  recent: CreditIncomeEntry[];
+};
+
 type ReferralPayload = {
   ok?: boolean;
   maxDepth?: number;
@@ -74,10 +102,18 @@ type ReferralPayload = {
   } | null;
   levels?: ReferralLevel[];
   strategyIncomeReport?: StrategyIncomeReport;
+  creditIncomeReport?: CreditIncomeReport;
   error?: {
     message?: string;
   };
 };
+
+function formatCreditAmount(value: number): string {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 8,
+  }).format(value);
+}
 
 function NetworkContent() {
   const { formatUsd } = useCurrency();
@@ -454,6 +490,137 @@ function NetworkContent() {
                               Wallet {formatUsd(
                                 entry.walletBalanceAfter,
                               )}
+                            </small>
+                          </div>
+
+                          <time>
+                            {entry.creditedAt
+                              ? new Intl.DateTimeFormat("en-US", {
+                                  month: "short",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }).format(new Date(entry.creditedAt))
+                              : "--"}
+                          </time>
+                        </article>
+                      ),
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section
+              className={`${styles.incomeReport} ${styles.creditIncomeReport}`}
+            >
+              <header className={styles.incomeHeader}>
+                <div>
+                  <span>AI CREDIT REFERRAL INCOME</span>
+                  <h2>Three-ring credit rewards</h2>
+                  <p>
+                    Paid strategy activations reward the chain
+                    from the credits consumed: Ring 1 gets 25%,
+                    Ring 2 gets 15%, and Ring 3 gets 5%.
+                  </p>
+                </div>
+
+                <b>REFERRAL CREDIT LEDGER</b>
+              </header>
+
+              <div className={styles.incomeSummary}>
+                <article>
+                  <span>CREDIT BALANCE</span>
+                  <strong>
+                    {formatCreditAmount(
+                      payload.creditIncomeReport?.balance ?? 0,
+                    )} credits
+                  </strong>
+                  <small>Separate referral-credit balance</small>
+                </article>
+
+                <article>
+                  <span>LIFETIME EARNED</span>
+                  <strong>
+                    {formatCreditAmount(
+                      payload.creditIncomeReport?.totalEarned ?? 0,
+                    )} credits
+                  </strong>
+                  <small>
+                    {payload.creditIncomeReport?.rewardCount ?? 0}
+                    {" "}reward records
+                  </small>
+                </article>
+
+                <article>
+                  <span>RING RATES</span>
+                  <strong className={styles.rateLine}>
+                    {payload.creditIncomeReport?.rates.level1 ?? 25}%
+                    <i>/</i>
+                    {payload.creditIncomeReport?.rates.level2 ?? 15}%
+                    <i>/</i>
+                    {payload.creditIncomeReport?.rates.level3 ?? 5}%
+                  </strong>
+                  <small>Ring 1 / Ring 2 / Ring 3</small>
+                </article>
+              </div>
+
+              <div className={styles.incomeLedger}>
+                <div className={styles.incomeLedgerHead}>
+                  <strong>Recent credit income</strong>
+                  <span>Latest 10 rewards</span>
+                </div>
+
+                {(payload.creditIncomeReport?.recent ?? []).length ===
+                0 ? (
+                  <p className={styles.incomeEmpty}>
+                    No credit referral income yet. Rewards will
+                    appear here when members in Rings 1-3 use
+                    credits to activate a paid strategy.
+                  </p>
+                ) : (
+                  <div className={styles.incomeRows}>
+                    {(payload.creditIncomeReport?.recent ?? []).map(
+                      (entry) => (
+                        <article key={entry.id}>
+                          <div className={styles.incomeMember}>
+                            <i>
+                              {(entry.sourceUser?.name ?? "R")
+                                .slice(0, 1)
+                                .toUpperCase()}
+                            </i>
+
+                            <div>
+                              <strong>
+                                {entry.sourceUser?.name ??
+                                  "Referral member"}
+                              </strong>
+                              <small>
+                                {entry.sourceUser?.email ??
+                                  "Account unavailable"}
+                              </small>
+                            </div>
+                          </div>
+
+                          <div className={styles.incomeBasis}>
+                            <span>RING {entry.level}</span>
+                            <strong>
+                              {entry.percentage}% of {formatCreditAmount(
+                                entry.baseCredits,
+                              )} credits
+                            </strong>
+                          </div>
+
+                          <div className={styles.incomeCredit}>
+                            <strong>
+                              +{formatCreditAmount(entry.rewardCredits)}
+                              {" "}credits
+                            </strong>
+                            <small>
+                              Balance {formatCreditAmount(
+                                entry.balanceAfter,
+                              )} credits
                             </small>
                           </div>
 

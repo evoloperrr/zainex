@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
-use App\Services\Referral\ReferralRewardService;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Http\JsonResponse;
@@ -516,21 +515,6 @@ final class WalletToCreditsController extends Controller
                                 $occurredAt,
                         ]);
 
-                    // ZAINEX_REFERRAL_REWARD_PERCENTAGES_V1
-                    app(
-                        ReferralRewardService::class,
-                    )->distribute(
-                        sourceUserId:
-                            (int) $user->id,
-                        sourceType:
-                            'CREDIT_PURCHASE',
-                        sourceReference:
-                            $referenceKey,
-                        baseCredits:
-                            $amount,
-                        occurredAt:
-                            $occurredAt,
-                    );
                     $transaction =
                         DB::table(
                             'wallet_transactions',

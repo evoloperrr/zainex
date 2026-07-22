@@ -19,7 +19,7 @@ return [
     'total_rate_bps' => 4500,
 
     'allowed_source_types' => [
-        'CREDIT_PURCHASE',
+        'STRATEGY_ACTIVATION',
         'SUBSCRIPTION_PURCHASE',
     ],
 ];

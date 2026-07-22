@@ -10,6 +10,9 @@ php artisan config:cache
 # Catch up due credits immediately after a cold start/deploy, then keep the
 # scheduler alive beside Apache. The accrual command is idempotent per day.
 (
+    # Referral credit rewards come from strategy activation credit costs,
+    # not wallet-to-credit conversions. Reconcile historical records once.
+    php artisan strategy:reconcile-referral-credits || true
     # Backfill previous qualifying activations. Unique ledger keys make this
     # safe on every restart and skip every referral income already credited.
     php artisan strategy:backfill-referral-income || true

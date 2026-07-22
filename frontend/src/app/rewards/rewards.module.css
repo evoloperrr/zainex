@@ -342,6 +342,22 @@
   box-shadow: 0 0 22px rgba(91, 242, 220, 0.7);
 }
 
+.creditIncomeReport::before {
+  background: linear-gradient(90deg, #a878ff, #55dcff, transparent);
+  box-shadow: 0 0 22px rgba(135, 103, 255, 0.62);
+}
+
+.creditIncomeReport .incomeHeader span,
+.creditIncomeReport .incomeSummary article:first-child strong {
+  color: #b89aff;
+}
+
+.creditIncomeReport .incomeHeader b {
+  color: #aedaef;
+  border-color: rgba(102, 199, 244, 0.2);
+  background: rgba(73, 173, 231, 0.055);
+}
+
 .incomeHeader {
   display: flex;
   align-items: end;
@@ -422,6 +438,19 @@
 .incomeSummary article:first-child strong {
   color: #72f5d2;
   text-shadow: 0 0 24px rgba(72, 237, 192, 0.22);
+}
+
+.rateLine {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+}
+
+.rateLine i {
+  color: #55617e;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 400;
 }
 
 .incomeSummary small {

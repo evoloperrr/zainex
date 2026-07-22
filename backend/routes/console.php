@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\Referral\StrategyReferralIncomeBackfillService;
+use App\Services\Referral\StrategyReferralCreditReconciliationService;
 use App\Services\Trading\StrategyAccrualService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -11,6 +12,27 @@ use Illuminate\Support\Facades\Schedule;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Artisan::command(
+    'strategy:reconcile-referral-credits',
+    function (): int {
+        $summary = app(
+            StrategyReferralCreditReconciliationService::class,
+        )->run();
+
+        $this->line(
+            json_encode(
+                $summary,
+                JSON_THROW_ON_ERROR |
+                JSON_PRETTY_PRINT,
+            ),
+        );
+
+        return 0;
+    },
+)->purpose(
+    'Reverse legacy conversion rewards and credit activation-based referral credits.',
+);
 
 Artisan::command(
     'strategy:backfill-referral-income',

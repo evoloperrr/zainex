@@ -160,6 +160,25 @@ final class StrategyReferralIncomeTest extends TestCase
             ->assertJsonPath(
                 'strategyIncomeReport.recent.0.walletBalanceAfter',
                 150,
+            )
+            ->assertJsonPath('creditIncomeReport.balance', 1.25)
+            ->assertJsonPath('creditIncomeReport.totalEarned', 1.25)
+            ->assertJsonPath('creditIncomeReport.rewardCount', 1)
+            ->assertJsonPath('creditIncomeReport.rates.level1', 25)
+            ->assertJsonPath('creditIncomeReport.rates.level2', 15)
+            ->assertJsonPath('creditIncomeReport.rates.level3', 5)
+            ->assertJsonPath(
+                'creditIncomeReport.recent.0.sourceUser.id',
+                $sourceUserId,
+            )
+            ->assertJsonPath('creditIncomeReport.recent.0.level', 1)
+            ->assertJsonPath(
+                'creditIncomeReport.recent.0.baseCredits',
+                5,
+            )
+            ->assertJsonPath(
+                'creditIncomeReport.recent.0.rewardCredits',
+                1.25,
             );
 
         $this
@@ -295,6 +314,108 @@ final class StrategyReferralIncomeTest extends TestCase
             (float) DB::table('users')
                 ->where('id', $inviterId)
                 ->value('wallet_balance'),
+        );
+    }
+
+    public function test_reconciliation_reverses_conversion_reward_and_backfills_activation_credits(): void
+    {
+        $inviterId = $this->createInviter();
+        $sourceUserId = (int) DB::table('users')
+            ->where('email', RootUserSeeder::EMAIL)
+            ->value('id');
+
+        DB::table('users')
+            ->where('id', $sourceUserId)
+            ->update([
+                'inviter_id' => $inviterId,
+                'referred_at' => now(),
+            ]);
+
+        $this
+            ->withHeaders($this->headers())
+            ->postJson(
+                '/api/trading/futures/strategies/activate',
+                [
+                    'tier' => 'VIP 2',
+                    'amount' => 100,
+                    'clientRequestId' => (string) Str::uuid(),
+                ],
+            )
+            ->assertCreated();
+
+        $activationId = (int) DB::table('strategy_activations')
+            ->value('id');
+
+        DB::table('referral_rewards')
+            ->where('source_type', 'STRATEGY_ACTIVATION')
+            ->delete();
+
+        DB::table('users')
+            ->where('id', $inviterId)
+            ->update([
+                'referral_credit_balance' => '25.00000000',
+            ]);
+
+        $now = now();
+
+        DB::table('referral_rewards')->insert([
+            'source_user_id' => $sourceUserId,
+            'beneficiary_user_id' => $inviterId,
+            'level' => 1,
+            'rate_bps' => 2500,
+            'base_credits' => '100.00000000',
+            'reward_credits' => '25.00000000',
+            'balance_before' => '0.00000000',
+            'balance_after' => '25.00000000',
+            'source_type' => 'CREDIT_PURCHASE',
+            'source_reference' => 'legacy-conversion:1',
+            'reference_key' => 'legacy-referral-credit:1',
+            'reversed_at' => null,
+            'occurred_at' => $now,
+            'created_at' => $now,
+        ]);
+
+        $this
+            ->artisan('strategy:reconcile-referral-credits')
+            ->assertExitCode(0);
+
+        self::assertNotNull(
+            DB::table('referral_rewards')
+                ->where('source_type', 'CREDIT_PURCHASE')
+                ->value('reversed_at'),
+        );
+        self::assertSame(
+            3.75,
+            (float) DB::table('users')
+                ->where('id', $inviterId)
+                ->value('referral_credit_balance'),
+        );
+
+        $activationReward = DB::table('referral_rewards')
+            ->where('source_type', 'STRATEGY_ACTIVATION')
+            ->firstOrFail();
+
+        self::assertSame($activationId, (int) str_replace(
+            'strategy:',
+            '',
+            (string) $activationReward->source_reference,
+        ));
+        self::assertSame(15.0, (float) $activationReward->base_credits);
+        self::assertSame(3.75, (float) $activationReward->reward_credits);
+
+        $this
+            ->artisan('strategy:reconcile-referral-credits')
+            ->assertExitCode(0);
+
+        self::assertSame(
+            2,
+            DB::table('referral_rewards')->count(),
+        );
+        self::assertSame(
+            3.75,
+            (float) DB::table('users')
+                ->where('id', $inviterId)
+                ->value('referral_credit_balance'),
         );
     }
 

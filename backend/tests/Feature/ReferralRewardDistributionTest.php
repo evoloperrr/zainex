@@ -33,9 +33,13 @@ final class ReferralRewardDistributionTest extends TestCase
         $this->seed(
             RootUserSeeder::class,
         );
+
+        DB::table('users')
+            ->where('email', RootUserSeeder::EMAIL)
+            ->update(['ai_credits' => 1000]);
     }
 
-    public function test_credit_purchase_pays_exact_three_levels_once(): void
+    public function test_paid_strategy_activation_pays_exact_three_levels_once(): void
     {
         [
             $source,
@@ -49,9 +53,9 @@ final class ReferralRewardDistributionTest extends TestCase
             (string) Str::uuid();
 
         $payload = [
+            'tier' => 'VIP 3',
             'amount' => 100,
-            'clientRequestId' =>
-                $clientRequestId,
+            'clientRequestId' => $clientRequestId,
         ];
 
         $first = $this
@@ -59,7 +63,7 @@ final class ReferralRewardDistributionTest extends TestCase
                 $this->headers(),
             )
             ->postJson(
-                '/api/trading/futures/wallet/convert',
+                '/api/trading/futures/strategies/activate',
                 $payload,
             );
 
@@ -71,17 +75,17 @@ final class ReferralRewardDistributionTest extends TestCase
             );
 
         self::assertSame(
-            '25.00000000',
+            '11.25000000',
             $this->balance($level1),
         );
 
         self::assertSame(
-            '15.00000000',
+            '6.75000000',
             $this->balance($level2),
         );
 
         self::assertSame(
-            '5.00000000',
+            '2.25000000',
             $this->balance($level3),
         );
 
@@ -91,7 +95,7 @@ final class ReferralRewardDistributionTest extends TestCase
         );
 
         self::assertSame(
-            '45.00000000',
+            '20.25000000',
             $this->totalRewards($source),
         );
 
@@ -116,8 +120,7 @@ final class ReferralRewardDistributionTest extends TestCase
                 ->map(
                     static fn (
                         mixed $value,
-                    ): int =>
-                        (int) $value,
+                    ): int => (int) $value,
                 )
                 ->all(),
         );
@@ -127,7 +130,7 @@ final class ReferralRewardDistributionTest extends TestCase
                 $this->headers(),
             )
             ->postJson(
-                '/api/trading/futures/wallet/convert',
+                '/api/trading/futures/strategies/activate',
                 $payload,
             );
 
@@ -146,12 +149,12 @@ final class ReferralRewardDistributionTest extends TestCase
         );
 
         self::assertSame(
-            '45.00000000',
+            '20.25000000',
             $this->totalRewards($source),
         );
     }
 
-    public function test_fractional_rewards_are_not_rounded_away(): void
+    public function test_vip_one_credit_cost_produces_fractional_rewards(): void
     {
         [
             ,
@@ -166,12 +169,12 @@ final class ReferralRewardDistributionTest extends TestCase
                 $this->headers(),
             )
             ->postJson(
-                '/api/trading/futures/wallet/convert',
+                '/api/trading/futures/strategies/activate',
                 [
-                    'amount' => 5,
+                    'tier' => 'VIP 1',
+                    'amount' => 100,
 
-                    'clientRequestId' =>
-                        (string)
+                    'clientRequestId' => (string)
                             Str::uuid(),
                 ],
             );
@@ -202,6 +205,36 @@ final class ReferralRewardDistributionTest extends TestCase
             '0.00000000',
             $this->balance($level4),
         );
+    }
+
+    public function test_wallet_to_credits_conversion_does_not_pay_referral_rewards(): void
+    {
+        [
+            $source,
+            $level1,
+            $level2,
+            $level3,
+        ] = $this->createReferralChain();
+
+        $this
+            ->withHeaders($this->headers())
+            ->postJson(
+                '/api/trading/futures/wallet/convert',
+                [
+                    'amount' => 100,
+                    'clientRequestId' => (string) Str::uuid(),
+                ],
+            )
+            ->assertCreated();
+
+        self::assertSame(
+            0,
+            DB::table('referral_rewards')->count(),
+        );
+        self::assertSame('0.00000000', $this->balance($level1));
+        self::assertSame('0.00000000', $this->balance($level2));
+        self::assertSame('0.00000000', $this->balance($level3));
+        self::assertSame('0.00000000', $this->totalRewards($source));
     }
 
     /**
@@ -241,29 +274,25 @@ final class ReferralRewardDistributionTest extends TestCase
         DB::table('users')
             ->where('id', $source)
             ->update([
-                'inviter_id' =>
-                    $level1,
+                'inviter_id' => $level1,
             ]);
 
         DB::table('users')
             ->where('id', $level1)
             ->update([
-                'inviter_id' =>
-                    $level2,
+                'inviter_id' => $level2,
             ]);
 
         DB::table('users')
             ->where('id', $level2)
             ->update([
-                'inviter_id' =>
-                    $level3,
+                'inviter_id' => $level3,
             ]);
 
         DB::table('users')
             ->where('id', $level3)
             ->update([
-                'inviter_id' =>
-                    $level4,
+                'inviter_id' => $level4,
             ]);
 
         return [
@@ -281,32 +310,25 @@ final class ReferralRewardDistributionTest extends TestCase
         $now = now();
 
         $row = [
-            'name' =>
-                $name,
+            'name' => $name,
 
-            'email' =>
-                Str::lower(
-                    (string)
-                        Str::uuid(),
-                ) .
+            'email' => Str::lower(
+                (string)
+                    Str::uuid(),
+            ).
                 '@example.test',
 
-            'email_verified_at' =>
-                $now,
+            'email_verified_at' => $now,
 
-            'password' =>
-                Hash::make(
-                    'password',
-                ),
+            'password' => Hash::make(
+                'password',
+            ),
 
-            'remember_token' =>
-                null,
+            'remember_token' => null,
 
-            'created_at' =>
-                $now,
+            'created_at' => $now,
 
-            'updated_at' =>
-                $now,
+            'updated_at' => $now,
         ];
 
         if (
@@ -354,7 +376,7 @@ final class ReferralRewardDistributionTest extends TestCase
             )
         ) {
             $row['referral_code'] =
-                'T' .
+                'T'.
                 strtoupper(
                     substr(
                         str_replace(
@@ -442,14 +464,11 @@ final class ReferralRewardDistributionTest extends TestCase
     private function headers(): array
     {
         return [
-            'X-Zainex-Internal-Token' =>
-                'referral-reward-test-token',
+            'X-Zainex-Internal-Token' => 'referral-reward-test-token',
 
-            'X-Zainex-Session-Id' =>
-                RootUserSeeder::TRADING_SESSION_ID,
+            'X-Zainex-Session-Id' => RootUserSeeder::TRADING_SESSION_ID,
 
-            'X-Zainex-Request-Id' =>
-                (string) Str::uuid(),
+            'X-Zainex-Request-Id' => (string) Str::uuid(),
         ];
     }
 }
