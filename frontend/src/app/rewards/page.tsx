@@ -106,7 +106,7 @@ function NetworkContent() {
           throw new Error(
             nextPayload.error
               ?.message ??
-              "Referral network is unavailable.",
+              "Referral circle is unavailable.",
           );
         }
 
@@ -129,7 +129,7 @@ function NetworkContent() {
         setError(
           caught instanceof Error
             ? caught.message
-            : "Referral network is unavailable.",
+            : "Referral circle is unavailable.",
         );
       }
       finally {
@@ -196,7 +196,7 @@ function NetworkContent() {
         <div className={chromeStyles.headerRight}>
           <span className={chromeStyles.secure}>
             <i />
-            Three-level network
+            Three-ring circle
           </span>
 
           <Link
@@ -219,27 +219,27 @@ function NetworkContent() {
 
             <h1>
               Grow your
-              <span> ZAINEX network.</span>
+              <span> ZAINEX circle.</span>
             </h1>
 
             <p>
               Share your permanent invite link and
-              view referrals through Level 1,
-              Level 2, and Level 3. Members beyond
-              Level 3 are never included.
+              view referrals through Ring 1,
+              Ring 2, and Ring 3. Members beyond
+              Ring 3 are never included.
             </p>
           </div>
 
           <aside className={styles.depth}>
-            <span>NETWORK DEPTH</span>
-            <strong>3 Levels</strong>
+            <span>CIRCLE DEPTH</span>
+            <strong>3 Rings</strong>
             <small>Hard backend limit</small>
           </aside>
         </section>
 
         {loading ? (
           <section className={styles.message}>
-            Loading referral network...
+            Loading referral circle...
           </section>
         ) : null}
 
@@ -293,7 +293,7 @@ function NetworkContent() {
               {levels.map((level) => (
                 <article key={level.level}>
                   <span>
-                    LEVEL {level.level}
+                    RING {level.level}
                   </span>
 
                   <strong>
@@ -304,19 +304,19 @@ function NetworkContent() {
                     {level.level === 1
                       ? "Direct invites"
                       : level.level === 2
-                        ? "Second-level members"
-                        : "Third-level members"}
+                        ? "Second-ring members"
+                        : "Third-ring members"}
                   </small>
                 </article>
               ))}
 
               <article>
-                <span>TOTAL NETWORK</span>
+                <span>TOTAL CIRCLE</span>
                 <strong>
                   {payload.totalMembers ?? 0}
                 </strong>
                 <small>
-                  Levels 1-3 only
+                  Rings 1-3 only
                 </small>
               </article>
             </section>
@@ -324,14 +324,14 @@ function NetworkContent() {
             <section className={styles.network}>
               <header>
                 <div>
-                  <span>NETWORK DIRECTORY</span>
+                  <span>CIRCLE DIRECTORY</span>
                   <h2>
-                    Your three referral levels
+                    Your three referral rings
                   </h2>
                 </div>
 
                 <b>
-                  LEVEL 4 EXCLUDED
+                  RING 4 EXCLUDED
                 </b>
               </header>
 
@@ -344,7 +344,7 @@ function NetworkContent() {
                     <div className={styles.levelHead}>
                       <div>
                         <span>
-                          LEVEL {level.level}
+                          RING {level.level}
                         </span>
                         <strong>
                           {level.count} member
@@ -363,7 +363,7 @@ function NetworkContent() {
 
                     {level.members.length === 0 ? (
                       <p className={styles.empty}>
-                        No members at this level yet.
+                        No members in this ring yet.
                       </p>
                     ) : (
                       <div className={styles.members}>
@@ -424,10 +424,10 @@ function NetworkContent() {
               <div>
                 <span>02</span>
                 <strong>
-                  Three levels only
+                  Three rings only
                 </strong>
                 <p>
-                  Level 4 and deeper members are not
+                  Ring 4 and deeper members are not
                   returned or counted.
                 </p>
               </div>
