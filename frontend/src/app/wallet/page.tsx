@@ -119,7 +119,13 @@ function getInitials(
   ).toUpperCase();
 }
 
-function WalletContent() {
+type WalletContentProps = {
+  mountActionCenter?: boolean;
+};
+
+function WalletContent({
+  mountActionCenter = true,
+}: WalletContentProps) {
   const {
     formatUsd: formatDisplayCurrency,
     formatCredits,
@@ -704,17 +710,19 @@ function WalletContent() {
               </div>
             </section>
 
-            <WalletActionCenter
-              walletBalance={
-                user?.walletBalance ?? 0
-              }
-              availableBalance={
-                account.availableBalance
-              }
-              credits={
-                user?.credits ?? 0
-              }
-            />
+            {mountActionCenter ? (
+              <WalletActionCenter
+                walletBalance={
+                  user?.walletBalance ?? 0
+                }
+                availableBalance={
+                  account.availableBalance
+                }
+                credits={
+                  user?.credits ?? 0
+                }
+              />
+            ) : null}
           </>
         ) : null}
       </div>
@@ -731,12 +739,12 @@ export default function WalletPage() {
         <section
           className={`desktop-shell ${styles.desktopContent}`}
         >
-          <WalletContent />
+          <WalletContent mountActionCenter />
         </section>
       </div>
 
       <div className={styles.mobileContent}>
-        <WalletContent />
+        <WalletContent mountActionCenter={false} />
       </div>
     </main>
   );
