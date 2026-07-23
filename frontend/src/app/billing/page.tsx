@@ -26,8 +26,8 @@ const plans = [
       "Standard watchlist access",
       "Community market updates",
     ],
-    action: "Current plan",
-    current: true,
+    action: "Fund wallet",
+    current: false,
     featured: false,
   },
   {
@@ -113,6 +113,7 @@ function BillingContent() {
     name: string;
     price: string;
     period: string;
+    mode: "subscription" | "wallet";
   } | null>(null);
 
   return (
@@ -232,6 +233,11 @@ function BillingContent() {
                     name: plan.name,
                     price: plan.price,
                     period: plan.period,
+                    mode:
+                      plan.name ===
+                      "FREE TIER"
+                        ? "wallet"
+                        : "subscription",
                   });
                 }}
               >
@@ -267,6 +273,7 @@ function BillingContent() {
       {checkoutPlan ? (
         <VipCheckoutChat
           plan={checkoutPlan}
+          mode={checkoutPlan.mode}
           onClose={() => {
             setCheckoutPlan(null);
           }}

@@ -238,6 +238,7 @@ type VipPlan = {
 type VipCheckoutChatProps = {
   plan: VipPlan;
   onClose: () => void;
+  mode?: "subscription" | "wallet";
 };
 
 type PaymentMethod =
@@ -355,6 +356,19 @@ function buildIntro(
     {
       kind: "message",
       text: "How would you like to pay?",
+    },
+  ];
+}
+
+function buildWalletIntro(): ScriptStep[] {
+  return [
+    {
+      kind: "message",
+      text: "Hi! I'm the ZAINEX billing assistant.",
+    },
+    {
+      kind: "message",
+      text: "Let's fund your trading wallet — no subscription needed.",
     },
   ];
 }
@@ -1031,6 +1045,7 @@ function AttachAndActions({
 export function VipCheckoutChat({
   plan,
   onClose,
+  mode = "subscription",
 }: VipCheckoutChatProps) {
   useBodyScrollLock(true);
 
@@ -1040,7 +1055,10 @@ export function VipCheckoutChat({
   } = useCurrency();
 
   const [introScript] = useState(
-    () => buildIntro(plan),
+    () =>
+      mode === "wallet"
+        ? buildWalletIntro()
+        : buildIntro(plan),
   );
 
   const [
@@ -1091,7 +1109,7 @@ export function VipCheckoutChat({
     setWalletUpsellAnswer,
   ] = useState<
     "yes" | "no" | null
-  >(null);
+  >(mode === "wallet" ? "yes" : null);
 
   const [
     walletMethod,
@@ -1293,9 +1311,11 @@ export function VipCheckoutChat({
     visibleCount < script.length;
 
   const conversationDone =
-    sent &&
-    (walletUpsellAnswer === "no" ||
-      walletSent);
+    mode === "wallet"
+      ? walletSent
+      : sent &&
+        (walletUpsellAnswer === "no" ||
+          walletSent);
 
   const vipProof = useProofUpload();
   const walletProof =
@@ -1465,7 +1485,9 @@ export function VipCheckoutChat({
             <strong
               id="vip-checkout-title"
             >
-              Activate {plan.name}
+              {mode === "wallet"
+                ? "Fund your trading wallet"
+                : `Activate ${plan.name}`}
             </strong>
           </div>
 
@@ -1786,7 +1808,8 @@ export function VipCheckoutChat({
           ) : null}
 
           {!typing &&
-          method === null ? (
+          method === null &&
+          mode !== "wallet" ? (
             <MethodChoiceButtons
               onPick={setMethod}
             />
