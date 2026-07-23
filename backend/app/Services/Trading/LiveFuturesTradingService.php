@@ -117,24 +117,29 @@ final class LiveFuturesTradingService
         $quote = $this->prices->price($request['symbol']);
         $entryPriceEstimate = $this->decimal($quote['price'], 8);
 
-        return DB::transaction(function () use (
+        $route = '/api/trading/futures/live/orders';
+        $requestHash = $this->requestHash($request);
+
+        // Phase 1: pre-flight checks + create the SUBMITTING order row,
+        // committed on its own. This row must survive independently of
+        // whatever happens next — if this process dies between placing
+        // the real OKX order (phase 2) and finishing this method (phase
+        // 3), ReconcileOkxOrders needs a durable breadcrumb to find, not
+        // a row that would vanish if it were rolled back together with a
+        // later failure the way one single wrapping transaction would.
+        [$order, $replay, $exchangeClientOrderId, $contracts] = DB::transaction(function () use (
             $account,
-            $connection,
-            $requestId,
             $request,
             $instId,
-            $meta,
             $entryPriceEstimate,
-            $ipAddress,
-            $userAgent,
+            $route,
+            $requestHash,
         ): array {
             $account = TradingAccount::query()
                 ->whereKey($account->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $route = '/api/trading/futures/live/orders';
-            $requestHash = $this->requestHash($request);
             $replay = $this->readIdempotentResult(
                 $account,
                 $route,
@@ -143,7 +148,7 @@ final class LiveFuturesTradingService
             );
 
             if ($replay !== null) {
-                return $replay;
+                return [null, $replay, null, null];
             }
 
             $existingPosition = FuturesPosition::query()
@@ -162,23 +167,33 @@ final class LiveFuturesTradingService
                 );
             }
 
+            $inFlight = FuturesOrder::query()
+                ->where('trading_account_id', $account->id)
+                ->where('symbol', $request['symbol'])
+                ->where('action', 'OPEN')
+                ->where('status', 'SUBMITTING')
+                ->lockForUpdate()
+                ->first();
+
+            if ($inFlight !== null) {
+                throw new FuturesTradingException(
+                    'FUTURES_ORDER_IN_FLIGHT',
+                    "A {$request['symbol']} order is already being submitted to OKX. Wait a moment and check your positions before retrying.",
+                    409,
+                    ['orderId' => $inFlight->id],
+                );
+            }
+
             $margin = $this->decimal($request['margin'], 8);
             $leverage = $request['leverage'];
             $notional = $this->scale($margin->multipliedBy($leverage), 8);
             $baseQty = $notional->dividedBy($entryPriceEstimate, 12, RoundingMode::Down);
             $contracts = $this->instruments->contractsForQuantity($instId, $baseQty);
 
-            $now = now();
-            $positionId = (string) Str::uuid();
-            $orderId = (string) Str::uuid();
             $exchangeClientOrderId = $this->exchangeClientOrderId();
 
-            // Write the local order row BEFORE calling OKX, so a crash
-            // between the OKX response and our own commit is
-            // recoverable by ReconcileOkxOrders instead of silently
-            // losing a real fill.
             $order = FuturesOrder::query()->create([
-                'id' => $orderId,
+                'id' => (string) Str::uuid(),
                 'trading_account_id' => $account->id,
                 'client_order_id' => $request['clientOrderId'],
                 'exchange_order_id' => null,
@@ -207,74 +222,121 @@ final class LiveFuturesTradingService
                 'cancelled_at' => null,
             ]);
 
-            $client = $this->clientFor($connection);
+            return [$order, null, $exchangeClientOrderId, $contracts];
+        }, 5);
 
-            try {
-                $client->post('/api/v5/account/set-leverage', [
-                    'instId' => $instId,
-                    'lever' => (string) $leverage,
-                    'mgnMode' => 'isolated',
-                ]);
+        if ($replay !== null) {
+            return $replay;
+        }
 
-                $orderResponse = $client->post('/api/v5/trade/order', [
-                    'instId' => $instId,
-                    'tdMode' => 'isolated',
-                    'side' => $request['direction'] === 'LONG' ? 'buy' : 'sell',
-                    'ordType' => 'market',
-                    'sz' => (string) $contracts,
-                    'clOrdId' => $exchangeClientOrderId,
-                    'attachAlgoOrds' => [[
-                        'tpTriggerPx' => $request['takeProfit'],
-                        'tpOrdPx' => '-1',
-                        'slTriggerPx' => $request['stopLoss'],
-                        'slOrdPx' => '-1',
-                    ]],
-                ]);
-            } catch (OkxApiException $exception) {
-                $order->update([
-                    'status' => 'REJECTED',
-                    'rejection_code' => $exception->sCode ?? 'OKX_ERROR',
-                ]);
+        // Phase 2: call OKX outside of any open transaction. An
+        // ambiguous network failure here must never roll back the
+        // SUBMITTING row committed above.
+        $client = $this->clientFor($connection);
+        $leverage = (int) $order->leverage;
 
-                $this->audit(
-                    $account,
-                    'live_futures_order_rejected',
-                    $requestId,
-                    $request['clientOrderId'],
-                    $requestHash,
-                    ['sCode' => $exception->sCode, 'sMsg' => $exception->sMsg],
-                    $ipAddress,
-                    $userAgent,
-                );
+        try {
+            $client->post('/api/v5/account/set-leverage', [
+                'instId' => $instId,
+                'lever' => (string) $leverage,
+                'mgnMode' => 'isolated',
+            ]);
 
-                throw new FuturesTradingException(
-                    'OKX_ORDER_REJECTED',
-                    $exception->sMsg ?? $exception->getMessage(),
-                    422,
-                    ['sCode' => $exception->sCode],
-                );
-            }
+            $orderResponse = $client->post('/api/v5/trade/order', [
+                'instId' => $instId,
+                'tdMode' => 'isolated',
+                'side' => $request['direction'] === 'LONG' ? 'buy' : 'sell',
+                'ordType' => 'market',
+                'sz' => (string) $contracts,
+                'clOrdId' => $exchangeClientOrderId,
+                'attachAlgoOrds' => [[
+                    'tpTriggerPx' => $request['takeProfit'],
+                    'tpOrdPx' => '-1',
+                    'slTriggerPx' => $request['stopLoss'],
+                    'slOrdPx' => '-1',
+                ]],
+            ]);
+        } catch (OkxApiException $exception) {
+            $order->update([
+                'status' => 'REJECTED',
+                'rejection_code' => $exception->sCode ?? 'OKX_ERROR',
+            ]);
 
-            $exchangeOrderId = (string) ($orderResponse['data'][0]['ordId'] ?? '');
+            $this->audit(
+                $account,
+                'live_futures_order_rejected',
+                $requestId,
+                $request['clientOrderId'],
+                $requestHash,
+                ['sCode' => $exception->sCode, 'sMsg' => $exception->sMsg],
+                $ipAddress,
+                $userAgent,
+            );
 
-            // Market orders fill near-instantly, but OKX's order-ack
-            // response doesn't always include the fill price yet —
-            // fetch the authoritative order state before trusting a
-            // price for the local mirror.
-            $filled = $this->fetchFilledOrder($client, $instId, $exchangeOrderId);
-            $executedPrice = isset($filled['avgPx']) && $filled['avgPx'] !== ''
-                ? $this->decimal($filled['avgPx'], 8)
-                : $entryPriceEstimate;
-            $fee = isset($filled['fee']) ? $this->decimal($filled['fee'], 8)->abs() : $this->decimal('0', 8);
-            $feeCurrency = (string) ($filled['feeCcy'] ?? self::CURRENCY);
-            $filledSz = isset($filled['accFillSz']) && $filled['accFillSz'] !== ''
-                ? BigDecimal::of((string) $filled['accFillSz'])
-                : $contracts;
-            $filledBaseQty = $this->scale($filledSz->multipliedBy($meta['ctVal']), 12);
-            $filledNotional = $this->scale($filledBaseQty->multipliedBy($executedPrice), 8);
-            $feeRate = $filledNotional->isZero()
-                ? $this->decimal('0', 8)
-                : $this->scale($fee->dividedBy($filledNotional, 8, RoundingMode::HalfUp), 8);
+            throw new FuturesTradingException(
+                'OKX_ORDER_REJECTED',
+                $exception->sMsg ?? $exception->getMessage(),
+                422,
+                ['sCode' => $exception->sCode],
+            );
+        }
+
+        $exchangeOrderId = (string) ($orderResponse['data'][0]['ordId'] ?? '');
+
+        // Market orders fill near-instantly, but OKX's order-ack
+        // response doesn't always include the fill price yet — fetch
+        // the authoritative order state before trusting a price for the
+        // local mirror.
+        $filled = $this->fetchFilledOrder($client, $instId, $exchangeOrderId);
+        $executedPrice = isset($filled['avgPx']) && $filled['avgPx'] !== ''
+            ? $this->decimal($filled['avgPx'], 8)
+            : $entryPriceEstimate;
+        $fee = isset($filled['fee']) ? $this->decimal($filled['fee'], 8)->abs() : $this->decimal('0', 8);
+        $feeCurrency = (string) ($filled['feeCcy'] ?? self::CURRENCY);
+        $filledSz = isset($filled['accFillSz']) && $filled['accFillSz'] !== ''
+            ? BigDecimal::of((string) $filled['accFillSz'])
+            : $contracts;
+        $filledBaseQty = $this->scale($filledSz->multipliedBy($meta['ctVal']), 12);
+        $filledNotional = $this->scale($filledBaseQty->multipliedBy($executedPrice), 8);
+        $feeRate = $filledNotional->isZero()
+            ? $this->decimal('0', 8)
+            : $this->scale($fee->dividedBy($filledNotional, 8, RoundingMode::HalfUp), 8);
+
+        $margin = $this->decimal($order->margin, 8);
+
+        // Phase 3: finalize in its own committed transaction. If
+        // anything here throws, the order stays durably SUBMITTING
+        // (already committed in phase 1) for ReconcileOkxOrders to pick
+        // up and finish, instead of vanishing with a rolled-back
+        // transaction that also wrapped the OKX calls.
+        return DB::transaction(function () use (
+            $account,
+            $requestId,
+            $request,
+            $instId,
+            $route,
+            $requestHash,
+            $order,
+            $margin,
+            $leverage,
+            $executedPrice,
+            $exchangeOrderId,
+            $filled,
+            $fee,
+            $feeRate,
+            $feeCurrency,
+            $filledBaseQty,
+            $filledNotional,
+            $ipAddress,
+            $userAgent,
+        ): array {
+            $account = TradingAccount::query()
+                ->whereKey($account->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $now = now();
+            $positionId = (string) Str::uuid();
 
             $order->update([
                 'exchange_order_id' => $exchangeOrderId,
@@ -408,21 +470,24 @@ final class LiveFuturesTradingService
     ): array {
         $request = $this->normalizeCloseRequest($input);
 
-        return DB::transaction(function () use (
+        $route = '/api/trading/futures/live/close';
+        $requestHash = $this->requestHash($request);
+
+        // Phase 1: pre-flight checks + create a SUBMITTING close order,
+        // committed on its own — see the equivalent comment in open()
+        // for why this can't live inside the same transaction that also
+        // makes the OKX network calls.
+        [$position, $closeOrder, $replay] = DB::transaction(function () use (
             $account,
-            $connection,
-            $requestId,
             $request,
-            $ipAddress,
-            $userAgent,
+            $route,
+            $requestHash,
         ): array {
             $account = TradingAccount::query()
                 ->whereKey($account->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $route = '/api/trading/futures/live/close';
-            $requestHash = $this->requestHash($request);
             $replay = $this->readIdempotentResult(
                 $account,
                 $route,
@@ -431,7 +496,7 @@ final class LiveFuturesTradingService
             );
 
             if ($replay !== null) {
-                return $replay;
+                return [null, null, $replay];
             }
 
             $position = FuturesPosition::query()
@@ -450,51 +515,6 @@ final class LiveFuturesTradingService
                 );
             }
 
-            $client = $this->clientFor($connection);
-
-            try {
-                $client->post('/api/v5/trade/close-position', [
-                    'instId' => $position->exchange_instrument_id,
-                    'mgnMode' => 'isolated',
-                    'autoCxl' => true,
-                ]);
-            } catch (OkxApiException $exception) {
-                $this->audit(
-                    $account,
-                    'live_futures_close_failed',
-                    $requestId,
-                    $request['clientOrderId'],
-                    $requestHash,
-                    ['sCode' => $exception->sCode, 'sMsg' => $exception->sMsg],
-                    $ipAddress,
-                    $userAgent,
-                );
-
-                throw new FuturesTradingException(
-                    'OKX_CLOSE_REJECTED',
-                    $exception->sMsg ?? $exception->getMessage(),
-                    422,
-                    ['sCode' => $exception->sCode],
-                );
-            }
-
-            // OKX's fills endpoint has the real exit price/fee/realized
-            // PnL for this instrument's most recent close.
-            $fill = $this->fetchLatestFill($client, $position->exchange_instrument_id);
-            $exitPrice = isset($fill['fillPx']) && $fill['fillPx'] !== ''
-                ? $this->decimal($fill['fillPx'], 8)
-                : $this->decimal($position->mark_price, 8);
-            $exitFee = isset($fill['fee']) ? $this->decimal($fill['fee'], 8)->abs() : $this->decimal('0', 8);
-            $feeCurrency = (string) ($fill['feeCcy'] ?? self::CURRENCY);
-            $realizedPnl = isset($fill['pnl']) && $fill['pnl'] !== ''
-                ? $this->decimal($fill['pnl'], 8)
-                : $this->decimal('0', 8);
-
-            $quantity = $this->decimal($position->quantity, 12);
-            $exitNotional = $this->scale($quantity->multipliedBy($exitPrice), 8);
-
-            $now = now();
-
             $closeOrder = FuturesOrder::query()->create([
                 'id' => (string) Str::uuid(),
                 'trading_account_id' => $account->id,
@@ -509,22 +529,118 @@ final class LiveFuturesTradingService
                 'position_mode' => 'ONE_WAY',
                 'leverage' => (int) $position->leverage,
                 'margin' => (string) $position->margin,
-                'quantity' => (string) $quantity,
+                'quantity' => (string) $position->quantity,
                 'requested_price' => null,
-                'executed_price' => (string) $exitPrice,
-                'notional' => (string) $exitNotional,
-                'fee' => (string) $exitFee,
-                'fee_rate' => $exitNotional->isZero()
-                    ? '0.00000000'
-                    : (string) $this->scale($exitFee->dividedBy($exitNotional, 8, RoundingMode::HalfUp), 8),
+                'executed_price' => '0.00000000',
+                'notional' => '0.00000000',
+                'fee' => '0.00000000',
+                'fee_rate' => '0.00000000',
                 'stop_loss' => $position->stop_loss,
                 'take_profit' => $position->take_profit,
                 'reduce_only' => true,
                 'quote_provider' => 'okx-live',
-                'status' => 'FILLED',
+                'status' => 'SUBMITTING',
                 'rejection_code' => null,
-                'filled_at' => $now,
+                'filled_at' => null,
                 'cancelled_at' => null,
+            ]);
+
+            return [$position, $closeOrder, null];
+        }, 5);
+
+        if ($replay !== null) {
+            return $replay;
+        }
+
+        // Phase 2: call OKX outside of any open transaction.
+        $client = $this->clientFor($connection);
+
+        try {
+            $client->post('/api/v5/trade/close-position', [
+                'instId' => $position->exchange_instrument_id,
+                'mgnMode' => 'isolated',
+                'autoCxl' => true,
+            ]);
+        } catch (OkxApiException $exception) {
+            $closeOrder->update([
+                'status' => 'REJECTED',
+                'rejection_code' => $exception->sCode ?? 'OKX_ERROR',
+            ]);
+
+            $this->audit(
+                $account,
+                'live_futures_close_failed',
+                $requestId,
+                $request['clientOrderId'],
+                $requestHash,
+                ['sCode' => $exception->sCode, 'sMsg' => $exception->sMsg],
+                $ipAddress,
+                $userAgent,
+            );
+
+            throw new FuturesTradingException(
+                'OKX_CLOSE_REJECTED',
+                $exception->sMsg ?? $exception->getMessage(),
+                422,
+                ['sCode' => $exception->sCode],
+            );
+        }
+
+        // OKX's fills endpoint has the real exit price/fee/realized PnL
+        // for this instrument's most recent close.
+        $fill = $this->fetchLatestFill($client, $position->exchange_instrument_id);
+        $exitPrice = isset($fill['fillPx']) && $fill['fillPx'] !== ''
+            ? $this->decimal($fill['fillPx'], 8)
+            : $this->decimal($position->mark_price, 8);
+        $exitFee = isset($fill['fee']) ? $this->decimal($fill['fee'], 8)->abs() : $this->decimal('0', 8);
+        $feeCurrency = (string) ($fill['feeCcy'] ?? self::CURRENCY);
+        $realizedPnl = isset($fill['pnl']) && $fill['pnl'] !== ''
+            ? $this->decimal($fill['pnl'], 8)
+            : $this->decimal('0', 8);
+
+        $quantity = $this->decimal($position->quantity, 12);
+        $exitNotional = $this->scale($quantity->multipliedBy($exitPrice), 8);
+        $feeRate = $exitNotional->isZero()
+            ? $this->decimal('0', 8)
+            : $this->scale($exitFee->dividedBy($exitNotional, 8, RoundingMode::HalfUp), 8);
+
+        // Phase 3: finalize in its own committed transaction. If
+        // anything here throws, the close order stays durably
+        // SUBMITTING (already committed in phase 1) for
+        // ReconcileOkxOrders to pick up and finish.
+        return DB::transaction(function () use (
+            $account,
+            $requestId,
+            $request,
+            $route,
+            $requestHash,
+            $position,
+            $closeOrder,
+            $quantity,
+            $exitPrice,
+            $exitFee,
+            $feeRate,
+            $feeCurrency,
+            $exitNotional,
+            $realizedPnl,
+            $fill,
+            $ipAddress,
+            $userAgent,
+        ): array {
+            $account = TradingAccount::query()
+                ->whereKey($account->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $now = now();
+
+            $closeOrder->update([
+                'executed_price' => (string) $exitPrice,
+                'notional' => (string) $exitNotional,
+                'fee' => (string) $exitFee,
+                'fee_rate' => (string) $feeRate,
+                'status' => 'FILLED',
+                'filled_at' => $now,
             ]);
 
             $execution = TradingExecution::query()->create([
@@ -649,6 +765,12 @@ final class LiveFuturesTradingService
                     'status' => 'REJECTED',
                     'rejection_code' => 'RECONCILE_NO_CONNECTION',
                 ]);
+
+                return;
+            }
+
+            if ($order->action === 'CLOSE') {
+                $this->reconcileSubmittingCloseOrder($order, $account, $connection);
 
                 return;
             }
@@ -826,6 +948,145 @@ final class LiveFuturesTradingService
                 null,
             );
         }, 5);
+    }
+
+    /**
+     * Resolves a stuck SUBMITTING close order. `POST
+     * /trade/close-position` doesn't accept or echo back a `clOrdId`,
+     * so unlike the OPEN path this can't look up "did my specific
+     * request go through" — instead it asks OKX whether a position
+     * still exists for the instrument. Gone means the close succeeded
+     * (finalize using the latest fill); still there means it hasn't
+     * cleared yet (leave SUBMITTING for the next scheduled run).
+     */
+    private function reconcileSubmittingCloseOrder(
+        FuturesOrder $order,
+        TradingAccount $account,
+        ExchangeConnection $connection,
+    ): void {
+        $position = FuturesPosition::query()
+            ->where('trading_account_id', $account->id)
+            ->where('symbol', $order->symbol)
+            ->where('status', 'OPEN')
+            ->lockForUpdate()
+            ->first();
+
+        if ($position === null) {
+            // Nothing locally open for this symbol anymore — a previous
+            // reconciliation run (or the request thread itself, racing
+            // this job) already finished the job.
+            $order->update(['status' => 'FILLED']);
+
+            return;
+        }
+
+        $instId = $position->exchange_instrument_id !== null && $position->exchange_instrument_id !== ''
+            ? $position->exchange_instrument_id
+            : $this->instruments->toInstrumentId($order->symbol);
+
+        $client = $this->clientFor($connection);
+
+        try {
+            $positionsResponse = $client->get('/api/v5/account/positions', [
+                'instType' => 'SWAP',
+                'instId' => $instId,
+            ]);
+        } catch (OkxApiException) {
+            // Transient — leave SUBMITTING for the next scheduled run.
+            return;
+        }
+
+        foreach (($positionsResponse['data'] ?? []) as $okxPosition) {
+            if (is_array($okxPosition) && (float) ($okxPosition['pos'] ?? 0) !== 0.0) {
+                // Still open on OKX — the close hasn't cleared yet (or
+                // genuinely failed without the exception bubbling up
+                // here). Leave SUBMITTING for the next scheduled run
+                // rather than guessing.
+                return;
+            }
+        }
+
+        $fill = $this->fetchLatestFill($client, $instId);
+        $exitPrice = isset($fill['fillPx']) && $fill['fillPx'] !== ''
+            ? $this->decimal($fill['fillPx'], 8)
+            : $this->decimal($position->mark_price, 8);
+        $exitFee = isset($fill['fee']) ? $this->decimal($fill['fee'], 8)->abs() : $this->decimal('0', 8);
+        $feeCurrency = (string) ($fill['feeCcy'] ?? self::CURRENCY);
+        $realizedPnl = isset($fill['pnl']) && $fill['pnl'] !== ''
+            ? $this->decimal($fill['pnl'], 8)
+            : $this->decimal('0', 8);
+
+        $quantity = $this->decimal($position->quantity, 12);
+        $exitNotional = $this->scale($quantity->multipliedBy($exitPrice), 8);
+        $feeRate = $exitNotional->isZero()
+            ? $this->decimal('0', 8)
+            : $this->scale($exitFee->dividedBy($exitNotional, 8, RoundingMode::HalfUp), 8);
+
+        $now = now();
+
+        $order->update([
+            'executed_price' => (string) $exitPrice,
+            'notional' => (string) $exitNotional,
+            'fee' => (string) $exitFee,
+            'fee_rate' => (string) $feeRate,
+            'status' => 'FILLED',
+            'filled_at' => $now,
+        ]);
+
+        TradingExecution::query()->create([
+            'id' => (string) Str::uuid(),
+            'trading_account_id' => $account->id,
+            'order_id' => $order->id,
+            'exchange_fill_id' => isset($fill['tradeId']) ? (string) $fill['tradeId'] : null,
+            'position_id' => $position->id,
+            'market_type' => 'FUTURES',
+            'symbol' => $position->symbol,
+            'direction' => $position->direction,
+            'action' => 'CLOSE',
+            'execution_type' => 'MARKET',
+            'quantity' => (string) $quantity,
+            'price' => (string) $exitPrice,
+            'entry_price' => (string) $position->entry_price,
+            'notional' => (string) $exitNotional,
+            'fee' => (string) $exitFee,
+            'fee_currency' => $feeCurrency,
+            'realized_pnl' => (string) $realizedPnl,
+            'close_reason' => 'USER_CLOSE',
+            'quote_provider' => 'okx-live',
+            'metadata' => [
+                'margin' => (string) $position->margin,
+                'leverage' => (int) $position->leverage,
+                'reconciled' => true,
+            ],
+            'executed_at' => $now,
+            'created_at' => $now,
+        ]);
+
+        $position->update([
+            'status' => 'CLOSED',
+            'open_slot' => null,
+            'mark_price' => (string) $exitPrice,
+            'current_notional' => (string) $exitNotional,
+            'unrealized_pnl' => '0.00000000',
+            'realized_pnl' => (string) $realizedPnl,
+            'close_fee' => (string) $exitFee,
+            'net_pnl' => (string) $realizedPnl,
+            'mark_provider' => 'okx-live',
+            'close_reason' => 'USER_CLOSE',
+            'version' => ((int) $position->version) + 1,
+            'closed_at' => $now,
+        ]);
+
+        $this->audit(
+            $account,
+            'live_futures_close_reconciled_filled',
+            (string) Str::uuid(),
+            $order->client_order_id,
+            hash('sha256', $order->id),
+            ['orderId' => $order->id, 'positionId' => $position->id],
+            null,
+            null,
+        );
     }
 
     /**
