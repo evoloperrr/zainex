@@ -23,6 +23,7 @@ final class FuturesPosition extends Model
         'id',
         'trading_account_id',
         'symbol',
+        'exchange_instrument_id',
         'direction',
         'status',
         'open_slot',

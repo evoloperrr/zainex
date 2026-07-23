@@ -83,6 +83,7 @@ final class StrategyReferralIncomeService
 
         $account = DB::table('trading_accounts')
             ->where('user_id', $inviterId)
+            ->where('account_type', 'PAPER')
             ->where('status', 'ACTIVE')
             ->orderBy('id')
             ->lockForUpdate()

@@ -48,6 +48,7 @@ trait LinksTradingAccountToUser
 
         $conflict = DB::table('trading_accounts')
             ->where('user_id', $user->id)
+            ->where('account_type', $account->account_type)
             ->where('id', '!=', $account->id)
             ->exists();
 

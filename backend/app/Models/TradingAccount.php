@@ -15,6 +15,7 @@ final class TradingAccount extends Model
 
     protected $fillable = [
         'user_id',
+        'exchange_connection_id',
         'external_session_id',
         'account_type',
         'mode',

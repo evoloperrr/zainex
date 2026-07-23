@@ -294,7 +294,7 @@ final class FuturesPaperTradingApiTest extends TestCase
     private function fakePrice(string $price): void
     {
         Http::fake([
-            'api.binance.com/*' => Http::response(
+            'data-api.binance.vision/*' => Http::response(
                 [
                     'symbol' => 'BTCUSDT',
                     'price' => $price,

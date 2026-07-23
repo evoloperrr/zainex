@@ -52,6 +52,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(TradingAccount::class);
     }
+
+    public function exchangeConnections(): HasMany
+    {
+        return $this->hasMany(ExchangeConnection::class);
+    }
     public function isRoot(): bool
     {
         return $this->role === 'ROOT';

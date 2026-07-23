@@ -23,6 +23,8 @@ final class FuturesOrder extends Model
         'id',
         'trading_account_id',
         'client_order_id',
+        'exchange_order_id',
+        'exchange_client_order_id',
         'symbol',
         'direction',
         'action',
