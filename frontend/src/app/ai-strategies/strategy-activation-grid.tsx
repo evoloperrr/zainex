@@ -197,6 +197,11 @@ export function StrategyActivationGrid() {
   const [amount, setAmount] =
     useState("");
 
+  const [billingCycle, setBillingCycle] =
+    useState<
+      "monthly" | "annual"
+    >("monthly");
+
   const [clientRequestId, setClientRequestId] =
     useState("");
 
@@ -394,6 +399,7 @@ export function StrategyActivationGrid() {
       ) {
         setSelected(null);
         setAmount("");
+        setBillingCycle("monthly");
         setError("");
         setSuccess("");
         setClientRequestId("");
@@ -446,9 +452,17 @@ export function StrategyActivationGrid() {
     amountIsValid &&
     numericAmount > walletBalance;
 
+  const effectiveCreditCost =
+    selected
+      ? billingCycle === "annual"
+        ? selected.creditCost * 12
+        : selected.creditCost
+      : 0;
+
   const lacksCredits =
     selected !== null &&
-    currentCredits < selected.creditCost;
+    currentCredits <
+      effectiveCreditCost;
 
   const canSubmit =
     selected !== null &&
@@ -472,7 +486,8 @@ export function StrategyActivationGrid() {
 
   const creditsAfter =
     selected
-      ? currentCredits - selected.creditCost
+      ? currentCredits -
+        effectiveCreditCost
       : currentCredits;
 
   function openModal(
@@ -487,6 +502,7 @@ export function StrategyActivationGrid() {
 
     setSelected(strategy);
     setAmount("");
+    setBillingCycle("monthly");
     setError("");
     setSuccess("");
     setClientRequestId(
@@ -501,6 +517,7 @@ export function StrategyActivationGrid() {
 
     setSelected(null);
     setAmount("");
+    setBillingCycle("monthly");
     setError("");
     setSuccess("");
     setClientRequestId("");
@@ -536,6 +553,11 @@ export function StrategyActivationGrid() {
             amount:
               numericAmount.toFixed(2),
             clientRequestId,
+            billingCycle:
+              selected.tier ===
+              "FREE TIER"
+                ? "monthly"
+                : billingCycle,
           }),
         },
       );
@@ -806,6 +828,71 @@ export function StrategyActivationGrid() {
                 </div>
               </label>
 
+              {selected.tier !==
+              "FREE TIER" ? (
+                <div
+                  className={
+                    billingStyles.cycleToggle
+                  }
+                  role="radiogroup"
+                  aria-label="Billing cycle"
+                >
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={
+                      billingCycle ===
+                      "monthly"
+                    }
+                    className={
+                      billingCycle ===
+                      "monthly"
+                        ? billingStyles.cycleActive
+                        : ""
+                    }
+                    disabled={submitting}
+                    onClick={() => {
+                      setBillingCycle(
+                        "monthly",
+                      );
+                    }}
+                  >
+                    Monthly
+                  </button>
+
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={
+                      billingCycle ===
+                      "annual"
+                    }
+                    className={
+                      billingCycle ===
+                      "annual"
+                        ? billingStyles.cycleActive
+                        : ""
+                    }
+                    disabled={submitting}
+                    onClick={() => {
+                      setBillingCycle(
+                        "annual",
+                      );
+                    }}
+                  >
+                    Annual{" "}
+                    <span
+                      className={
+                        billingStyles.cycleSaveBadge
+                      }
+                    >
+                      12 mo, no
+                      re-activation
+                    </span>
+                  </button>
+                </div>
+              ) : null}
+
               <div className={styles.summaryGrid}>
                 <div>
                   <span>Strategy</span>
@@ -816,9 +903,19 @@ export function StrategyActivationGrid() {
                   <span>Credit cost</span>
                   <strong>
                     {formatCreditsAmount(
-                      selected.creditCost,
+                      effectiveCreditCost,
                     )}{" "}
                     credits
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Term</span>
+                  <strong>
+                    {billingCycle ===
+                    "annual"
+                      ? "360 days"
+                      : "30 days"}
                   </strong>
                 </div>
 
@@ -924,7 +1021,7 @@ export function StrategyActivationGrid() {
                     {submitting
                       ? "Activating..."
                       : `Activate for ${formatCreditsAmount(
-                          selected.creditCost,
+                          effectiveCreditCost,
                         )} credits`}
                   </button>
                 ) : null}

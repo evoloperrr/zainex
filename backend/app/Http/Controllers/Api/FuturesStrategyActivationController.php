@@ -260,6 +260,33 @@ final class FuturesStrategyActivationController extends Controller
             );
         }
 
+        // Annual billing charges 12x the normal credit cost up front for
+        // a 360-day term instead of 30, so the user doesn't have to
+        // manually re-activate every month. Doesn't apply to FREE TIER,
+        // which has its own fixed 30-day random-payout schedule and a
+        // zero credit cost either way.
+        $billingCycle = strtolower(
+            trim(
+                (string) (
+                    $body['billingCycle'] ?? 'monthly'
+                ),
+            ),
+        );
+
+        if (
+            ! in_array(
+                $billingCycle,
+                ['monthly', 'annual'],
+                true,
+            )
+        ) {
+            $billingCycle = 'monthly';
+        }
+
+        if ($tier === 'FREE TIER') {
+            $billingCycle = 'monthly';
+        }
+
         $strategy =
             self::STRATEGIES[$tier];
 
@@ -269,6 +296,7 @@ final class FuturesStrategyActivationController extends Controller
                 [
                     'tier' => $tier,
                     'amount' => (string) $amount,
+                    'billingCycle' => $billingCycle,
                 ],
                 JSON_THROW_ON_ERROR,
             ),
@@ -277,6 +305,7 @@ final class FuturesStrategyActivationController extends Controller
         return DB::transaction(
             function () use (
                 $sessionId,
+                $billingCycle,
                 $requestId,
                 $clientRequestId,
                 $requestHash,
@@ -313,6 +342,10 @@ final class FuturesStrategyActivationController extends Controller
                             ->where(
                                 'user_id',
                                 $user->id,
+                            )
+                            ->where(
+                                'account_type',
+                                'PAPER',
                             )
                             ->where(
                                 'status',
@@ -518,7 +551,10 @@ final class FuturesStrategyActivationController extends Controller
 
                 $creditCost =
                     (int)
-                        $strategy['creditCost'];
+                        $strategy['creditCost'] *
+                    ($billingCycle === 'annual'
+                        ? 12
+                        : 1);
 
                 $currentCredits =
                     (int)
@@ -599,7 +635,9 @@ final class FuturesStrategyActivationController extends Controller
                 $payoutCount =
                     $tier === 'FREE TIER'
                         ? StrategyPayoutSchedule::FREE_PAYOUT_COUNT
-                        : 30;
+                        : ($billingCycle === 'annual'
+                            ? 360
+                            : 30);
 
                 $firstPayoutDay =
                     $payoutDays[0] ?? 1;
@@ -619,6 +657,7 @@ final class FuturesStrategyActivationController extends Controller
                         'display_rate' => $strategy['displayRate'],
                         'allocated_amount' => (string) $amount,
                         'credit_cost' => $creditCost,
+                        'billing_cycle' => $billingCycle,
                         'status' => 'ACTIVE',
                         'daily_rate' => match ($tier) {
                             'VIP 3' => '0.0300000000',
@@ -641,7 +680,7 @@ final class FuturesStrategyActivationController extends Controller
                         'last_accrual_at' => null,
                         'matures_at' => $now
                             ->copy()
-                            ->addDays(30),
+                            ->addDays($payoutCount),
                         'principal_released_at' => null,
                         'completed_at' => null,
                         'created_at' => $now,
@@ -752,6 +791,10 @@ final class FuturesStrategyActivationController extends Controller
                     $activation->allocated_amount,
             'creditCost' => (int)
                     $activation->credit_cost,
+            'billingCycle' => (string)
+                    ($activation->billing_cycle ?? 'monthly'),
+            'termDays' => (int)
+                    $activation->term_days,
             'status' => $activation->status,
             'createdAt' => $activation->created_at,
         ];
