@@ -143,7 +143,8 @@
 .sent,
 .received,
 .adminCredit,
-.vipGrant {
+.vipGrant,
+.cryptoCredit {
   display: inline-flex;
   min-height: 27px;
   align-items: center;
@@ -193,6 +194,14 @@
   color: #c9a6ff;
   background:
     rgba(160, 110, 255, 0.08);
+}
+
+.cryptoCredit {
+  border: 1px solid
+    rgba(120, 200, 255, 0.22);
+  color: #7fc7ff;
+  background:
+    rgba(90, 170, 255, 0.08);
 }
 
 .credit {

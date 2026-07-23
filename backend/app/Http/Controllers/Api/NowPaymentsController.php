@@ -41,6 +41,10 @@ final class NowPaymentsController extends Controller
         'VIP 3' => 45.0,
     ];
 
+    // Annual billing pays for 12 months up front at a 10% discount off
+    // 12x the monthly price.
+    private const ANNUAL_DISCOUNT_RATE = 0.10;
+
     private const MIN_WALLET_FUNDING_USD = 1.0;
 
     private const MAX_WALLET_FUNDING_USD = 10_000.0;
@@ -66,6 +70,7 @@ final class NowPaymentsController extends Controller
         $validator = Validator::make($request->all(), [
             'purpose' => ['required', 'string', 'in:subscription,wallet'],
             'planName' => ['required_if:purpose,subscription', 'string'],
+            'billingCycle' => ['nullable', 'string', 'in:monthly,annual'],
             'amount' => ['required_if:purpose,wallet', 'numeric'],
         ]);
 
@@ -81,15 +86,25 @@ final class NowPaymentsController extends Controller
         $purpose = (string) $validated['purpose'];
 
         if ($purpose === 'subscription') {
-            $planName = (string) $validated['planName'];
-            $priceAmount = self::SUBSCRIPTION_PRICES_USD[$planName] ?? null;
+            $tierName = (string) $validated['planName'];
+            $monthlyPrice = self::SUBSCRIPTION_PRICES_USD[$tierName] ?? null;
 
-            if ($priceAmount === null) {
+            if ($monthlyPrice === null) {
                 return $this->error(
                     422,
                     'UNKNOWN_VIP_PLAN',
                     'That plan is not recognized.',
                 );
+            }
+
+            $billingCycle = (string) ($validated['billingCycle'] ?? 'monthly');
+
+            if ($billingCycle === 'annual') {
+                $priceAmount = round($monthlyPrice * 12 * (1 - self::ANNUAL_DISCOUNT_RATE), 2);
+                $planName = "{$tierName} (Annual)";
+            } else {
+                $priceAmount = $monthlyPrice;
+                $planName = $tierName;
             }
         } else {
             $planName = null;
@@ -408,19 +423,15 @@ final class NowPaymentsController extends Controller
         $amount = BigDecimal::of((string) $payment->price_amount)
             ->toScale(8, RoundingMode::Down);
 
-        if ($payment->purpose === 'subscription') {
-            $expires = now()->addMonth();
-
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'vip_tier' => $payment->plan_name,
-                    'vip_expires_at' => $expires,
-                    'updated_at' => now(),
-                ]);
-
-            return;
-        }
+        // A "subscription" crypto payment is just payment confirmation for
+        // a plan the user intends to fund — like merchant cash-ins, it
+        // always credits the wallet. VIP tier itself is decided later on
+        // the strategy page, when the user spends credits/wallet funds to
+        // activate a VIP-tier strategy (see AdminController::
+        // approveMerchantCashin() for the same reasoning).
+        $description = $payment->purpose === 'subscription'
+            ? "Trading wallet funded via NOWPayments crypto transfer ({$payment->plan_name} plan funding)."
+            : 'Trading wallet funded via NOWPayments crypto transfer.';
 
         $balance = DB::table('trading_balances')
             ->where('trading_account_id', $account->id)
@@ -476,7 +487,7 @@ final class NowPaymentsController extends Controller
             'ai_credits_before' => (int) $user->ai_credits,
             'ai_credits_after' => (int) $user->ai_credits,
             'reference_key' => 'crypto-payment:'.$payment->id,
-            'description' => 'Trading wallet funded via NOWPayments crypto transfer.',
+            'description' => $description,
             'metadata' => json_encode([
                 'provider' => 'nowpayments',
                 'providerPaymentId' => $payment->provider_payment_id,

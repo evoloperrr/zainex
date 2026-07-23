@@ -103,8 +103,30 @@ function parsePriceUsd(
     : 0;
 }
 
+const ANNUAL_DISCOUNT_RATE = 0.1;
+
+function annualPriceUsd(
+  monthlyUsd: number,
+): number {
+  return (
+    Math.round(
+      monthlyUsd *
+        12 *
+        (1 - ANNUAL_DISCOUNT_RATE) *
+        100,
+    ) / 100
+  );
+}
+
 function BillingContent() {
   const { formatUsd } = useCurrency();
+
+  const [
+    billingCycle,
+    setBillingCycle,
+  ] = useState<
+    "monthly" | "annual"
+  >("monthly");
 
   const [
     checkoutPlan,
@@ -114,6 +136,9 @@ function BillingContent() {
     price: string;
     period: string;
     mode: "subscription" | "wallet";
+    billingCycle:
+      | "monthly"
+      | "annual";
   } | null>(null);
 
   return (
@@ -177,74 +202,164 @@ function BillingContent() {
           </aside>
         </section>
 
+        <div
+          className={
+            styles.cycleToggle
+          }
+          role="radiogroup"
+          aria-label="Billing cycle"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={
+              billingCycle ===
+              "monthly"
+            }
+            className={
+              billingCycle ===
+              "monthly"
+                ? styles.cycleActive
+                : ""
+            }
+            onClick={() => {
+              setBillingCycle(
+                "monthly",
+              );
+            }}
+          >
+            Monthly
+          </button>
+
+          <button
+            type="button"
+            role="radio"
+            aria-checked={
+              billingCycle ===
+              "annual"
+            }
+            className={
+              billingCycle ===
+              "annual"
+                ? styles.cycleActive
+                : ""
+            }
+            onClick={() => {
+              setBillingCycle(
+                "annual",
+              );
+            }}
+          >
+            Annual{" "}
+            <span
+              className={
+                styles.cycleSaveBadge
+              }
+            >
+              Save 10%
+            </span>
+          </button>
+        </div>
+
         <section
           className={styles.plans}
           aria-label="AI Intelitrade subscription plans"
         >
-          {plans.map((plan) => (
-            <article
-              key={plan.name}
-              className={`${styles.card} ${
-                plan.featured ? styles.featured : ""
-              }`}
-            >
-              {plan.featured ? (
-                <span className={styles.badge}>
-                  MOST POPULAR
+          {plans.map((plan) => {
+            const isFree =
+              plan.name ===
+              "FREE TIER";
+
+            const monthlyUsd =
+              parsePriceUsd(
+                plan.price,
+              );
+
+            const displayUsd =
+              !isFree &&
+              billingCycle ===
+                "annual"
+                ? annualPriceUsd(
+                    monthlyUsd,
+                  )
+                : monthlyUsd;
+
+            const displayPeriod =
+              isFree
+                ? plan.period
+                : billingCycle ===
+                    "annual"
+                  ? "per year"
+                  : plan.period;
+
+            return (
+              <article
+                key={plan.name}
+                className={`${styles.card} ${
+                  plan.featured ? styles.featured : ""
+                }`}
+              >
+                {plan.featured ? (
+                  <span className={styles.badge}>
+                    MOST POPULAR
+                  </span>
+                ) : null}
+
+                <span className={styles.planName}>
+                  {plan.name}
                 </span>
-              ) : null}
 
-              <span className={styles.planName}>
-                {plan.name}
-              </span>
+                <div className={styles.price}>
+                  <strong>
+                    {formatUsd(
+                      displayUsd,
+                    )}
+                  </strong>
+                  <small>{displayPeriod}</small>
+                </div>
 
-              <div className={styles.price}>
-                <strong>
-                  {formatUsd(
-                    parsePriceUsd(
-                      plan.price,
-                    ),
-                  )}
-                </strong>
-                <small>{plan.period}</small>
-              </div>
+                <p>{plan.description}</p>
 
-              <p>{plan.description}</p>
+                <div className={styles.divider} />
 
-              <div className={styles.divider} />
+                <ul>
+                  {plan.features.map((feature) => (
+                    <li key={feature}>
+                      <span>{"\u2713"}</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
 
-              <ul>
-                {plan.features.map((feature) => (
-                  <li key={feature}>
-                    <span>{"\u2713"}</span>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                type="button"
-                disabled={plan.current}
-                className={
-                  plan.current ? styles.currentButton : ""
-                }
-                onClick={() => {
-                  setCheckoutPlan({
-                    name: plan.name,
-                    price: plan.price,
-                    period: plan.period,
-                    mode:
-                      plan.name ===
-                      "FREE TIER"
+                <button
+                  type="button"
+                  disabled={plan.current}
+                  className={
+                    plan.current ? styles.currentButton : ""
+                  }
+                  onClick={() => {
+                    setCheckoutPlan({
+                      name: plan.name,
+                      price: isFree
+                        ? plan.price
+                        : `$${displayUsd.toFixed(2)}`,
+                      period:
+                        displayPeriod,
+                      mode: isFree
                         ? "wallet"
                         : "subscription",
-                  });
-                }}
-              >
-                {plan.action}
-              </button>
-            </article>
-          ))}
+                      billingCycle:
+                        isFree
+                          ? "monthly"
+                          : billingCycle,
+                    });
+                  }}
+                >
+                  {plan.action}
+                </button>
+              </article>
+            );
+          })}
         </section>
 
         <section className={styles.summary}>
@@ -255,7 +370,12 @@ function BillingContent() {
 
           <div>
             <span>BILLING CYCLE</span>
-            <strong>Monthly</strong>
+            <strong>
+              {billingCycle ===
+              "annual"
+                ? "Annual (10% off)"
+                : "Monthly"}
+            </strong>
           </div>
 
           <div>
@@ -274,6 +394,9 @@ function BillingContent() {
         <VipCheckoutChat
           plan={checkoutPlan}
           mode={checkoutPlan.mode}
+          billingCycle={
+            checkoutPlan.billingCycle
+          }
           onClose={() => {
             setCheckoutPlan(null);
           }}

@@ -69,7 +69,8 @@ type AdminCreditLog = {
   id: number;
   eventType:
     | "ADMIN_MANUAL_CREDIT"
-    | "ADMIN_VIP_GRANT";
+    | "ADMIN_VIP_GRANT"
+    | "CRYPTO_WALLET_FUNDING";
   amountUsd: number;
   walletBalanceBefore: number;
   walletBalanceAfter: number;
@@ -90,7 +91,8 @@ type ActivityKind =
   | "SENT"
   | "RECEIVED"
   | "ADMIN_CREDIT"
-  | "VIP_GRANT";
+  | "VIP_GRANT"
+  | "CRYPTO_CREDIT";
 
 type ActivityRow = {
   key: string;
@@ -251,16 +253,24 @@ function combineLogs(
           };
         }
 
+        const isCrypto =
+          log.eventType ===
+          "CRYPTO_WALLET_FUNDING";
+
         return {
           key: `admin-credit-${log.id}`,
-          kind: "ADMIN_CREDIT",
+          kind: isCrypto
+            ? "CRYPTO_CREDIT"
+            : "ADMIN_CREDIT",
           title:
             `${formatUsd(
               log.amountUsd,
             )} wallet credited`,
           detail:
             log.description ||
-            "Credited by an admin",
+            (isCrypto
+              ? "Credited via crypto payment"
+              : "Credited by an admin"),
           change:
             `+${formatUsd(
               log.amountUsd,
@@ -763,7 +773,10 @@ export function WalletActionCenter({
                                 : row.kind ===
                                     "VIP_GRANT"
                                   ? styles.vipGrant
-                                  : styles.received
+                                  : row.kind ===
+                                      "CRYPTO_CREDIT"
+                                    ? styles.cryptoCredit
+                                    : styles.received
                         }
                       >
                         {row.kind}

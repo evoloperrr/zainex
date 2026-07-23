@@ -239,6 +239,7 @@ type VipCheckoutChatProps = {
   plan: VipPlan;
   onClose: () => void;
   mode?: "subscription" | "wallet";
+  billingCycle?: "monthly" | "annual";
 };
 
 type PaymentMethod =
@@ -463,6 +464,10 @@ function useCryptoInvoice(
   planName: string | null,
   amount: number | null,
   onConfirmed: () => void,
+  billingCycle:
+    | "monthly"
+    | "annual"
+    | null = null,
 ): CryptoInvoiceState {
   const [state, setState] =
     useState<CryptoInvoiceState>({
@@ -500,6 +505,9 @@ function useCryptoInvoice(
             planName ?? undefined,
           amount:
             amount ?? undefined,
+          billingCycle:
+            billingCycle ??
+            undefined,
         }),
       },
     )
@@ -556,7 +564,13 @@ function useCryptoInvoice(
     return () => {
       cancelled = true;
     };
-  }, [active, purpose, planName, amount]);
+  }, [
+    active,
+    purpose,
+    planName,
+    amount,
+    billingCycle,
+  ]);
 
   const readyPaymentId =
     state.phase === "ready"
@@ -1046,6 +1060,7 @@ export function VipCheckoutChat({
   plan,
   onClose,
   mode = "subscription",
+  billingCycle = "monthly",
 }: VipCheckoutChatProps) {
   useBodyScrollLock(true);
 
@@ -1178,6 +1193,7 @@ export function VipCheckoutChat({
       () => {
         setSent(true);
       },
+      billingCycle,
     );
 
   const walletCryptoState =
@@ -1391,6 +1407,10 @@ export function VipCheckoutChat({
     planName: string | null,
     amount: number,
     proofFile: File | null,
+    billingCycleOverride:
+      | "monthly"
+      | "annual"
+      | null = null,
   ): Promise<
     | { ok: true }
     | { ok: false; message: string }
@@ -1417,6 +1437,9 @@ export function VipCheckoutChat({
               undefined,
             amount,
             proofImage,
+            billingCycle:
+              billingCycleOverride ??
+              undefined,
           }),
         },
       );
@@ -1925,6 +1948,7 @@ export function VipCheckoutChat({
                     plan.price,
                   ),
                   vipProof.file,
+                  billingCycle,
                 );
 
               if (result.ok) {

@@ -32,6 +32,10 @@ final class MerchantCashinController extends Controller
         'VIP 3' => 45.0,
     ];
 
+    // Annual billing pays for 12 months up front at a 10% discount off
+    // 12x the monthly price.
+    private const ANNUAL_DISCOUNT_RATE = 0.10;
+
     private const MIN_WALLET_FUNDING_USD = 1.0;
 
     private const MAX_WALLET_FUNDING_USD = 10_000.0;
@@ -47,6 +51,7 @@ final class MerchantCashinController extends Controller
         $validator = Validator::make($request->all(), [
             'purpose' => ['required', 'string', 'in:subscription,wallet'],
             'planName' => ['required_if:purpose,subscription', 'string'],
+            'billingCycle' => ['nullable', 'string', 'in:monthly,annual'],
             'amount' => ['required_if:purpose,wallet', 'numeric'],
             'proofImage' => ['nullable', 'string', 'max:3000000'],
         ]);
@@ -59,11 +64,21 @@ final class MerchantCashinController extends Controller
         $purpose = (string) $validated['purpose'];
 
         if ($purpose === 'subscription') {
-            $planName = (string) $validated['planName'];
-            $amount = self::SUBSCRIPTION_PRICES_USD[$planName] ?? null;
+            $tierName = (string) $validated['planName'];
+            $monthlyPrice = self::SUBSCRIPTION_PRICES_USD[$tierName] ?? null;
 
-            if ($amount === null) {
+            if ($monthlyPrice === null) {
                 return $this->error(422, 'UNKNOWN_VIP_PLAN', 'That plan is not recognized.');
+            }
+
+            $billingCycle = (string) ($validated['billingCycle'] ?? 'monthly');
+
+            if ($billingCycle === 'annual') {
+                $amount = round($monthlyPrice * 12 * (1 - self::ANNUAL_DISCOUNT_RATE), 2);
+                $planName = "{$tierName} (Annual)";
+            } else {
+                $amount = $monthlyPrice;
+                $planName = $tierName;
             }
         } else {
             $planName = null;

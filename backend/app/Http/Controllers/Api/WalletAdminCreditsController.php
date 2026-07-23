@@ -13,21 +13,27 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 // ZAINEX_WALLET_ADMIN_CREDIT_ACTIVITY_V1
-// Surfaces a user's own admin-driven wallet_transactions rows — written
-// by AdminController::applyWalletCredit() (direct admin wallet credit or
-// an approved merchant cash-in) and AdminController::applyVipGrant()
-// (direct VIP grant or a cash-in-approved subscription) — so they show
-// up in the user-facing wallet activity feed. That feed previously only
-// combined WALLET_TO_CREDITS conversions and credit transfers, so an
-// approved cash-in was invisible to the user even though it was already
-// recorded in the admin-only Wallet ledger tab.
+// Surfaces a user's own non-conversion, non-transfer wallet_transactions
+// rows — admin-driven credits (AdminController::applyWalletCredit(),
+// covering both a direct admin wallet credit and an approved merchant
+// cash-in), admin VIP grants (AdminController::applyVipGrant()), and
+// automated crypto payment completions (NowPaymentsController::credit())
+// — so they show up in the user-facing wallet activity feed. That feed
+// previously only combined WALLET_TO_CREDITS conversions and credit
+// transfers, so any of these were invisible to the user even though
+// admin-driven ones were already recorded in the admin-only Wallet
+// ledger tab.
 
 final class WalletAdminCreditsController extends Controller
 {
     use LinksTradingAccountToUser;
 
     /** @var list<string> */
-    private const EVENT_TYPES = ['ADMIN_MANUAL_CREDIT', 'ADMIN_VIP_GRANT'];
+    private const EVENT_TYPES = [
+        'ADMIN_MANUAL_CREDIT',
+        'ADMIN_VIP_GRANT',
+        'CRYPTO_WALLET_FUNDING',
+    ];
 
     public function index(Request $request): JsonResponse
     {
