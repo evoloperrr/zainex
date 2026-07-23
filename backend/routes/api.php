@@ -50,6 +50,28 @@ Route::controller(
         ->middleware('throttle:20,1');
     Route::get('/positions', 'positions');
 });
+
+// ZAINEX_LIVE_OKX_TRADING_V1
+Route::controller(
+    \App\Http\Controllers\Api\ExchangeConnectionController::class
+)->prefix('/trading/exchange/okx')->group(function (): void {
+    Route::get('/', 'status');
+    Route::post('/connect', 'connect')
+        ->middleware('throttle:10,1');
+    Route::post('/disconnect', 'disconnect')
+        ->middleware('throttle:10,1');
+});
+Route::controller(
+    \App\Http\Controllers\Api\LiveFuturesTradingController::class
+)->prefix('/trading/futures/live')->group(function (): void {
+    Route::get('/account', 'account');
+    Route::get('/orders', 'orders');
+    Route::post('/orders', 'open')
+        ->middleware('throttle:10,1');
+    Route::post('/close', 'close')
+        ->middleware('throttle:10,1');
+    Route::get('/positions', 'positions');
+});
 // ZAINEX_SPOT_DB_PERSISTENCE_V1
 Route::controller(
     \App\Http\Controllers\Api\SpotPaperTradingController::class
@@ -106,6 +128,15 @@ Route::post(
         'store',
     ],
 )->middleware('throttle:20,1');
+
+// ZAINEX_WALLET_ADMIN_CREDIT_ACTIVITY_V1
+Route::get(
+    '/trading/futures/wallet/admin-credits',
+    [
+        \App\Http\Controllers\Api\WalletAdminCreditsController::class,
+        'index',
+    ],
+)->middleware('throttle:60,1');
 
 // ZAINEX_ROOT_ADMIN_WALLET_TRANSFER_V1
 Route::get(

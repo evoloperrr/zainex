@@ -141,7 +141,8 @@
 
 .converted,
 .sent,
-.received {
+.received,
+.adminCredit {
   display: inline-flex;
   min-height: 27px;
   align-items: center;
@@ -175,6 +176,14 @@
   color: #75ebc4;
   background:
     rgba(54, 221, 170, 0.07);
+}
+
+.adminCredit {
+  border: 1px solid
+    rgba(255, 200, 87, 0.22);
+  color: #ffcf6b;
+  background:
+    rgba(255, 190, 60, 0.08);
 }
 
 .credit {

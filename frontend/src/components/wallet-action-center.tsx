@@ -65,10 +65,25 @@ type TransferResponse = {
   logs?: TransferLog[];
 };
 
+type AdminCreditLog = {
+  id: number;
+  amountUsd: number;
+  walletBalanceBefore: number;
+  walletBalanceAfter: number;
+  description: string | null;
+  occurredAt: string;
+};
+
+type AdminCreditResponse = {
+  ok: boolean;
+  logs?: AdminCreditLog[];
+};
+
 type ActivityKind =
   | "CONVERTED"
   | "SENT"
-  | "RECEIVED";
+  | "RECEIVED"
+  | "ADMIN_CREDIT";
 
 type ActivityRow = {
   key: string;
@@ -126,6 +141,7 @@ function formatDate(
 function combineLogs(
   conversions: ConversionLog[],
   transfers: TransferLog[],
+  adminCredits: AdminCreditLog[],
   formatUsd: (
     value: number,
   ) => string,
@@ -199,9 +215,37 @@ function combineLogs(
       },
     );
 
+  const adminCreditRows =
+    adminCredits.map(
+      (log): ActivityRow => ({
+        key: `admin-credit-${log.id}`,
+        kind: "ADMIN_CREDIT",
+        title:
+          `${formatUsd(
+            log.amountUsd,
+          )} credited`,
+        detail:
+          log.description ||
+          "Credited by an admin",
+        change:
+          `+${formatUsd(
+            log.amountUsd,
+          )}`,
+        balance:
+          `${formatUsd(
+            log.walletBalanceBefore,
+          )} → ${formatUsd(
+            log.walletBalanceAfter,
+          )}`,
+        occurredAt:
+          log.occurredAt,
+      }),
+    );
+
   return [
     ...conversionRows,
     ...transferRows,
+    ...adminCreditRows,
   ]
     .sort(
       (left, right) =>
@@ -251,6 +295,11 @@ export function WalletActionCenter({
   ] = useState<TransferLog[]>([]);
 
   const [
+    adminCreditLogs,
+    setAdminCreditLogs,
+  ] = useState<AdminCreditLog[]>([]);
+
+  const [
     loading,
     setLoading,
   ] = useState(true);
@@ -265,6 +314,7 @@ export function WalletActionCenter({
       const [
         conversionResponse,
         transferResponse,
+        adminCreditResponse,
       ] = await Promise.all([
         fetch(
           "/api/trading/futures/wallet/convert",
@@ -282,16 +332,27 @@ export function WalletActionCenter({
               "same-origin",
           },
         ),
+        fetch(
+          "/api/trading/futures/wallet/admin-credits",
+          {
+            cache: "no-store",
+            credentials:
+              "same-origin",
+          },
+        ),
       ]);
 
       const [
         conversionPayload,
         transferPayload,
+        adminCreditPayload,
       ] = await Promise.all([
         conversionResponse.json() as
           Promise<ConversionResponse>,
         transferResponse.json() as
           Promise<TransferResponse>,
+        adminCreditResponse.json() as
+          Promise<AdminCreditResponse>,
       ]);
 
       if (
@@ -313,8 +374,18 @@ export function WalletActionCenter({
       }
 
       if (
+        adminCreditResponse.ok &&
+        adminCreditPayload.ok
+      ) {
+        setAdminCreditLogs(
+          adminCreditPayload.logs ?? [],
+        );
+      }
+
+      if (
         !conversionResponse.ok &&
-        !transferResponse.ok
+        !transferResponse.ok &&
+        !adminCreditResponse.ok
       ) {
         throw new Error(
           "Wallet activity is unavailable.",
@@ -464,12 +535,14 @@ export function WalletActionCenter({
       combineLogs(
         conversionLogs,
         transferLogs,
+        adminCreditLogs,
         formatUsd,
         formatCredits,
       ),
     [
       conversionLogs,
       transferLogs,
+      adminCreditLogs,
       formatUsd,
       formatCredits,
     ],
@@ -649,7 +722,10 @@ export function WalletActionCenter({
                             : row.kind ===
                                 "SENT"
                               ? styles.sent
-                              : styles.received
+                              : row.kind ===
+                                  "ADMIN_CREDIT"
+                                ? styles.adminCredit
+                                : styles.received
                         }
                       >
                         {row.kind}
