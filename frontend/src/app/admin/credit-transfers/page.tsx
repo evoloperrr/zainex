@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { useCurrency } from "@/components/currency-provider";
+
 import styles from "../admin.module.css";
 
 type TransferRow = {
@@ -31,14 +33,6 @@ type TransfersResponse = {
 };
 
 const PER_PAGE = 25;
-
-function formatCredits(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-  ).format(value);
-}
 
 function formatDate(
   value: string,
@@ -76,6 +70,8 @@ function statusPillClass(
 }
 
 export default function AdminCreditTransfersPage() {
+  const { formatCredits } = useCurrency();
+
   const [page, setPage] =
     useState(1);
 

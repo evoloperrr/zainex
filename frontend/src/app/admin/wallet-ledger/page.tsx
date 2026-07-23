@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { useCurrency } from "@/components/currency-provider";
+
 import styles from "../admin.module.css";
 
 type LedgerRow = {
@@ -35,20 +37,6 @@ type LedgerResponse = {
 };
 
 const PER_PAGE = 25;
-
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
 
 function formatDate(
   value: string,
@@ -87,6 +75,8 @@ function directionPillClass(
 }
 
 export default function AdminWalletLedgerPage() {
+  const { formatUsd } = useCurrency();
+
   const [eventType, setEventType] =
     useState("");
 

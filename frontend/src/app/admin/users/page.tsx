@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 
+import { useCurrency } from "@/components/currency-provider";
+
 import styles from "../admin.module.css";
 
 type AdminUser = {
@@ -54,20 +56,6 @@ type OpenAction =
   | null;
 
 const PER_PAGE = 20;
-
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
 
 function formatDate(
   value: string | null,
@@ -116,6 +104,8 @@ function vipPillClass(
 }
 
 export default function AdminUsersPage() {
+  const { formatUsd } = useCurrency();
+
   const [search, setSearch] =
     useState("");
 

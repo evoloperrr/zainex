@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { useCurrency } from "@/components/currency-provider";
+
 import styles from "./admin.module.css";
 
 type OverviewResponse = {
@@ -29,20 +31,6 @@ type OverviewResponse = {
     message?: string;
   };
 };
-
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
 
 function formatNumber(
   value: number,
@@ -71,6 +59,8 @@ function formatDate(
 }
 
 export default function AdminOverviewPage() {
+  const { formatUsd } = useCurrency();
+
   const [data, setData] =
     useState<OverviewResponse | null>(
       null,

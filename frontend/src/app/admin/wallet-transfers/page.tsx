@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { useCurrency } from "@/components/currency-provider";
+
 import styles from "../admin.module.css";
 
 type TransferRow = {
@@ -31,20 +33,6 @@ type TransfersResponse = {
 };
 
 const PER_PAGE = 25;
-
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
 
 function formatDate(
   value: string,
@@ -82,6 +70,8 @@ function statusPillClass(
 }
 
 export default function AdminWalletTransfersPage() {
+  const { formatUsd } = useCurrency();
+
   const [page, setPage] =
     useState(1);
 

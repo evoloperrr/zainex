@@ -9,6 +9,8 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { CurrencySwitcher } from "@/components/currency-switcher";
+
 import styles from "./admin.module.css";
 
 type AccountResponse = {
@@ -159,13 +161,21 @@ export default function AdminLayout({
           </strong>
         </div>
 
-        <span
+        <div
           className={
-            styles.adminEmail
+            styles.headerActions
           }
         >
-          {adminEmail}
-        </span>
+          <CurrencySwitcher />
+
+          <span
+            className={
+              styles.adminEmail
+            }
+          >
+            {adminEmail}
+          </span>
+        </div>
       </header>
 
       <nav className={styles.tabs}>

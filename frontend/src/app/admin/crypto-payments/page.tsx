@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { useCurrency } from "@/components/currency-provider";
+
 import styles from "../admin.module.css";
 
 type CryptoPayment = {
@@ -46,20 +48,6 @@ const STATUS_OPTIONS = [
   "failed",
   "expired",
 ];
-
-function formatUsd(
-  value: number,
-): string {
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    },
-  ).format(value);
-}
 
 function formatDate(
   value: string | null,
@@ -104,6 +92,8 @@ function statusPillClass(
 }
 
 export default function AdminCryptoPaymentsPage() {
+  const { formatUsd } = useCurrency();
+
   const [status, setStatus] =
     useState("");
 

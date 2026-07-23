@@ -53,6 +53,13 @@
   font-weight: 700;
 }
 
+.headerActions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
 .adminEmail {
   color: var(--z-muted);
   font-size: 13px;
