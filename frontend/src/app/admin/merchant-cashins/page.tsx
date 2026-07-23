@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 import { useCurrency } from "@/components/currency-provider";
 
@@ -96,6 +97,9 @@ function statusPillClass(
 
 export default function AdminMerchantCashinsPage() {
   const { formatUsd } = useCurrency();
+
+  const [viewingProof, setViewingProof] =
+    useState<string | null>(null);
 
   const [status, setStatus] =
     useState("pending");
@@ -197,6 +201,30 @@ export default function AdminMerchantCashinsPage() {
       disposed = true;
     };
   }, [status, page, refreshKey]);
+
+  useEffect(() => {
+    if (!viewingProof) {
+      return;
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setViewingProof(null);
+      }
+    }
+
+    window.addEventListener(
+      "keydown",
+      onKeyDown,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        onKeyDown,
+      );
+    };
+  }, [viewingProof]);
 
   function refresh() {
     setRefreshKey(
@@ -459,12 +487,16 @@ export default function AdminMerchantCashinsPage() {
                       <td>
                         {cashin.hasProofImage &&
                         cashin.proofImage ? (
-                          <a
-                            href={
-                              cashin.proofImage
+                          <button
+                            type="button"
+                            className={
+                              styles.proofThumbButton
                             }
-                            target="_blank"
-                            rel="noreferrer"
+                            onClick={() => {
+                              setViewingProof(
+                                cashin.proofImage,
+                              );
+                            }}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
@@ -483,7 +515,7 @@ export default function AdminMerchantCashinsPage() {
                                   "cover",
                               }}
                             />
-                          </a>
+                          </button>
                         ) : (
                           "—"
                         )}
@@ -806,6 +838,55 @@ export default function AdminMerchantCashinsPage() {
           </button>
         </div>
       ) : null}
+
+      {viewingProof &&
+      typeof document !==
+        "undefined"
+        ? createPortal(
+            <div
+              className={
+                styles.proofModalBackdrop
+              }
+              onClick={() => {
+                setViewingProof(null);
+              }}
+            >
+              <div
+                className={
+                  styles.proofModalContent
+                }
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                <button
+                  type="button"
+                  className={
+                    styles.proofModalClose
+                  }
+                  aria-label="Close"
+                  onClick={() => {
+                    setViewingProof(
+                      null,
+                    );
+                  }}
+                >
+                  ×
+                </button>
+
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={viewingProof}
+                  alt="Payment proof screenshot (full size)"
+                  className={
+                    styles.proofModalImage
+                  }
+                />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }
