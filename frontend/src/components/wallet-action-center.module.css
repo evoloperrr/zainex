@@ -142,7 +142,8 @@
 .converted,
 .sent,
 .received,
-.adminCredit {
+.adminCredit,
+.vipGrant {
   display: inline-flex;
   min-height: 27px;
   align-items: center;
@@ -184,6 +185,14 @@
   color: #ffcf6b;
   background:
     rgba(255, 190, 60, 0.08);
+}
+
+.vipGrant {
+  border: 1px solid
+    rgba(190, 140, 255, 0.24);
+  color: #c9a6ff;
+  background:
+    rgba(160, 110, 255, 0.08);
 }
 
 .credit {

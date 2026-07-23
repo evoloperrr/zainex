@@ -305,9 +305,13 @@ final class AdminController extends Controller
     /**
      * @return array{status: int, payload: array<string, mixed>}
      */
-    private function applyVipGrant(string $targetEmail, string $planName, int $months): array
-    {
-        return DB::transaction(function () use ($targetEmail, $planName, $months): array {
+    private function applyVipGrant(
+        string $targetEmail,
+        string $planName,
+        int $months,
+        ?string $referenceKey = null,
+    ): array {
+        return DB::transaction(function () use ($targetEmail, $planName, $months, $referenceKey): array {
             $target = DB::table('users')
                 ->whereRaw('LOWER(email) = ?', [$targetEmail])
                 ->lockForUpdate()
@@ -332,14 +336,63 @@ final class AdminController extends Controller
                 : now();
 
             $expiresAt = $base->copy()->addMonths($months);
+            $occurredAt = now();
 
             DB::table('users')
                 ->where('id', $target->id)
                 ->update([
                     'vip_tier' => $planName,
                     'vip_expires_at' => $expiresAt,
-                    'updated_at' => now(),
+                    'updated_at' => $occurredAt,
                 ]);
+
+            // VIP grants don't move any wallet funds, but they're still an
+            // admin-driven credit the user should see a record of — log it
+            // in the same wallet_transactions ledger (before/after balances
+            // are unchanged, the grant details live in metadata) so it
+            // shows up both in the admin Wallet ledger tab and the user's
+            // own wallet activity feed.
+            $account = DB::table('trading_accounts')
+                ->where('user_id', $target->id)
+                ->where('account_type', 'PAPER')
+                ->where('status', 'ACTIVE')
+                ->first();
+
+            $balance = $account !== null
+                ? DB::table('trading_balances')
+                    ->where('trading_account_id', $account->id)
+                    ->where('asset', self::ASSET)
+                    ->first()
+                : null;
+
+            if ($account !== null && $balance !== null) {
+                DB::table('wallet_transactions')->insert([
+                    'trading_account_id' => $account->id,
+                    'user_id' => $target->id,
+                    'strategy_activation_id' => null,
+                    'event_type' => 'ADMIN_VIP_GRANT',
+                    'direction' => 'CREDIT',
+                    'asset' => 'VIP',
+                    'amount' => '0.00000000',
+                    'wallet_balance_before' => (string) $target->wallet_balance,
+                    'wallet_balance_after' => (string) $target->wallet_balance,
+                    'available_balance_before' => (string) $balance->available_balance,
+                    'available_balance_after' => (string) $balance->available_balance,
+                    'strategy_locked_before' => (string) ($balance->strategy_locked_balance ?? '0'),
+                    'strategy_locked_after' => (string) ($balance->strategy_locked_balance ?? '0'),
+                    'ai_credits_before' => (int) $target->ai_credits,
+                    'ai_credits_after' => (int) $target->ai_credits,
+                    'reference_key' => $referenceKey ?? 'vip-grant:manual:'.Str::uuid(),
+                    'description' => "Granted {$planName} for {$months} month(s).",
+                    'metadata' => json_encode([
+                        'vipTier' => $planName,
+                        'months' => $months,
+                        'expiresAt' => (string) $expiresAt,
+                    ], JSON_THROW_ON_ERROR),
+                    'occurred_at' => $occurredAt,
+                    'created_at' => $occurredAt,
+                ]);
+            }
 
             return [
                 'status' => 200,
@@ -390,6 +443,7 @@ final class AdminController extends Controller
 
             $account = DB::table('trading_accounts')
                 ->where('user_id', $target->id)
+                ->where('account_type', 'PAPER')
                 ->where('status', 'ACTIVE')
                 ->lockForUpdate()
                 ->first();
@@ -893,7 +947,12 @@ final class AdminController extends Controller
 
         try {
             if ($cashin->purpose === 'subscription') {
-                $result = $this->applyVipGrant($targetEmail, (string) $cashin->plan_name, $months);
+                $result = $this->applyVipGrant(
+                    $targetEmail,
+                    (string) $cashin->plan_name,
+                    $months,
+                    'vip-grant:merchant-cashin:'.$cashin->id,
+                );
             } else {
                 $result = $this->applyWalletCredit(
                     $targetEmail,

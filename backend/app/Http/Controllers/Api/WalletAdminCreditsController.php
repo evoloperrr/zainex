@@ -13,19 +13,21 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 // ZAINEX_WALLET_ADMIN_CREDIT_ACTIVITY_V1
-// Surfaces a user's own ADMIN_MANUAL_CREDIT wallet_transactions rows —
-// written by AdminController::applyWalletCredit() for both a direct
-// admin wallet credit and an approved merchant cash-in (GoTyme) — so
-// they show up in the user-facing wallet activity feed. That feed
-// previously only combined WALLET_TO_CREDITS conversions and credit
-// transfers, so an approved cash-in was invisible to the user even
-// though it was already recorded in the admin-only Wallet ledger tab.
+// Surfaces a user's own admin-driven wallet_transactions rows — written
+// by AdminController::applyWalletCredit() (direct admin wallet credit or
+// an approved merchant cash-in) and AdminController::applyVipGrant()
+// (direct VIP grant or a cash-in-approved subscription) — so they show
+// up in the user-facing wallet activity feed. That feed previously only
+// combined WALLET_TO_CREDITS conversions and credit transfers, so an
+// approved cash-in was invisible to the user even though it was already
+// recorded in the admin-only Wallet ledger tab.
 
 final class WalletAdminCreditsController extends Controller
 {
     use LinksTradingAccountToUser;
 
-    private const EVENT_TYPE = 'ADMIN_MANUAL_CREDIT';
+    /** @var list<string> */
+    private const EVENT_TYPES = ['ADMIN_MANUAL_CREDIT', 'ADMIN_VIP_GRANT'];
 
     public function index(Request $request): JsonResponse
     {
@@ -86,20 +88,30 @@ final class WalletAdminCreditsController extends Controller
     {
         return DB::table('wallet_transactions')
             ->where('trading_account_id', $accountId)
-            ->where('event_type', self::EVENT_TYPE)
+            ->whereIn('event_type', self::EVENT_TYPES)
             ->orderByDesc('occurred_at')
             ->orderByDesc('id')
             ->limit(10)
             ->get()
-            ->map(fn (object $row): array => [
-                'id' => (int) $row->id,
-                'amountUsd' => (float) $row->amount,
-                'walletBalanceBefore' => (float) $row->wallet_balance_before,
-                'walletBalanceAfter' => (float) $row->wallet_balance_after,
-                'description' => $row->description,
-                'referenceKey' => $row->reference_key,
-                'occurredAt' => $row->occurred_at,
-            ])
+            ->map(function (object $row): array {
+                $metadata = is_string($row->metadata)
+                    ? (json_decode($row->metadata, true) ?: [])
+                    : [];
+
+                return [
+                    'id' => (int) $row->id,
+                    'eventType' => (string) $row->event_type,
+                    'amountUsd' => (float) $row->amount,
+                    'walletBalanceBefore' => (float) $row->wallet_balance_before,
+                    'walletBalanceAfter' => (float) $row->wallet_balance_after,
+                    'description' => $row->description,
+                    'referenceKey' => $row->reference_key,
+                    'occurredAt' => $row->occurred_at,
+                    'vipTier' => $metadata['vipTier'] ?? null,
+                    'vipMonths' => $metadata['months'] ?? null,
+                    'vipExpiresAt' => $metadata['expiresAt'] ?? null,
+                ];
+            })
             ->values()
             ->all();
     }

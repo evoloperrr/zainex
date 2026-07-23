@@ -67,11 +67,17 @@ type TransferResponse = {
 
 type AdminCreditLog = {
   id: number;
+  eventType:
+    | "ADMIN_MANUAL_CREDIT"
+    | "ADMIN_VIP_GRANT";
   amountUsd: number;
   walletBalanceBefore: number;
   walletBalanceAfter: number;
   description: string | null;
   occurredAt: string;
+  vipTier: string | null;
+  vipMonths: number | null;
+  vipExpiresAt: string | null;
 };
 
 type AdminCreditResponse = {
@@ -83,7 +89,8 @@ type ActivityKind =
   | "CONVERTED"
   | "SENT"
   | "RECEIVED"
-  | "ADMIN_CREDIT";
+  | "ADMIN_CREDIT"
+  | "VIP_GRANT";
 
 type ActivityRow = {
   key: string;
@@ -217,29 +224,57 @@ function combineLogs(
 
   const adminCreditRows =
     adminCredits.map(
-      (log): ActivityRow => ({
-        key: `admin-credit-${log.id}`,
-        kind: "ADMIN_CREDIT",
-        title:
-          `${formatUsd(
-            log.amountUsd,
-          )} credited`,
-        detail:
-          log.description ||
-          "Credited by an admin",
-        change:
-          `+${formatUsd(
-            log.amountUsd,
-          )}`,
-        balance:
-          `${formatUsd(
-            log.walletBalanceBefore,
-          )} → ${formatUsd(
-            log.walletBalanceAfter,
-          )}`,
-        occurredAt:
-          log.occurredAt,
-      }),
+      (log): ActivityRow => {
+        if (
+          log.eventType ===
+          "ADMIN_VIP_GRANT"
+        ) {
+          return {
+            key: `admin-vip-${log.id}`,
+            kind: "VIP_GRANT",
+            title:
+              `${log.vipTier ?? "VIP"} granted`,
+            detail:
+              log.description ||
+              `${
+                log.vipMonths ?? 1
+              } month(s)`,
+            change:
+              log.vipExpiresAt
+                ? `Until ${formatDate(
+                    log.vipExpiresAt,
+                  )}`
+                : "Activated",
+            balance: "—",
+            occurredAt:
+              log.occurredAt,
+          };
+        }
+
+        return {
+          key: `admin-credit-${log.id}`,
+          kind: "ADMIN_CREDIT",
+          title:
+            `${formatUsd(
+              log.amountUsd,
+            )} credited`,
+          detail:
+            log.description ||
+            "Credited by an admin",
+          change:
+            `+${formatUsd(
+              log.amountUsd,
+            )}`,
+          balance:
+            `${formatUsd(
+              log.walletBalanceBefore,
+            )} → ${formatUsd(
+              log.walletBalanceAfter,
+            )}`,
+          occurredAt:
+            log.occurredAt,
+        };
+      },
     );
 
   return [
@@ -725,7 +760,10 @@ export function WalletActionCenter({
                               : row.kind ===
                                   "ADMIN_CREDIT"
                                 ? styles.adminCredit
-                                : styles.received
+                                : row.kind ===
+                                    "VIP_GRANT"
+                                  ? styles.vipGrant
+                                  : styles.received
                         }
                       >
                         {row.kind}
