@@ -167,6 +167,8 @@
   cursor: pointer;
   font: inherit;
   font-size: 12px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .quickAmounts button:hover {
@@ -268,6 +270,8 @@
   font: inherit;
   font-size: 13px;
   font-weight: 550;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .submit:disabled {

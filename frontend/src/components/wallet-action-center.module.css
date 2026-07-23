@@ -272,6 +272,7 @@
   background:
     rgba(1, 4, 16, 0.79);
   backdrop-filter: blur(13px);
+  touch-action: manipulation;
 }
 
 .modal {
@@ -317,6 +318,8 @@
   font: inherit;
   font-size: 25px;
   line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .closeButton:hover {

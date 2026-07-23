@@ -509,6 +509,8 @@
     transform 160ms ease,
     border-color 160ms ease,
     background 160ms ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cardAction:hover {
