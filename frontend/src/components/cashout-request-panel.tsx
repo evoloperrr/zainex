@@ -93,6 +93,7 @@ export function CashoutRequestPanel({
     formatUsd,
     toUsd,
     convertUsd,
+    currencySymbol,
   } = useCurrency();
 
   const [amount, setAmount] =
@@ -352,7 +353,7 @@ export function CashoutRequestPanel({
         </label>
 
         <div className={styles.amountInput}>
-          <span>$</span>
+          <span>{currencySymbol}</span>
 
           <input
             id="cashout-amount"
