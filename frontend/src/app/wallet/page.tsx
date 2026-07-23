@@ -31,8 +31,15 @@ type WalletUser = {
   avatarUrl: string | null;
   walletBalance: number;
   credits: number;
-  vipTier: string | null;
-  vipExpiresAt: string | null;
+};
+
+type CurrentStrategyResponse = {
+  ok: boolean;
+  currentStrategy?: {
+    tier?: string;
+    defaulted?: boolean;
+    activatedAt?: string | null;
+  };
 };
 
 type WalletAccount = {
@@ -65,7 +72,7 @@ type GoogleSessionResponse = {
     email?: string | null;
   };
 };
-function formatVipExpiresAt(
+function formatActivatedAt(
   value: string | null,
 ): string {
   if (!value) {
@@ -85,21 +92,6 @@ function formatVipExpiresAt(
       day: "2-digit",
       year: "numeric",
     },
-  );
-}
-
-function isVipActive(
-  value: string | null,
-): boolean {
-  if (!value) {
-    return false;
-  }
-
-  const parsed = new Date(value);
-
-  return (
-    !Number.isNaN(parsed.getTime()) &&
-    parsed.getTime() > Date.now()
   );
 }
 
@@ -149,6 +141,16 @@ function WalletContent() {
 
   const [account, setAccount] =
     useState<WalletAccount | null>(null);
+
+  const [
+    currentStrategyTier,
+    setCurrentStrategyTier,
+  ] = useState<string | null>(null);
+
+  const [
+    currentStrategyActivatedAt,
+    setCurrentStrategyActivatedAt,
+  ] = useState<string | null>(null);
 
   const [loading, setLoading] =
     useState(true);
@@ -266,6 +268,76 @@ function WalletContent() {
 
     const handleWalletChanged = () => {
       void loadWallet();
+    };
+
+    window.addEventListener(
+      "zainex:wallet-data-changed",
+      handleWalletChanged,
+    );
+
+    return () => {
+      disposed = true;
+      window.clearInterval(timer);
+
+      window.removeEventListener(
+        "zainex:wallet-data-changed",
+        handleWalletChanged,
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    let disposed = false;
+
+    async function loadCurrentStrategy() {
+      try {
+        const response = await fetch(
+          "/api/trading/futures/strategies/current",
+          {
+            cache: "no-store",
+          },
+        );
+
+        const payload =
+          (await response.json()) as CurrentStrategyResponse;
+
+        if (
+          disposed ||
+          !response.ok ||
+          !payload.ok
+        ) {
+          return;
+        }
+
+        setCurrentStrategyTier(
+          payload.currentStrategy
+            ?.defaulted
+            ? null
+            : payload.currentStrategy
+                ?.tier ?? null,
+        );
+
+        setCurrentStrategyActivatedAt(
+          payload.currentStrategy
+            ?.activatedAt ?? null,
+        );
+      } catch {
+        // Keep whatever tier was last
+        // successfully loaded.
+      }
+    }
+
+    void loadCurrentStrategy();
+
+    const timer = window.setInterval(
+      () => {
+        void loadCurrentStrategy();
+      },
+      5000,
+    );
+
+    const handleWalletChanged = () => {
+      void loadCurrentStrategy();
     };
 
     window.addEventListener(
@@ -556,33 +628,24 @@ function WalletContent() {
                 <span>VIP TIER</span>
                 <strong
                   className={
-                    isVipActive(
-                      user?.vipExpiresAt ??
-                        null,
-                    )
+                    currentStrategyTier
                       ? styles.positive
                       : ""
                   }
                 >
-                  {isVipActive(
-                    user?.vipExpiresAt ??
-                      null,
-                  ) && user?.vipTier
-                    ? user.vipTier
-                    : "FREE"}
+                  {currentStrategyTier ??
+                    "FREE"}
                 </strong>
               </div>
 
-              {isVipActive(
-                user?.vipExpiresAt ??
-                  null,
-              ) ? (
+              {currentStrategyTier ? (
                 <div>
-                  <span>VIP EXPIRES</span>
+                  <span>
+                    STRATEGY ACTIVATED
+                  </span>
                   <strong>
-                    {formatVipExpiresAt(
-                      user?.vipExpiresAt ??
-                        null,
+                    {formatActivatedAt(
+                      currentStrategyActivatedAt,
                     )}
                   </strong>
                 </div>

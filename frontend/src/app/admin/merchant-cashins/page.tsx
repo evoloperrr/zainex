@@ -123,9 +123,6 @@ export default function AdminMerchantCashinsPage() {
     setOpenAction,
   ] = useState<OpenAction>(null);
 
-  const [months, setMonths] =
-    useState("1");
-
   const [
     rejectNote,
     setRejectNote,
@@ -247,10 +244,6 @@ export default function AdminMerchantCashinsPage() {
             "Content-Type":
               "application/json",
           },
-          body: JSON.stringify({
-            months:
-              Number(months) || 1,
-          }),
         },
       );
 
@@ -624,51 +617,18 @@ export default function AdminMerchantCashinsPage() {
                               styles.inlineForm
                             }
                           >
-                            {cashin.purpose ===
-                            "subscription" ? (
-                              <>
-                                <input
-                                  type="number"
-                                  min={
-                                    1
-                                  }
-                                  max={
-                                    24
-                                  }
-                                  value={
-                                    months
-                                  }
-                                  onChange={(
-                                    event,
-                                  ) => {
-                                    setMonths(
-                                      event
-                                        .target
-                                        .value,
-                                    );
-                                  }}
-                                  style={{
-                                    width:
-                                      "70px",
-                                  }}
-                                />
-                                <span>
-                                  month(s)
-                                  of{" "}
-                                  {cashin.planName}
-                                </span>
-                              </>
-                            ) : (
-                              <span>
-                                Credit{" "}
-                                {formatUsd(
-                                  cashin.amount,
-                                )}{" "}
-                                to
-                                their
-                                wallet
-                              </span>
-                            )}
+                            <span>
+                              Credit{" "}
+                              {formatUsd(
+                                cashin.amount,
+                              )}{" "}
+                              to their
+                              wallet
+                              {cashin.purpose ===
+                              "subscription"
+                                ? ` (${cashin.planName} plan funding)`
+                                : ""}
+                            </span>
 
                             <button
                               type="button"

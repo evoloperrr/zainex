@@ -905,16 +905,6 @@ final class AdminController extends Controller
             return $guard;
         }
 
-        $validator = Validator::make($request->all(), [
-            'months' => ['nullable', 'integer', 'min:1', 'max:24'],
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error(422, 'INVALID_APPROVE_REQUEST', $validator->errors()->first());
-        }
-
-        $months = (int) ($validator->validated()['months'] ?? 1);
-
         $cashin = DB::table('merchant_cashins')->where('id', (int) $id)->first();
 
         if ($cashin === null) {
@@ -946,21 +936,26 @@ final class AdminController extends Controller
         $targetEmail = strtolower((string) $targetUser->email);
 
         try {
-            if ($cashin->purpose === 'subscription') {
-                $result = $this->applyVipGrant(
-                    $targetEmail,
+            // A "subscription" cash-in is just GoTyme payment confirmation
+            // for a plan the user intends to fund — it always credits the
+            // wallet like any other top-up. VIP tier itself is never
+            // granted here; it's decided on the strategy page when the
+            // user actually activates a VIP-tier strategy by spending the
+            // credits/wallet funds this credit makes available.
+            $description = $cashin->purpose === 'subscription'
+                ? sprintf(
+                    'Approved GoTyme merchant cash-in #%d (%s plan funding).',
+                    $cashin->id,
                     (string) $cashin->plan_name,
-                    $months,
-                    'vip-grant:merchant-cashin:'.$cashin->id,
-                );
-            } else {
-                $result = $this->applyWalletCredit(
-                    $targetEmail,
-                    (string) $cashin->amount,
-                    fn (int $accountId): string => 'merchant-cashin:'.$cashin->id,
-                    'Approved GoTyme merchant cash-in #'.$cashin->id,
-                );
-            }
+                )
+                : 'Approved GoTyme merchant cash-in #'.$cashin->id;
+
+            $result = $this->applyWalletCredit(
+                $targetEmail,
+                (string) $cashin->amount,
+                fn (int $accountId): string => 'merchant-cashin:'.$cashin->id,
+                $description,
+            );
 
             if ($result['status'] >= 400) {
                 return response()
