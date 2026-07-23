@@ -42,6 +42,10 @@ const TABS = [
     label: "Merchant cash-ins",
   },
   {
+    href: "/admin/cashouts",
+    label: "Cashouts",
+  },
+  {
     href: "/admin/crypto-payments",
     label: "Crypto payments",
   },

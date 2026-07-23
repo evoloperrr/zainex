@@ -24,6 +24,10 @@ import {
   WalletToCreditsConverter,
 } from "@/components/wallet-to-credits-converter";
 
+import {
+  CashoutRequestPanel,
+} from "@/components/cashout-request-panel";
+
 import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
 import styles from "./wallet-action-center.module.css";
@@ -31,6 +35,7 @@ import styles from "./wallet-action-center.module.css";
 type WalletAction =
   | "convert"
   | "transfer"
+  | "cashout"
   | null;
 
 type ConversionLog = {
@@ -86,13 +91,31 @@ type AdminCreditResponse = {
   logs?: AdminCreditLog[];
 };
 
+type CashoutLog = {
+  id: number;
+  amount: number;
+  destinationNote: string | null;
+  status: string;
+  adminNote: string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+};
+
+type CashoutResponse = {
+  ok: boolean;
+  logs?: CashoutLog[];
+};
+
 type ActivityKind =
   | "CONVERTED"
   | "SENT"
   | "RECEIVED"
   | "ADMIN_CREDIT"
   | "VIP_GRANT"
-  | "CRYPTO_CREDIT";
+  | "CRYPTO_CREDIT"
+  | "CASHOUT_PENDING"
+  | "CASHOUT_APPROVED"
+  | "CASHOUT_REJECTED";
 
 type ActivityRow = {
   key: string;
@@ -147,10 +170,40 @@ function formatDate(
   );
 }
 
+function kindBadgeClass(
+  kind: ActivityKind,
+  styleSheet: Record<
+    string,
+    string
+  >,
+): string {
+  switch (kind) {
+    case "CONVERTED":
+      return styleSheet.converted;
+    case "SENT":
+      return styleSheet.sent;
+    case "ADMIN_CREDIT":
+      return styleSheet.adminCredit;
+    case "VIP_GRANT":
+      return styleSheet.vipGrant;
+    case "CRYPTO_CREDIT":
+      return styleSheet.cryptoCredit;
+    case "CASHOUT_PENDING":
+      return styleSheet.cashoutPending;
+    case "CASHOUT_APPROVED":
+      return styleSheet.cashoutApproved;
+    case "CASHOUT_REJECTED":
+      return styleSheet.cashoutRejected;
+    default:
+      return styleSheet.received;
+  }
+}
+
 function combineLogs(
   conversions: ConversionLog[],
   transfers: TransferLog[],
   adminCredits: AdminCreditLog[],
+  cashouts: CashoutLog[],
   formatUsd: (
     value: number,
   ) => string,
@@ -287,10 +340,57 @@ function combineLogs(
       },
     );
 
+  const cashoutRows =
+    cashouts.map(
+      (log): ActivityRow => {
+        const kind =
+          log.status === "approved"
+            ? "CASHOUT_APPROVED"
+            : log.status === "rejected"
+              ? "CASHOUT_REJECTED"
+              : "CASHOUT_PENDING";
+
+        const detail =
+          log.status === "rejected" &&
+          log.adminNote
+            ? `Rejected — ${log.adminNote}`
+            : log.status === "approved"
+              ? "Sent — funds left your wallet"
+              : log.destinationNote ||
+                "Pending admin review";
+
+        return {
+          key: `cashout-${log.id}`,
+          kind,
+          title:
+            `${formatUsd(
+              log.amount,
+            )} cashout ${log.status}`,
+          detail,
+          change:
+            log.status === "rejected"
+              ? `+${formatUsd(
+                  log.amount,
+                )} released`
+              : `-${formatUsd(
+                  log.amount,
+                )}`,
+          balance:
+            log.status === "pending"
+              ? "Held pending review"
+              : "—",
+          occurredAt:
+            log.reviewedAt ??
+            log.createdAt,
+        };
+      },
+    );
+
   return [
     ...conversionRows,
     ...transferRows,
     ...adminCreditRows,
+    ...cashoutRows,
   ]
     .sort(
       (left, right) =>
@@ -345,6 +445,11 @@ export function WalletActionCenter({
   ] = useState<AdminCreditLog[]>([]);
 
   const [
+    cashoutLogs,
+    setCashoutLogs,
+  ] = useState<CashoutLog[]>([]);
+
+  const [
     loading,
     setLoading,
   ] = useState(true);
@@ -360,6 +465,7 @@ export function WalletActionCenter({
         conversionResponse,
         transferResponse,
         adminCreditResponse,
+        cashoutResponse,
       ] = await Promise.all([
         fetch(
           "/api/trading/futures/wallet/convert",
@@ -385,12 +491,21 @@ export function WalletActionCenter({
               "same-origin",
           },
         ),
+        fetch(
+          "/api/trading/futures/wallet/cashout",
+          {
+            cache: "no-store",
+            credentials:
+              "same-origin",
+          },
+        ),
       ]);
 
       const [
         conversionPayload,
         transferPayload,
         adminCreditPayload,
+        cashoutPayload,
       ] = await Promise.all([
         conversionResponse.json() as
           Promise<ConversionResponse>,
@@ -398,6 +513,8 @@ export function WalletActionCenter({
           Promise<TransferResponse>,
         adminCreditResponse.json() as
           Promise<AdminCreditResponse>,
+        cashoutResponse.json() as
+          Promise<CashoutResponse>,
       ]);
 
       if (
@@ -428,9 +545,19 @@ export function WalletActionCenter({
       }
 
       if (
+        cashoutResponse.ok &&
+        cashoutPayload.ok
+      ) {
+        setCashoutLogs(
+          cashoutPayload.logs ?? [],
+        );
+      }
+
+      if (
         !conversionResponse.ok &&
         !transferResponse.ok &&
-        !adminCreditResponse.ok
+        !adminCreditResponse.ok &&
+        !cashoutResponse.ok
       ) {
         throw new Error(
           "Wallet activity is unavailable.",
@@ -478,6 +605,13 @@ export function WalletActionCenter({
       );
     }
 
+    // Separate from handleRefresh (which re-dispatches
+    // zainex:wallet-data-changed) so listening for it here
+    // doesn't loop back on itself — this only re-fetches.
+    function handleWalletDataChanged() {
+      void refresh();
+    }
+
     window.addEventListener(
       "focus",
       handleRefresh,
@@ -491,6 +625,11 @@ export function WalletActionCenter({
     window.addEventListener(
       "zainex:credits-transferred",
       handleRefresh,
+    );
+
+    window.addEventListener(
+      "zainex:wallet-data-changed",
+      handleWalletDataChanged,
     );
 
     return () => {
@@ -512,6 +651,11 @@ export function WalletActionCenter({
         "zainex:credits-transferred",
         handleRefresh,
       );
+
+      window.removeEventListener(
+        "zainex:wallet-data-changed",
+        handleWalletDataChanged,
+      );
     };
   }, []);
 
@@ -526,7 +670,8 @@ export function WalletActionCenter({
 
       if (
         action === "convert" ||
-        action === "transfer"
+        action === "transfer" ||
+        action === "cashout"
       ) {
         setOpenAction(action);
       }
@@ -581,6 +726,7 @@ export function WalletActionCenter({
         conversionLogs,
         transferLogs,
         adminCreditLogs,
+        cashoutLogs,
         formatUsd,
         formatCredits,
       ),
@@ -588,6 +734,7 @@ export function WalletActionCenter({
       conversionLogs,
       transferLogs,
       adminCreditLogs,
+      cashoutLogs,
       formatUsd,
       formatCredits,
     ],
@@ -617,7 +764,9 @@ export function WalletActionCenter({
               aria-label={
                 openAction === "convert"
                   ? "Convert wallet funds to AI credits"
-                  : "Transfer AI credits by email"
+                  : openAction === "cashout"
+                    ? "Request a wallet cashout"
+                    : "Transfer AI credits by email"
               }
             >
               <button
@@ -640,6 +789,13 @@ export function WalletActionCenter({
                     availableBalance
                   }
                   credits={credits}
+                />
+              ) : openAction ===
+                "cashout" ? (
+                <CashoutRequestPanel
+                  availableBalance={
+                    availableBalance
+                  }
                 />
               ) : (
                 <CreditTransferPanel
@@ -760,24 +916,10 @@ export function WalletActionCenter({
                   <tr key={row.key}>
                     <td>
                       <span
-                        className={
-                          row.kind ===
-                          "CONVERTED"
-                            ? styles.converted
-                            : row.kind ===
-                                "SENT"
-                              ? styles.sent
-                              : row.kind ===
-                                  "ADMIN_CREDIT"
-                                ? styles.adminCredit
-                                : row.kind ===
-                                    "VIP_GRANT"
-                                  ? styles.vipGrant
-                                  : row.kind ===
-                                      "CRYPTO_CREDIT"
-                                    ? styles.cryptoCredit
-                                    : styles.received
-                        }
+                        className={kindBadgeClass(
+                          row.kind,
+                          styles,
+                        )}
                       >
                         {row.kind}
                       </span>
@@ -796,8 +938,11 @@ export function WalletActionCenter({
                     <td>
                       <strong
                         className={
+                          row.kind === "SENT" ||
                           row.kind ===
-                          "SENT"
+                            "CASHOUT_PENDING" ||
+                          row.kind ===
+                            "CASHOUT_APPROVED"
                             ? styles.debit
                             : styles.credit
                         }

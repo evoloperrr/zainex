@@ -1029,6 +1029,374 @@ final class AdminController extends Controller
             ->header('Cache-Control', 'no-store');
     }
 
+    public function cashoutRequests(Request $request): JsonResponse
+    {
+        $guard = $this->authorize($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        [$page, $perPage] = $this->pagination($request);
+
+        $status = trim((string) $request->query('status', ''));
+
+        $query = DB::table('cashout_requests as cr')
+            ->leftJoin('users as u', 'u.id', '=', 'cr.user_id')
+            ->leftJoin('users as reviewer', 'reviewer.id', '=', 'cr.reviewed_by')
+            ->select(
+                'cr.id',
+                'cr.amount',
+                'cr.destination_note',
+                'cr.status',
+                'cr.admin_note',
+                'cr.reviewed_at',
+                'cr.created_at',
+                'u.email as user_email',
+                'reviewer.email as reviewer_email',
+            );
+
+        if ($status !== '') {
+            $query->where('cr.status', $status);
+        }
+
+        $total = (clone $query)->count();
+
+        $rows = $query
+            ->orderByDesc('cr.created_at')
+            ->forPage($page, $perPage)
+            ->get()
+            ->map(fn (object $row): array => [
+                'id' => (int) $row->id,
+                'userEmail' => $row->user_email,
+                'amount' => (float) $row->amount,
+                'destinationNote' => $row->destination_note,
+                'status' => (string) $row->status,
+                'adminNote' => $row->admin_note,
+                'reviewerEmail' => $row->reviewer_email,
+                'reviewedAt' => $row->reviewed_at,
+                'createdAt' => (string) $row->created_at,
+            ])
+            ->values()
+            ->all();
+
+        return response()
+            ->json([
+                'ok' => true,
+                'page' => $page,
+                'perPage' => $perPage,
+                'total' => $total,
+                'cashouts' => $rows,
+            ])
+            ->header('Cache-Control', 'no-store');
+    }
+
+    public function approveCashoutRequest(Request $request, string $id): JsonResponse
+    {
+        [$guard, $admin] = $this->authorizeWithActor($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        $validator = Validator::make($request->all(), [
+            'note' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(422, 'INVALID_APPROVE_REQUEST', $validator->errors()->first());
+        }
+
+        $note = trim((string) ($validator->validated()['note'] ?? ''));
+
+        try {
+            $result = DB::transaction(function () use ($id, $admin, $note): array {
+                $cashout = DB::table('cashout_requests')
+                    ->where('id', (int) $id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($cashout === null) {
+                    return [
+                        'status' => 404,
+                        'payload' => $this->errorPayload(
+                            'CASHOUT_REQUEST_NOT_FOUND',
+                            'That cashout request was not found.',
+                        ),
+                    ];
+                }
+
+                if ($cashout->status !== 'pending') {
+                    return [
+                        'status' => 409,
+                        'payload' => $this->errorPayload(
+                            'CASHOUT_REQUEST_ALREADY_REVIEWED',
+                            'That cashout request was already reviewed.',
+                        ),
+                    ];
+                }
+
+                if ($cashout->trading_account_id === null || $cashout->user_id === null) {
+                    return [
+                        'status' => 409,
+                        'payload' => $this->errorPayload(
+                            'CASHOUT_REQUEST_NOT_LINKED',
+                            'That cashout request has no linked account.',
+                        ),
+                    ];
+                }
+
+                $user = DB::table('users')
+                    ->where('id', $cashout->user_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                $balance = DB::table('trading_balances')
+                    ->where('trading_account_id', $cashout->trading_account_id)
+                    ->where('asset', self::ASSET)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($user === null || $balance === null) {
+                    return [
+                        'status' => 409,
+                        'payload' => $this->errorPayload(
+                            'WALLET_STATE_NOT_AVAILABLE',
+                            'The linked wallet state is unavailable.',
+                        ),
+                    ];
+                }
+
+                $amount = $this->decimal($cashout->amount);
+                $walletBefore = $this->decimal($user->wallet_balance);
+                $walletAfter = $walletBefore->minus($amount)->toScale(8, RoundingMode::Down);
+
+                $available = $this->decimal($balance->available_balance);
+                $cashoutLocked = $this->decimal($balance->cashout_locked_balance);
+                $newCashoutLocked = $cashoutLocked->minus($amount)->toScale(8, RoundingMode::Down);
+
+                if ($newCashoutLocked->isLessThan(BigDecimal::of('0'))) {
+                    $newCashoutLocked = $this->decimal('0');
+                }
+
+                $occurredAt = now();
+
+                DB::table('users')
+                    ->where('id', $user->id)
+                    ->update([
+                        'wallet_balance' => (string) $walletAfter,
+                        'updated_at' => $occurredAt,
+                    ]);
+
+                DB::table('trading_balances')
+                    ->where('id', $balance->id)
+                    ->update([
+                        'cashout_locked_balance' => (string) $newCashoutLocked,
+                        'updated_at' => $occurredAt,
+                    ]);
+
+                DB::table('cashout_requests')
+                    ->where('id', $cashout->id)
+                    ->update([
+                        'status' => 'approved',
+                        'admin_note' => $note !== '' ? $note : null,
+                        'reviewed_by' => $admin?->id,
+                        'reviewed_at' => $occurredAt,
+                        'updated_at' => $occurredAt,
+                    ]);
+
+                DB::table('wallet_transactions')->insert([
+                    'trading_account_id' => $cashout->trading_account_id,
+                    'user_id' => $user->id,
+                    'strategy_activation_id' => null,
+                    'event_type' => 'CASHOUT_APPROVED',
+                    'direction' => 'DEBIT',
+                    'asset' => self::ASSET,
+                    'amount' => (string) $amount,
+                    'wallet_balance_before' => (string) $walletBefore,
+                    'wallet_balance_after' => (string) $walletAfter,
+                    'available_balance_before' => (string) $available,
+                    'available_balance_after' => (string) $available,
+                    'strategy_locked_before' => (string) $balance->strategy_locked_balance,
+                    'strategy_locked_after' => (string) $balance->strategy_locked_balance,
+                    'ai_credits_before' => (int) $user->ai_credits,
+                    'ai_credits_after' => (int) $user->ai_credits,
+                    'reference_key' => 'cashout-approved:'.$cashout->id,
+                    'description' => 'Cashout approved #'.$cashout->id.' — sent outside ZAINEX manually.',
+                    'metadata' => json_encode([
+                        'cashoutRequestId' => $cashout->id,
+                        'destinationNote' => $cashout->destination_note,
+                    ], JSON_THROW_ON_ERROR),
+                    'occurred_at' => $occurredAt,
+                    'created_at' => $occurredAt,
+                ]);
+
+                return [
+                    'status' => 200,
+                    'payload' => ['ok' => true],
+                ];
+            }, 5);
+
+            return response()
+                ->json($result['payload'], $result['status'])
+                ->header('Cache-Control', 'no-store');
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return $this->error(500, 'CASHOUT_APPROVE_FAILED', 'The cashout could not be approved.');
+        }
+    }
+
+    public function rejectCashoutRequest(Request $request, string $id): JsonResponse
+    {
+        [$guard, $admin] = $this->authorizeWithActor($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        $validator = Validator::make($request->all(), [
+            'note' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error(422, 'INVALID_REJECT_REQUEST', $validator->errors()->first());
+        }
+
+        $note = trim((string) ($validator->validated()['note'] ?? ''));
+
+        try {
+            $result = DB::transaction(function () use ($id, $admin, $note): array {
+                $cashout = DB::table('cashout_requests')
+                    ->where('id', (int) $id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($cashout === null) {
+                    return [
+                        'status' => 404,
+                        'payload' => $this->errorPayload(
+                            'CASHOUT_REQUEST_NOT_FOUND',
+                            'That cashout request was not found.',
+                        ),
+                    ];
+                }
+
+                if ($cashout->status !== 'pending') {
+                    return [
+                        'status' => 409,
+                        'payload' => $this->errorPayload(
+                            'CASHOUT_REQUEST_ALREADY_REVIEWED',
+                            'That cashout request was already reviewed.',
+                        ),
+                    ];
+                }
+
+                if ($cashout->trading_account_id === null) {
+                    DB::table('cashout_requests')
+                        ->where('id', $cashout->id)
+                        ->update([
+                            'status' => 'rejected',
+                            'admin_note' => $note !== '' ? $note : null,
+                            'reviewed_by' => $admin?->id,
+                            'reviewed_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+
+                    return ['status' => 200, 'payload' => ['ok' => true]];
+                }
+
+                $balance = DB::table('trading_balances')
+                    ->where('trading_account_id', $cashout->trading_account_id)
+                    ->where('asset', self::ASSET)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($balance === null) {
+                    return [
+                        'status' => 409,
+                        'payload' => $this->errorPayload(
+                            'WALLET_STATE_NOT_AVAILABLE',
+                            'The linked wallet state is unavailable.',
+                        ),
+                    ];
+                }
+
+                $amount = $this->decimal($cashout->amount);
+                $available = $this->decimal($balance->available_balance);
+                $newAvailable = $available->plus($amount)->toScale(8, RoundingMode::Down);
+
+                $cashoutLocked = $this->decimal($balance->cashout_locked_balance);
+                $newCashoutLocked = $cashoutLocked->minus($amount)->toScale(8, RoundingMode::Down);
+
+                if ($newCashoutLocked->isLessThan(BigDecimal::of('0'))) {
+                    $newCashoutLocked = $this->decimal('0');
+                }
+
+                $occurredAt = now();
+
+                DB::table('trading_balances')
+                    ->where('id', $balance->id)
+                    ->update([
+                        'available_balance' => (string) $newAvailable,
+                        'cashout_locked_balance' => (string) $newCashoutLocked,
+                        'updated_at' => $occurredAt,
+                    ]);
+
+                DB::table('cashout_requests')
+                    ->where('id', $cashout->id)
+                    ->update([
+                        'status' => 'rejected',
+                        'admin_note' => $note !== '' ? $note : null,
+                        'reviewed_by' => $admin?->id,
+                        'reviewed_at' => $occurredAt,
+                        'updated_at' => $occurredAt,
+                    ]);
+
+                if ($cashout->user_id !== null) {
+                    $user = DB::table('users')->where('id', $cashout->user_id)->first();
+
+                    DB::table('wallet_transactions')->insert([
+                        'trading_account_id' => $cashout->trading_account_id,
+                        'user_id' => $cashout->user_id,
+                        'strategy_activation_id' => null,
+                        'event_type' => 'CASHOUT_REJECTED',
+                        'direction' => 'UNLOCK',
+                        'asset' => self::ASSET,
+                        'amount' => (string) $amount,
+                        'wallet_balance_before' => (string) $user->wallet_balance,
+                        'wallet_balance_after' => (string) $user->wallet_balance,
+                        'available_balance_before' => (string) $available,
+                        'available_balance_after' => (string) $newAvailable,
+                        'strategy_locked_before' => (string) $balance->strategy_locked_balance,
+                        'strategy_locked_after' => (string) $balance->strategy_locked_balance,
+                        'ai_credits_before' => (int) $user->ai_credits,
+                        'ai_credits_after' => (int) $user->ai_credits,
+                        'reference_key' => 'cashout-rejected:'.$cashout->id,
+                        'description' => $note !== ''
+                            ? 'Cashout request rejected — '.$note
+                            : 'Cashout request rejected — funds released back to available balance.',
+                        'metadata' => json_encode([
+                            'cashoutRequestId' => $cashout->id,
+                        ], JSON_THROW_ON_ERROR),
+                        'occurred_at' => $occurredAt,
+                        'created_at' => $occurredAt,
+                    ]);
+                }
+
+                return ['status' => 200, 'payload' => ['ok' => true]];
+            }, 5);
+
+            return response()
+                ->json($result['payload'], $result['status'])
+                ->header('Cache-Control', 'no-store');
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return $this->error(500, 'CASHOUT_REJECT_FAILED', 'The cashout could not be rejected.');
+        }
+    }
+
     /**
      * @return array{int, int}
      */

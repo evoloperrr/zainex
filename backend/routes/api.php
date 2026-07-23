@@ -219,6 +219,16 @@ Route::post(
     ],
 )->middleware('throttle:20,1');
 
+// ZAINEX_CASHOUT_REQUEST_V1
+Route::controller(
+    \App\Http\Controllers\Api\CashoutRequestController::class
+)->prefix('/trading/futures/wallet/cashout')->group(function (): void {
+    Route::get('/', 'index')
+        ->middleware('throttle:60,1');
+    Route::post('/', 'store')
+        ->middleware('throttle:20,1');
+});
+
 // ZAINEX_ADMIN_CONSOLE_V1
 Route::controller(
     \App\Http\Controllers\Api\AdminController::class
@@ -248,5 +258,11 @@ Route::controller(
     Route::post('/merchant-cashins/{id}/approve', 'approveMerchantCashin')
         ->middleware('throttle:20,1');
     Route::post('/merchant-cashins/{id}/reject', 'rejectMerchantCashin')
+        ->middleware('throttle:20,1');
+    Route::get('/cashout-requests', 'cashoutRequests')
+        ->middleware('throttle:60,1');
+    Route::post('/cashout-requests/{id}/approve', 'approveCashoutRequest')
+        ->middleware('throttle:20,1');
+    Route::post('/cashout-requests/{id}/reject', 'rejectCashoutRequest')
         ->middleware('throttle:20,1');
 });

@@ -144,7 +144,10 @@
 .received,
 .adminCredit,
 .vipGrant,
-.cryptoCredit {
+.cryptoCredit,
+.cashoutPending,
+.cashoutApproved,
+.cashoutRejected {
   display: inline-flex;
   min-height: 27px;
   align-items: center;
@@ -202,6 +205,30 @@
   color: #7fc7ff;
   background:
     rgba(90, 170, 255, 0.08);
+}
+
+.cashoutPending {
+  border: 1px solid
+    rgba(255, 200, 87, 0.22);
+  color: #ffcf6b;
+  background:
+    rgba(255, 190, 60, 0.08);
+}
+
+.cashoutApproved {
+  border: 1px solid
+    rgba(255, 138, 90, 0.24);
+  color: #ff9d6b;
+  background:
+    rgba(255, 120, 70, 0.08);
+}
+
+.cashoutRejected {
+  border: 1px solid
+    rgba(140, 150, 180, 0.22);
+  color: #a7b0cc;
+  background:
+    rgba(120, 130, 160, 0.08);
 }
 
 .credit {

@@ -470,35 +470,66 @@ function WalletContent() {
                   trading balance
                 </small>
 
-                <button
-                  type="button"
-                  className={styles.cardAction}
-                  aria-label="Convert wallet funds to AI credits"
-                  onClick={() => {
-                    window.dispatchEvent(
-                      new CustomEvent(
-                        "zainex:open-wallet-action",
-                        {
-                          detail: "convert",
-                        },
-                      ),
-                    );
-                  }}
-                >
-                  <i aria-hidden="true">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path d="M7 7h10" />
-                      <path d="m14 4 3 3-3 3" />
-                      <path d="M17 17H7" />
-                      <path d="m10 14-3 3 3 3" />
-                    </svg>
-                  </i>
+                <div className={styles.cardActionRow}>
+                  <button
+                    type="button"
+                    className={styles.cardAction}
+                    aria-label="Convert wallet funds to AI credits"
+                    onClick={() => {
+                      window.dispatchEvent(
+                        new CustomEvent(
+                          "zainex:open-wallet-action",
+                          {
+                            detail: "convert",
+                          },
+                        ),
+                      );
+                    }}
+                  >
+                    <i aria-hidden="true">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path d="M7 7h10" />
+                        <path d="m14 4 3 3-3 3" />
+                        <path d="M17 17H7" />
+                        <path d="m10 14-3 3 3 3" />
+                      </svg>
+                    </i>
 
-                  <span>Convert</span>
-                </button>
+                    <span>Convert</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.cardAction}
+                    aria-label="Request a wallet cashout"
+                    onClick={() => {
+                      window.dispatchEvent(
+                        new CustomEvent(
+                          "zainex:open-wallet-action",
+                          {
+                            detail: "cashout",
+                          },
+                        ),
+                      );
+                    }}
+                  >
+                    <i aria-hidden="true">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path d="M12 4v16" />
+                        <path d="m7 9 5-5 5 5" />
+                        <path d="M5 20h14" />
+                      </svg>
+                    </i>
+
+                    <span>Cash out</span>
+                  </button>
+                </div>
               </article>
 
               <article

@@ -477,6 +477,12 @@
 
 /* ZAINEX_WALLET_CARD_ACTIONS_V1 */
 
+.cardActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .cardAction {
   display: inline-flex;
   min-height: 38px;
