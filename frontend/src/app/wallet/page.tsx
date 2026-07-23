@@ -31,6 +31,8 @@ type WalletUser = {
   avatarUrl: string | null;
   walletBalance: number;
   credits: number;
+  vipTier: string | null;
+  vipExpiresAt: string | null;
 };
 
 type WalletAccount = {
@@ -63,6 +65,44 @@ type GoogleSessionResponse = {
     email?: string | null;
   };
 };
+function formatVipExpiresAt(
+  value: string | null,
+): string {
+  if (!value) {
+    return "-";
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return parsed.toLocaleString(
+    "en-US",
+    {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    },
+  );
+}
+
+function isVipActive(
+  value: string | null,
+): boolean {
+  if (!value) {
+    return false;
+  }
+
+  const parsed = new Date(value);
+
+  return (
+    !Number.isNaN(parsed.getTime()) &&
+    parsed.getTime() > Date.now()
+  );
+}
+
 function getInitials(
   name: string | null | undefined,
 ): string {
@@ -511,6 +551,42 @@ function WalletContent() {
                     : user?.role ?? "-"}
                 </strong>
               </div>
+
+              <div>
+                <span>VIP TIER</span>
+                <strong
+                  className={
+                    isVipActive(
+                      user?.vipExpiresAt ??
+                        null,
+                    )
+                      ? styles.positive
+                      : ""
+                  }
+                >
+                  {isVipActive(
+                    user?.vipExpiresAt ??
+                      null,
+                  ) && user?.vipTier
+                    ? user.vipTier
+                    : "FREE"}
+                </strong>
+              </div>
+
+              {isVipActive(
+                user?.vipExpiresAt ??
+                  null,
+              ) ? (
+                <div>
+                  <span>VIP EXPIRES</span>
+                  <strong>
+                    {formatVipExpiresAt(
+                      user?.vipExpiresAt ??
+                        null,
+                    )}
+                  </strong>
+                </div>
+              ) : null}
 
               <div>
                 <span>CURRENCY</span>

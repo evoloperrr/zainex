@@ -851,6 +851,11 @@ final class FuturesPaperTradingService
                             ),
                         ),
                         'credits' => (int) $account->user->ai_credits,
+                        // ZAINEX_WALLET_VIP_STATUS_DISPLAY_V1
+                        'vipTier' => $account->user->vip_tier,
+                        'vipExpiresAt' => $account->user->vip_expires_at !== null
+                            ? (string) $account->user->vip_expires_at
+                            : null,
                     ],
             'currency' => self::CURRENCY,
             'initialBalance' => $this->number(
