@@ -94,6 +94,7 @@ export function CashoutRequestPanel({
     toUsd,
     convertUsd,
     currencySymbol,
+    currency,
   } = useCurrency();
 
   const [amount, setAmount] =
@@ -409,7 +410,11 @@ export function CashoutRequestPanel({
           className={
             styles.destinationInput
           }
-          placeholder="e.g. GCash 0917xxxxxxx, or a bank account — payment options will be finalized soon."
+          placeholder={
+            currency === "PHP"
+              ? "e.g. GCash 0917xxxxxxx, or a bank account — payment options will be finalized soon."
+              : "e.g. your bank account details — payment options will be finalized soon."
+          }
           value={destinationNote}
           maxLength={500}
           onChange={(event) => {
