@@ -257,7 +257,7 @@ function combineLogs(
           title:
             `${formatUsd(
               log.amountUsd,
-            )} credited`,
+            )} wallet credited`,
           detail:
             log.description ||
             "Credited by an admin",
@@ -740,7 +740,7 @@ export function WalletActionCenter({
                   <th>TYPE</th>
                   <th>DETAILS</th>
                   <th>CHANGE</th>
-                  <th>CREDIT BALANCE</th>
+                  <th>BALANCE</th>
                   <th>DATE</th>
                 </tr>
               </thead>
