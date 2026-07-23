@@ -60,14 +60,14 @@ final class WalletCreditsApiTest extends TestCase
             );
 
         $this->assertSame(
-            10000.0,
+            100000.0,
             (float) $response->json(
                 'account.user.walletBalance',
             ),
         );
 
         $this->assertSame(
-            10000.0,
+            100000.0,
             (float) $response->json(
                 'account.availableBalance',
             ),

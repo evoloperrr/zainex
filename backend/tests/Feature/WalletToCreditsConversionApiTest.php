@@ -83,7 +83,7 @@ final class WalletToCreditsConversionApiTest extends TestCase
             );
 
         self::assertSame(
-            9975.0,
+            99975.0,
             (float) DB::table('users')
                 ->where(
                     'email',
@@ -105,7 +105,7 @@ final class WalletToCreditsConversionApiTest extends TestCase
         );
 
         self::assertSame(
-            9975.0,
+            99975.0,
             (float) DB::table(
                 'trading_balances',
             )
@@ -167,7 +167,7 @@ final class WalletToCreditsConversionApiTest extends TestCase
             );
 
         self::assertSame(
-            9990.0,
+            99990.0,
             (float) DB::table('users')
                 ->where(
                     'email',

@@ -51,11 +51,11 @@ final class FuturesStrategyFinalRulesApiTest extends TestCase
             ->assertCreated()
             ->assertJsonPath(
                 'result.account.walletBalance',
-                10000,
+                100000,
             )
             ->assertJsonPath(
                 'result.account.availableBalance',
-                9200,
+                99200,
             )
             ->assertJsonPath(
                 'result.account.strategyLockedBalance',
@@ -89,7 +89,7 @@ final class FuturesStrategyFinalRulesApiTest extends TestCase
         );
 
         self::assertSame(
-            10000.0,
+            100000.0,
             (float) DB::table('users')
                 ->where(
                     'email',

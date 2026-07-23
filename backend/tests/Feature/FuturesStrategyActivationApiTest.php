@@ -88,11 +88,11 @@ final class FuturesStrategyActivationApiTest extends TestCase
             )
             ->assertJsonPath(
                 'result.account.walletBalance',
-                10000,
+                100000,
             )
             ->assertJsonPath(
                 'result.account.availableBalance',
-                9500,
+                99500,
             )
             ->assertJsonPath(
                 'result.account.lockedBalance',
@@ -202,7 +202,7 @@ final class FuturesStrategyActivationApiTest extends TestCase
         );
 
         self::assertSame(
-            10000.0,
+            100000.0,
             (float) $user->wallet_balance,
         );
     }
@@ -239,11 +239,11 @@ final class FuturesStrategyActivationApiTest extends TestCase
             )
             ->assertJsonPath(
                 'result.account.walletBalance',
-                10000,
+                100000,
             )
             ->assertJsonPath(
                 'result.account.availableBalance',
-                9900,
+                99900,
             );
     }
 
@@ -255,7 +255,7 @@ final class FuturesStrategyActivationApiTest extends TestCase
                 '/api/trading/futures/strategies/activate',
                 [
                     'tier' => 'VIP 3',
-                    'amount' => '20000',
+                    'amount' => '200000',
                     'clientRequestId' =>
                         (string) Str::uuid(),
                 ],
@@ -291,7 +291,7 @@ final class FuturesStrategyActivationApiTest extends TestCase
         );
 
         self::assertSame(
-            10000.0,
+            100000.0,
             (float) $user->wallet_balance,
         );
 
