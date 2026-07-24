@@ -807,20 +807,27 @@ function WalletAmountForm({
   onSubmit,
 }: {
   onSubmit: (
-    amount: number,
+    amountUsd: number,
   ) => void;
 }) {
+  const { currency, toUsd, convertUsd } =
+    useCurrency();
+
   const [value, setValue] =
     useState("");
 
-  const parsed = Number(value);
+  const parsedDisplay = Number(value);
+
+  const parsedUsd = toUsd(
+    parsedDisplay,
+  );
 
   const valid =
     value.trim() !== "" &&
-    Number.isFinite(parsed) &&
-    parsed >=
+    Number.isFinite(parsedDisplay) &&
+    parsedUsd >=
       MIN_WALLET_FUNDING_USD &&
-    parsed <=
+    parsedUsd <=
       MAX_WALLET_FUNDING_USD;
 
   return (
@@ -832,21 +839,25 @@ function WalletAmountForm({
         event.preventDefault();
 
         if (valid) {
-          onSubmit(parsed);
+          onSubmit(
+            Math.round(
+              parsedUsd * 100,
+            ) / 100,
+          );
         }
       }}
     >
       <input
         type="number"
         inputMode="decimal"
-        min={
-          MIN_WALLET_FUNDING_USD
-        }
-        max={
-          MAX_WALLET_FUNDING_USD
-        }
+        min={convertUsd(
+          MIN_WALLET_FUNDING_USD,
+        )}
+        max={convertUsd(
+          MAX_WALLET_FUNDING_USD,
+        )}
         step="0.01"
-        placeholder="Amount in USD"
+        placeholder={`Amount in ${currency}`}
         className={
           styles.amountInput
         }
@@ -875,21 +886,28 @@ function TopUpAmountForm({
   onSubmit,
 }: {
   onSubmit: (
-    amount: number,
+    amountUsd: number,
   ) => void;
 }) {
+  const { currency, toUsd, convertUsd } =
+    useCurrency();
+
   const [value, setValue] =
     useState("");
 
-  const parsed =
+  const parsedDisplay =
     value.trim() === ""
       ? 0
       : Number(value);
 
+  const parsedUsd = toUsd(
+    parsedDisplay,
+  );
+
   const valid =
-    Number.isFinite(parsed) &&
-    parsed >= 0 &&
-    parsed <=
+    Number.isFinite(parsedDisplay) &&
+    parsedUsd >= 0 &&
+    parsedUsd <=
       MAX_WALLET_FUNDING_USD;
 
   return (
@@ -901,7 +919,11 @@ function TopUpAmountForm({
         event.preventDefault();
 
         if (valid) {
-          onSubmit(parsed);
+          onSubmit(
+            Math.round(
+              parsedUsd * 100,
+            ) / 100,
+          );
         }
       }}
     >
@@ -909,11 +931,11 @@ function TopUpAmountForm({
         type="number"
         inputMode="decimal"
         min={0}
-        max={
-          MAX_WALLET_FUNDING_USD
-        }
+        max={convertUsd(
+          MAX_WALLET_FUNDING_USD,
+        )}
         step="0.01"
-        placeholder="Amount in USD (optional)"
+        placeholder={`Amount in ${currency} (optional)`}
         className={
           styles.amountInput
         }
@@ -932,7 +954,7 @@ function TopUpAmountForm({
         }
         disabled={!valid}
       >
-        {parsed > 0
+        {parsedUsd > 0
           ? "Continue"
           : "Skip"}
       </button>
