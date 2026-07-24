@@ -19,6 +19,7 @@ import { useCurrency } from "@/components/currency-provider";
 import { SharedProfileMenu } from "@/components/shared-profile-menu";
 import { WalletActionCenter } from "@/components/wallet-action-center";
 import { AdminWalletTransfer } from "@/components/admin-wallet-transfer";
+import { VipCheckoutChat } from "@/components/vip-checkout-chat";
 
 import styles from "./wallet.module.css";
 
@@ -165,6 +166,9 @@ function WalletContent({
 
   const [error, setError] =
     useState("");
+
+  const [rechargeOpen, setRechargeOpen] =
+    useState(false);
 
   const [
     googleIdentity,
@@ -486,6 +490,26 @@ function WalletContent({
                   <button
                     type="button"
                     className={styles.cardAction}
+                    aria-label="Recharge trading wallet"
+                    onClick={() => {
+                      setRechargeOpen(true);
+                    }}
+                  >
+                    <i aria-hidden="true">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
+                      </svg>
+                    </i>
+
+                    <span>Recharge</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.cardAction}
                     aria-label="Convert wallet funds to AI credits"
                     onClick={() => {
                       window.dispatchEvent(
@@ -741,6 +765,20 @@ function WalletContent({
           </>
         ) : null}
       </div>
+
+      {rechargeOpen ? (
+        <VipCheckoutChat
+          plan={{
+            name: "Trading Wallet",
+            price: "$0",
+            period: "",
+          }}
+          mode="wallet"
+          onClose={() => {
+            setRechargeOpen(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
