@@ -5,6 +5,8 @@ import { SharedProfileMenu } from "@/components/shared-profile-menu";
 import { useCurrency } from "@/components/currency-provider";
 import { TradingViewChart } from "@/components/tradingview-chart";
 import { FuturesPaperTerminal } from "@/components/futures-paper-terminal";
+import { LiveFuturesTerminal } from "@/components/live-futures-terminal";
+import productSwitchStyles from "@/components/live-futures-terminal.module.css";
 import { signOut } from "next-auth/react";
 import { createPortal } from "react-dom";
 import {
@@ -2853,6 +2855,13 @@ function DesktopMarketColumn({
     "spot",
   );
 
+  const [
+    tradingProduct,
+    setTradingProduct,
+  ] = useState<"paper" | "live">(
+    "paper",
+  );
+
   const paperTrades =
     paperAccount?.trades ?? [];
 
@@ -2873,45 +2882,90 @@ function DesktopMarketColumn({
           forexPair={forexPair}
         />
 
-        <FuturesPaperTerminal
-          variant="desktop"
-          activeMarket={activeMarket}
-          cryptoSymbol={cryptoSymbol}
-          forexPair={forexPair}
-          displayPrice={market.price}
-          onSpotSell={(quantity) => {
-            submitPaperTrade(
-              "SELL",
-              activeMarket,
-              market,
-              quantity,
-            );
-          }}
-          onSpotBuy={(
-            quantity,
-            stopLoss,
-            takeProfit,
-          ) => {
-            submitPaperTrade(
-              "BUY",
-              activeMarket,
-              market,
+        <div
+          className={
+            productSwitchStyles.productSwitch
+          }
+        >
+          <button
+            type="button"
+            className={
+              tradingProduct === "paper"
+                ? productSwitchStyles.activePaper
+                : ""
+            }
+            onClick={() => {
+              setTradingProduct(
+                "paper",
+              );
+            }}
+          >
+            PAPER
+          </button>
+
+          <button
+            type="button"
+            className={
+              tradingProduct === "live"
+                ? productSwitchStyles.activeLive
+                : ""
+            }
+            onClick={() => {
+              setTradingProduct(
+                "live",
+              );
+            }}
+          >
+            LIVE
+          </button>
+        </div>
+
+        {tradingProduct === "paper" ? (
+          <FuturesPaperTerminal
+            variant="desktop"
+            activeMarket={activeMarket}
+            cryptoSymbol={cryptoSymbol}
+            forexPair={forexPair}
+            displayPrice={market.price}
+            onSpotSell={(quantity) => {
+              submitPaperTrade(
+                "SELL",
+                activeMarket,
+                market,
+                quantity,
+              );
+            }}
+            onSpotBuy={(
               quantity,
               stopLoss,
               takeProfit,
-            );
-          }}
-          onModeChange={(
-            nextMode,
-          ) => {
-            setDesktopTradingMode(
+            ) => {
+              submitPaperTrade(
+                "BUY",
+                activeMarket,
+                market,
+                quantity,
+                stopLoss,
+                takeProfit,
+              );
+            }}
+            onModeChange={(
               nextMode,
-            );
-          }}
-        />
+            ) => {
+              setDesktopTradingMode(
+                nextMode,
+              );
+            }}
+          />
+        ) : (
+          <LiveFuturesTerminal
+            variant="desktop"
+          />
+        )}
       </article>
 
-      {desktopTradingMode === "spot" ? (
+      {tradingProduct === "paper" &&
+      desktopTradingMode === "spot" ? (
         <article className="trade-history-card">
           <div className="trade-history-heading">
             <div>
@@ -3241,6 +3295,13 @@ function MobileDashboard({
     setMobileSigningOut,
   ] = useState(false);
 
+  const [
+    tradingProduct,
+    setTradingProduct,
+  ] = useState<"paper" | "live">(
+    "paper",
+  );
+
   const mobileMenuItems: Array<{
     label: string;
     description: string;
@@ -3482,35 +3543,75 @@ function MobileDashboard({
         </div>
       </article>
 
-      <FuturesPaperTerminal
-        variant="mobile"
-        activeMarket={activeMarket}
-        cryptoSymbol={cryptoSymbol}
-        forexPair={forexPair}
-        displayPrice={market.price}
-        onSpotSell={(quantity) => {
-          submitPaperTrade(
-            "SELL",
-            activeMarket,
-            market,
-            quantity,
-          );
-        }}
-        onSpotBuy={(
-          quantity,
-          stopLoss,
-          takeProfit,
-        ) => {
-          submitPaperTrade(
-            "BUY",
-            activeMarket,
-            market,
+      <div
+        className={
+          productSwitchStyles.productSwitch
+        }
+      >
+        <button
+          type="button"
+          className={
+            tradingProduct === "paper"
+              ? productSwitchStyles.activePaper
+              : ""
+          }
+          onClick={() => {
+            setTradingProduct("paper");
+          }}
+        >
+          PAPER
+        </button>
+
+        <button
+          type="button"
+          className={
+            tradingProduct === "live"
+              ? productSwitchStyles.activeLive
+              : ""
+          }
+          onClick={() => {
+            setTradingProduct("live");
+          }}
+        >
+          LIVE
+        </button>
+      </div>
+
+      {tradingProduct === "paper" ? (
+        <FuturesPaperTerminal
+          variant="mobile"
+          activeMarket={activeMarket}
+          cryptoSymbol={cryptoSymbol}
+          forexPair={forexPair}
+          displayPrice={market.price}
+          onSpotSell={(quantity) => {
+            submitPaperTrade(
+              "SELL",
+              activeMarket,
+              market,
+              quantity,
+            );
+          }}
+          onSpotBuy={(
             quantity,
             stopLoss,
             takeProfit,
-          );
-        }}
-      />
+          ) => {
+            submitPaperTrade(
+              "BUY",
+              activeMarket,
+              market,
+              quantity,
+              stopLoss,
+              takeProfit,
+            );
+          }}
+        />
+      ) : (
+        <LiveFuturesTerminal
+          variant="mobile"
+        />
+      )}
 
       <section className="mobile-statistics">
         {mobileStats.map((stat) => (

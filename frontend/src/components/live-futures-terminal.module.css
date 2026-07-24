@@ -1,0 +1,224 @@
+.productSwitch {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(110, 132, 194, 0.14);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.productSwitch button {
+  min-width: 76px;
+  height: 31px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  color: #7e879f;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+}
+
+.productSwitch .activePaper {
+  color: #07111b;
+  background: linear-gradient(135deg, #58dfff, #8978ff);
+}
+
+.productSwitch .activeLive {
+  color: #200912;
+  background: linear-gradient(135deg, #ff8fae, #ff5c85);
+}
+
+.liveLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 99, 146, 0.35);
+  background: rgba(255, 99, 146, 0.1);
+  color: #ff8fae;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.liveLabel i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5c85;
+  box-shadow: 0 0 8px rgba(255, 92, 133, 0.8);
+  flex-shrink: 0;
+}
+
+.connectPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.connectPanel p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(226, 232, 255, 0.72);
+}
+
+.connectForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.connectForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(226, 232, 255, 0.72);
+}
+
+.connectForm input[type="text"],
+.connectForm input[type="password"] {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(107, 129, 200, 0.24);
+  background: rgba(9, 13, 31, 0.6);
+  color: #f4f6ff;
+  font-size: 14px;
+}
+
+.connectForm input[type="text"]:focus,
+.connectForm input[type="password"]:focus {
+  outline: none;
+  border-color: rgba(255, 99, 146, 0.5);
+}
+
+.connectCheckbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.connectCheckbox input {
+  width: 16px;
+  height: 16px;
+}
+
+.connectStatusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(107, 129, 200, 0.18);
+  background: rgba(9, 13, 31, 0.5);
+}
+
+.connectStatusRow span {
+  font-size: 12px;
+  color: rgba(226, 232, 255, 0.6);
+}
+
+.connectStatusRow strong {
+  font-size: 13px;
+  color: #f4f6ff;
+}
+
+.statusPill {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.statusActive {
+  background: rgba(74, 222, 128, 0.14);
+  color: #4ade80;
+}
+
+.statusInactive {
+  background: rgba(255, 99, 146, 0.14);
+  color: #ff6392;
+}
+
+.disconnectButton {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 99, 146, 0.3);
+  background: transparent;
+  color: #ff8fae;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.disconnectButton:hover {
+  background: rgba(255, 99, 146, 0.08);
+}
+
+.symbolSelect {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(107, 129, 200, 0.24);
+  background: rgba(9, 13, 31, 0.6);
+  color: #f4f6ff;
+  font-size: 14px;
+  width: 100%;
+}
+
+.ambiguous {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  background: rgba(250, 204, 21, 0.08);
+}
+
+.ambiguous i {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(250, 204, 21, 0.2);
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.ambiguous i::before {
+  content: "!";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #facc15;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ambiguous strong {
+  display: block;
+  color: #facc15;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.ambiguous span {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(226, 232, 255, 0.75);
+}
