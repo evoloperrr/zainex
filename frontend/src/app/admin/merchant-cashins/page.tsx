@@ -19,6 +19,8 @@ type Cashin = {
   purpose: string;
   planName: string | null;
   amount: number;
+  walletTopUpAmount: number;
+  billingCycle: string;
   hasProofImage: boolean;
   proofImage: string | null;
   status: string;
@@ -78,6 +80,15 @@ function formatDate(
       dateStyle: "medium",
       timeStyle: "short",
     },
+  );
+}
+
+function subscriptionPortion(
+  cashin: Cashin,
+): number {
+  return (
+    cashin.amount -
+    cashin.walletTopUpAmount
   );
 }
 
@@ -474,8 +485,34 @@ export default function AdminMerchantCashinsPage() {
                           : "wallet top-up"}
                       </td>
                       <td>
-                        {formatUsd(
-                          cashin.amount,
+                        {cashin.purpose ===
+                          "subscription" &&
+                        cashin.walletTopUpAmount >
+                          0 ? (
+                          <>
+                            <strong>
+                              {formatUsd(
+                                cashin.amount,
+                              )}
+                            </strong>
+                            <br />
+                            <small>
+                              {formatUsd(
+                                subscriptionPortion(
+                                  cashin,
+                                ),
+                              )}{" "}
+                              plan +{" "}
+                              {formatUsd(
+                                cashin.walletTopUpAmount,
+                              )}{" "}
+                              wallet
+                            </small>
+                          </>
+                        ) : (
+                          formatUsd(
+                            cashin.amount,
+                          )
                         )}
                       </td>
                       <td>
@@ -619,16 +656,32 @@ export default function AdminMerchantCashinsPage() {
                             }
                           >
                             <span>
-                              Credit{" "}
-                              {formatUsd(
-                                cashin.amount,
-                              )}{" "}
-                              to their
-                              wallet
                               {cashin.purpose ===
-                              "subscription"
-                                ? ` (${cashin.planName} plan funding)`
-                                : ""}
+                              "subscription" ? (
+                                <>
+                                  Grants{" "}
+                                  {
+                                    cashin.planName
+                                  }{" "}
+                                  VIP
+                                  {cashin.walletTopUpAmount >
+                                  0
+                                    ? ` and credits ${formatUsd(
+                                        cashin.walletTopUpAmount,
+                                      )} to their trading wallet`
+                                    : " (no wallet top-up in this payment)"}
+                                </>
+                              ) : (
+                                <>
+                                  Credits{" "}
+                                  {formatUsd(
+                                    cashin.amount,
+                                  )}{" "}
+                                  to their
+                                  trading
+                                  wallet
+                                </>
+                              )}
                             </span>
 
                             <button

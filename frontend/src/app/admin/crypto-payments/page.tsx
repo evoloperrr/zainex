@@ -17,6 +17,8 @@ type CryptoPayment = {
   purpose: string;
   planName: string | null;
   priceAmount: number;
+  walletTopUpAmount: number;
+  billingCycle: string;
   payCurrency: string | null;
   payAmount: string | null;
   status: string;
@@ -276,8 +278,33 @@ export default function AdminCryptoPaymentsPage() {
                         : "wallet top-up"}
                     </td>
                     <td>
-                      {formatUsd(
-                        payment.priceAmount,
+                      {payment.purpose ===
+                        "subscription" &&
+                      payment.walletTopUpAmount >
+                        0 ? (
+                        <>
+                          <strong>
+                            {formatUsd(
+                              payment.priceAmount,
+                            )}
+                          </strong>
+                          <br />
+                          <small>
+                            {formatUsd(
+                              payment.priceAmount -
+                                payment.walletTopUpAmount,
+                            )}{" "}
+                            plan +{" "}
+                            {formatUsd(
+                              payment.walletTopUpAmount,
+                            )}{" "}
+                            wallet
+                          </small>
+                        </>
+                      ) : (
+                        formatUsd(
+                          payment.priceAmount,
+                        )
                       )}
                     </td>
                     <td>
