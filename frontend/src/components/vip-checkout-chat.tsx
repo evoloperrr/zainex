@@ -356,7 +356,7 @@ function buildIntro(
     },
     {
       kind: "message",
-      text: "How would you like to pay?",
+      text: "Want to add funds to your trading wallet in the same payment? Enter an amount below, or leave it blank to skip.",
     },
   ];
 }
@@ -468,6 +468,7 @@ function useCryptoInvoice(
     | "monthly"
     | "annual"
     | null = null,
+  walletTopUpAmount: number | null = null,
 ): CryptoInvoiceState {
   const [state, setState] =
     useState<CryptoInvoiceState>({
@@ -507,6 +508,9 @@ function useCryptoInvoice(
             amount ?? undefined,
           billingCycle:
             billingCycle ??
+            undefined,
+          walletTopUpAmount:
+            walletTopUpAmount ??
             undefined,
         }),
       },
@@ -570,6 +574,7 @@ function useCryptoInvoice(
     planName,
     amount,
     billingCycle,
+    walletTopUpAmount,
   ]);
 
   const readyPaymentId =
@@ -863,6 +868,75 @@ function WalletAmountForm({
   );
 }
 
+function TopUpAmountForm({
+  onSubmit,
+}: {
+  onSubmit: (
+    amount: number,
+  ) => void;
+}) {
+  const [value, setValue] =
+    useState("");
+
+  const parsed =
+    value.trim() === ""
+      ? 0
+      : Number(value);
+
+  const valid =
+    Number.isFinite(parsed) &&
+    parsed >= 0 &&
+    parsed <=
+      MAX_WALLET_FUNDING_USD;
+
+  return (
+    <form
+      className={
+        styles.amountForm
+      }
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        if (valid) {
+          onSubmit(parsed);
+        }
+      }}
+    >
+      <input
+        type="number"
+        inputMode="decimal"
+        min={0}
+        max={
+          MAX_WALLET_FUNDING_USD
+        }
+        step="0.01"
+        placeholder="Amount in USD (optional)"
+        className={
+          styles.amountInput
+        }
+        value={value}
+        onChange={(event) => {
+          setValue(
+            event.target.value,
+          );
+        }}
+      />
+
+      <button
+        type="submit"
+        className={
+          styles.primaryAction
+        }
+        disabled={!valid}
+      >
+        {parsed > 0
+          ? "Continue"
+          : "Skip"}
+      </button>
+    </form>
+  );
+}
+
 function MerchantCountryForm({
   onSubmit,
 }: {
@@ -1119,12 +1193,25 @@ export function VipCheckoutChat({
     setSent,
   ] = useState(false);
 
+  // Optional wallet funds bundled into the SAME subscription payment —
+  // replaces the old "would you like to fund your wallet too?" upsell,
+  // which submitted (and required approving) a second, separate
+  // cash-in after the plan was already paid for. Irrelevant in
+  // mode === "wallet" (that flow has its own amount step already).
   const [
-    walletUpsellAnswer,
-    setWalletUpsellAnswer,
-  ] = useState<
-    "yes" | "no" | null
-  >(mode === "wallet" ? "yes" : null);
+    subscriptionTopUpAmount,
+    setSubscriptionTopUpAmount,
+  ] = useState<number | null>(
+    mode === "wallet" ? 0 : null,
+  );
+
+  // Fixed at "yes" for mode === "wallet" (the standalone fund-wallet
+  // flow) and unused for subscriptions now that the wallet top-up is
+  // answered up front and bundled into the same submission — kept as a
+  // plain value (not state) since nothing sets it after mount anymore.
+  const walletUpsellAnswer:
+    "yes" | "no" | null =
+    mode === "wallet" ? "yes" : null;
 
   const [
     walletMethod,
@@ -1184,7 +1271,9 @@ export function VipCheckoutChat({
 
   const vipCryptoState =
     useCryptoInvoice(
-      method === "crypto",
+      method === "crypto" &&
+        subscriptionTopUpAmount !==
+          null,
       "subscription",
       plan.name,
       parsePlanPriceUsd(
@@ -1194,6 +1283,7 @@ export function VipCheckoutChat({
         setSent(true);
       },
       billingCycle,
+      subscriptionTopUpAmount,
     );
 
   const walletCryptoState =
@@ -1210,6 +1300,22 @@ export function VipCheckoutChat({
 
   let script: ScriptStep[] =
     introScript;
+
+  if (
+    mode !== "wallet" &&
+    subscriptionTopUpAmount !== null
+  ) {
+    script = [
+      ...script,
+      {
+        kind: "message",
+        text:
+          subscriptionTopUpAmount > 0
+            ? `Got it — I'll add ${formatUsd(subscriptionTopUpAmount)} to your trading wallet in the same payment. How would you like to pay?`
+            : "How would you like to pay?",
+      },
+    ];
+  }
 
   if (method) {
     script = [
@@ -1243,21 +1349,12 @@ export function VipCheckoutChat({
       ...script,
       {
         kind: "message",
-        text: `Thank you! Your ${plan.name} upgrade is now pending verification. You'll see it reflected on this page once it's confirmed.`,
-      },
-      {
-        kind: "message",
-        text: "Would you like to fund your trading wallet too?",
-      },
-    ];
-  }
-
-  if (walletUpsellAnswer === "no") {
-    script = [
-      ...script,
-      {
-        kind: "message",
-        text: "No problem — you can fund your trading wallet anytime from the Wallet page.",
+        text:
+          subscriptionTopUpAmount !==
+            null &&
+          subscriptionTopUpAmount > 0
+            ? `Thank you! Your ${plan.name} upgrade and wallet top-up are now pending verification. You'll see both reflected on this page once confirmed.`
+            : `Thank you! Your ${plan.name} upgrade is now pending verification. You'll see it reflected on this page once it's confirmed.`,
       },
     ];
   }
@@ -1329,9 +1426,7 @@ export function VipCheckoutChat({
   const conversationDone =
     mode === "wallet"
       ? walletSent
-      : sent &&
-        (walletUpsellAnswer === "no" ||
-          walletSent);
+      : sent;
 
   const vipProof = useProofUpload();
   const walletProof =
@@ -1411,6 +1506,9 @@ export function VipCheckoutChat({
       | "monthly"
       | "annual"
       | null = null,
+    walletTopUpAmountOverride:
+      | number
+      | null = null,
   ): Promise<
     | { ok: true }
     | { ok: false; message: string }
@@ -1439,6 +1537,9 @@ export function VipCheckoutChat({
             proofImage,
             billingCycle:
               billingCycleOverride ??
+              undefined,
+            walletTopUpAmount:
+              walletTopUpAmountOverride ??
               undefined,
           }),
         },
@@ -1685,17 +1786,29 @@ export function VipCheckoutChat({
                 );
               }
 
+              const subscriptionTotal =
+                parsePlanPriceUsd(
+                  plan.price,
+                ) +
+                (subscriptionTopUpAmount ??
+                  0);
+
               const amountLabel =
                 step.forWallet
                   ? formatUsd(
                       walletFundAmount ??
                         0,
                     )
-                  : `${formatUsd(
-                      parsePlanPriceUsd(
-                        plan.price,
-                      ),
-                    )} ${plan.period}`;
+                  : subscriptionTopUpAmount !==
+                        null &&
+                      subscriptionTopUpAmount >
+                        0
+                    ? `${formatUsd(subscriptionTotal)} (${formatUsd(parsePlanPriceUsd(plan.price))} ${plan.period} + ${formatUsd(subscriptionTopUpAmount)} wallet top-up)`
+                    : `${formatUsd(
+                        parsePlanPriceUsd(
+                          plan.price,
+                        ),
+                      )} ${plan.period}`;
 
               const region =
                 (step.forWallet
@@ -1831,8 +1944,21 @@ export function VipCheckoutChat({
           ) : null}
 
           {!typing &&
+          mode !== "wallet" &&
+          subscriptionTopUpAmount ===
+            null ? (
+            <TopUpAmountForm
+              onSubmit={
+                setSubscriptionTopUpAmount
+              }
+            />
+          ) : null}
+
+          {!typing &&
           method === null &&
-          mode !== "wallet" ? (
+          mode !== "wallet" &&
+          subscriptionTopUpAmount !==
+            null ? (
             <MethodChoiceButtons
               onPick={setMethod}
             />
@@ -1846,45 +1972,6 @@ export function VipCheckoutChat({
                 setMerchantRegion
               }
             />
-          ) : null}
-
-          {!typing &&
-          sent &&
-          walletUpsellAnswer ===
-            null ? (
-            <div
-              className={
-                styles.methodChoice
-              }
-            >
-              <button
-                type="button"
-                className={
-                  styles.secondaryAction
-                }
-                onClick={() => {
-                  setWalletUpsellAnswer(
-                    "no",
-                  );
-                }}
-              >
-                Not now
-              </button>
-
-              <button
-                type="button"
-                className={
-                  styles.primaryAction
-                }
-                onClick={() => {
-                  setWalletUpsellAnswer(
-                    "yes",
-                  );
-                }}
-              >
-                Yes, fund my wallet
-              </button>
-            </div>
           ) : null}
 
           {!typing &&
@@ -1949,6 +2036,7 @@ export function VipCheckoutChat({
                   ),
                   vipProof.file,
                   billingCycle,
+                  subscriptionTopUpAmount,
                 );
 
               if (result.ok) {
