@@ -47,6 +47,8 @@ type WalletAccount = {
   initialBalance: number;
   availableBalance: number;
   usedMargin: number;
+  strategyLocked: number;
+  cashoutLocked: number;
   totalEquity: number;
   realizedPnl: number;
   unrealizedPnl: number;
@@ -472,8 +474,10 @@ function WalletContent({
                   {formatUsd(user?.walletBalance)}
                 </strong>
                 <small>
-                  Synchronized with the authoritative
-                  trading balance
+                  Your total account value — includes
+                  funds locked in active strategies or
+                  a pending cashout, which Available
+                  Balance excludes
                 </small>
 
                 <div className={styles.cardActionRow}>
@@ -615,6 +619,24 @@ function WalletContent({
                 <span>USED MARGIN</span>
                 <strong>
                   {formatUsd(account.usedMargin)}
+                </strong>
+              </div>
+
+              <div>
+                <span>IN ACTIVE STRATEGIES</span>
+                <strong>
+                  {formatUsd(
+                    account.strategyLocked,
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>PENDING CASHOUT</span>
+                <strong>
+                  {formatUsd(
+                    account.cashoutLocked,
+                  )}
                 </strong>
               </div>
 

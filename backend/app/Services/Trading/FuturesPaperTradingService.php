@@ -806,10 +806,28 @@ final class FuturesPaperTradingService
             $balance->available_balance,
             8,
         );
+        // Funds committed to an active strategy or a pending cashout are
+        // moved out of available_balance the moment they're locked (see
+        // FuturesStrategyActivationController / CashoutRequestController)
+        // but never touch wallet_balance until finalized or reversed.
+        // Total equity must add them back, or it silently understates the
+        // account's true value by exactly what's locked — the same gap
+        // that made "Wallet Balance" and "Total Equity" fail to reconcile
+        // on the wallet page whenever a strategy/cashout was active.
+        $strategyLocked = $this->decimal(
+            $balance->strategy_locked_balance ?? '0',
+            8,
+        );
+        $cashoutLocked = $this->decimal(
+            $balance->cashout_locked_balance ?? '0',
+            8,
+        );
         $totalEquity = $this->scale(
             $availableBalance
                 ->plus($usedMargin)
-                ->plus($unrealizedPnl),
+                ->plus($unrealizedPnl)
+                ->plus($strategyLocked)
+                ->plus($cashoutLocked),
             8,
         );
 
@@ -863,6 +881,8 @@ final class FuturesPaperTradingService
             ),
             'availableBalance' => $this->number($availableBalance),
             'usedMargin' => $this->number($usedMargin),
+            'strategyLocked' => $this->number($strategyLocked),
+            'cashoutLocked' => $this->number($cashoutLocked),
             'totalEquity' => $this->number($totalEquity),
             'realizedPnl' => $this->number(
                 $this->decimal($balance->realized_pnl, 8),
