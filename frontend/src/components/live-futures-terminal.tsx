@@ -13,6 +13,12 @@ import {
 import styles from "./futures-paper-terminal.module.css";
 import liveStyles from "./live-futures-terminal.module.css";
 
+import { FuturesAiSignalPanel } from "./futures-ai-signal-panel";
+
+import {
+  CRYPTO_SYMBOL_LABELS,
+} from "@/lib/crypto-symbols";
+
 // ZAINEX_LIVE_OKX_TRADING_V1
 // Standalone live-trading terminal, kept entirely separate from
 // FuturesPaperTerminal (which stays untouched) — reuses its CSS module
@@ -1767,6 +1773,29 @@ export function LiveFuturesTerminal({
                 comes from OKX)
               </p>
             ) : null}
+
+            <FuturesAiSignalPanel
+              symbol={symbol}
+              symbolLabel={
+                CRYPTO_SYMBOL_LABELS[
+                  symbol
+                ]
+              }
+              onApplyLevels={(
+                levels,
+              ) => {
+                setStopLossInput(
+                  String(
+                    levels.stopLoss,
+                  ),
+                );
+                setTakeProfitInput(
+                  String(
+                    levels.takeProfit,
+                  ),
+                );
+              }}
+            />
 
             <div
               className={
