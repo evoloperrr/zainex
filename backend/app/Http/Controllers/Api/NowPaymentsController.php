@@ -7,6 +7,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
 use App\Services\Payments\NowPaymentsService;
+use App\Services\Referral\CashinReferralIncomeService;
+use App\Services\Referral\ReferralRewardService;
+use App\Services\Vip\VipGrantService;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Http\JsonResponse;
@@ -72,6 +75,7 @@ final class NowPaymentsController extends Controller
             'planName' => ['required_if:purpose,subscription', 'string'],
             'billingCycle' => ['nullable', 'string', 'in:monthly,annual'],
             'amount' => ['required_if:purpose,wallet', 'numeric'],
+            'walletTopUpAmount' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         if ($validator->fails()) {
@@ -84,6 +88,8 @@ final class NowPaymentsController extends Controller
 
         $validated = $validator->validated();
         $purpose = (string) $validated['purpose'];
+        $billingCycle = null;
+        $walletTopUpAmount = 0.0;
 
         if ($purpose === 'subscription') {
             $tierName = (string) $validated['planName'];
@@ -100,12 +106,24 @@ final class NowPaymentsController extends Controller
             $billingCycle = (string) ($validated['billingCycle'] ?? 'monthly');
 
             if ($billingCycle === 'annual') {
-                $priceAmount = round($monthlyPrice * 12 * (1 - self::ANNUAL_DISCOUNT_RATE), 2);
+                $subscriptionAmount = round($monthlyPrice * 12 * (1 - self::ANNUAL_DISCOUNT_RATE), 2);
                 $planName = "{$tierName} (Annual)";
             } else {
-                $priceAmount = $monthlyPrice;
+                $subscriptionAmount = $monthlyPrice;
                 $planName = $tierName;
             }
+
+            $walletTopUpAmount = round((float) ($validated['walletTopUpAmount'] ?? 0), 2);
+
+            if ($walletTopUpAmount < 0 || $walletTopUpAmount > self::MAX_WALLET_FUNDING_USD) {
+                return $this->error(
+                    422,
+                    'INVALID_WALLET_FUNDING_AMOUNT',
+                    sprintf('Enter a wallet top-up amount up to $%s.', number_format(self::MAX_WALLET_FUNDING_USD, 2)),
+                );
+            }
+
+            $priceAmount = round($subscriptionAmount + $walletTopUpAmount, 2);
         } else {
             $planName = null;
             $priceAmount = (float) $validated['amount'];
@@ -216,7 +234,9 @@ final class NowPaymentsController extends Controller
             'trading_account_id' => $account->id,
             'purpose' => $purpose,
             'plan_name' => $planName,
+            'billing_cycle' => $billingCycle,
             'price_amount' => (string) $priceAmount,
+            'wallet_top_up_amount' => (string) $walletTopUpAmount,
             'price_currency' => 'usd',
             'pay_currency' => $payCurrency,
             'order_id' => $orderId,
@@ -236,6 +256,7 @@ final class NowPaymentsController extends Controller
                 'payAmount' => $payAmount,
                 'payCurrency' => $payCurrency,
                 'priceAmount' => $priceAmount,
+                'walletTopUpAmount' => $walletTopUpAmount,
                 'status' => (string) ($response['payment_status'] ?? 'waiting'),
             ])
             ->header('Cache-Control', 'no-store');
@@ -420,18 +441,14 @@ final class NowPaymentsController extends Controller
             return;
         }
 
+        if ($payment->purpose === 'subscription') {
+            $this->creditSubscriptionPayment($payment, (int) $user->id);
+
+            return;
+        }
+
         $amount = BigDecimal::of((string) $payment->price_amount)
             ->toScale(8, RoundingMode::Down);
-
-        // A "subscription" crypto payment is just payment confirmation for
-        // a plan the user intends to fund — like merchant cash-ins, it
-        // always credits the wallet. VIP tier itself is decided later on
-        // the strategy page, when the user spends credits/wallet funds to
-        // activate a VIP-tier strategy (see AdminController::
-        // approveMerchantCashin() for the same reasoning).
-        $description = $payment->purpose === 'subscription'
-            ? "Trading wallet funded via NOWPayments crypto transfer ({$payment->plan_name} plan funding)."
-            : 'Trading wallet funded via NOWPayments crypto transfer.';
 
         $balance = DB::table('trading_balances')
             ->where('trading_account_id', $account->id)
@@ -487,7 +504,7 @@ final class NowPaymentsController extends Controller
             'ai_credits_before' => (int) $user->ai_credits,
             'ai_credits_after' => (int) $user->ai_credits,
             'reference_key' => 'crypto-payment:'.$payment->id,
-            'description' => $description,
+            'description' => 'Trading wallet funded via NOWPayments crypto transfer.',
             'metadata' => json_encode([
                 'provider' => 'nowpayments',
                 'providerPaymentId' => $payment->provider_payment_id,
@@ -495,6 +512,117 @@ final class NowPaymentsController extends Controller
             'occurred_at' => $occurredAt,
             'created_at' => $occurredAt,
         ]);
+    }
+
+    /**
+     * Crypto equivalent of AdminController::approveSubscriptionCashin() —
+     * the NOWPayments webhook confirmation is this rail's "approval"
+     * moment, so it grants VIP + triggers both referral rewards the same
+     * way, instead of crediting the full price to the wallet.
+     */
+    private function creditSubscriptionPayment(object $payment, int $userId): void
+    {
+        $user = DB::table('users')->where('id', $userId)->first();
+
+        if ($user === null) {
+            return;
+        }
+
+        $walletTopUpAmount = round((float) ($payment->wallet_top_up_amount ?? 0), 2);
+        $subscriptionAmount = round(((float) $payment->price_amount) - $walletTopUpAmount, 2);
+        $cleanTierName = trim(str_replace('(Annual)', '', (string) $payment->plan_name));
+        $months = ((string) ($payment->billing_cycle ?? 'monthly')) === 'annual' ? 12 : 1;
+
+        app(VipGrantService::class)->grant(
+            (string) $user->email,
+            $cleanTierName,
+            $months,
+            'crypto-payment-vip:'.$payment->id,
+        );
+
+        if ($walletTopUpAmount > 0) {
+            $account = DB::table('trading_accounts')
+                ->where('id', $payment->trading_account_id)
+                ->lockForUpdate()
+                ->first();
+
+            $balance = $account !== null
+                ? DB::table('trading_balances')
+                    ->where('trading_account_id', $account->id)
+                    ->where('asset', 'USDT')
+                    ->lockForUpdate()
+                    ->first()
+                : null;
+
+            if ($account !== null && $balance !== null) {
+                $topUp = BigDecimal::of((string) $walletTopUpAmount)->toScale(8, RoundingMode::Down);
+
+                $freshUser = DB::table('users')->where('id', $userId)->lockForUpdate()->first();
+
+                $walletBefore = BigDecimal::of((string) $freshUser->wallet_balance)->toScale(8, RoundingMode::Down);
+                $walletAfter = $walletBefore->plus($topUp)->toScale(8, RoundingMode::Down);
+                $availableBefore = BigDecimal::of((string) $balance->available_balance)->toScale(8, RoundingMode::Down);
+                $availableAfter = $availableBefore->plus($topUp)->toScale(8, RoundingMode::Down);
+                $strategyLocked = BigDecimal::of((string) ($balance->strategy_locked_balance ?? '0'))->toScale(8, RoundingMode::Down);
+                $occurredAt = now();
+
+                DB::table('users')->where('id', $userId)->update([
+                    'wallet_balance' => (string) $walletAfter,
+                    'updated_at' => $occurredAt,
+                ]);
+
+                DB::table('trading_balances')->where('id', $balance->id)->update([
+                    'available_balance' => (string) $availableAfter,
+                    'updated_at' => $occurredAt,
+                ]);
+
+                DB::table('wallet_transactions')->insert([
+                    'trading_account_id' => $account->id,
+                    'user_id' => $userId,
+                    'strategy_activation_id' => null,
+                    'event_type' => 'CRYPTO_WALLET_FUNDING',
+                    'direction' => 'CREDIT',
+                    'asset' => 'USDT',
+                    'amount' => (string) $topUp,
+                    'wallet_balance_before' => (string) $walletBefore,
+                    'wallet_balance_after' => (string) $walletAfter,
+                    'available_balance_before' => (string) $availableBefore,
+                    'available_balance_after' => (string) $availableAfter,
+                    'strategy_locked_before' => (string) $strategyLocked,
+                    'strategy_locked_after' => (string) $strategyLocked,
+                    'ai_credits_before' => (int) $freshUser->ai_credits,
+                    'ai_credits_after' => (int) $freshUser->ai_credits,
+                    'reference_key' => 'crypto-payment-topup:'.$payment->id,
+                    'description' => sprintf(
+                        'Wallet top-up bundled with NOWPayments crypto subscription payment #%d (%s plan).',
+                        $payment->id,
+                        $cleanTierName,
+                    ),
+                    'metadata' => json_encode([
+                        'provider' => 'nowpayments',
+                        'providerPaymentId' => $payment->provider_payment_id,
+                    ], JSON_THROW_ON_ERROR),
+                    'occurred_at' => $occurredAt,
+                    'created_at' => $occurredAt,
+                ]);
+            }
+
+            app(CashinReferralIncomeService::class)->credit(
+                $userId,
+                'crypto-payment',
+                (int) $payment->id,
+                $walletTopUpAmount,
+            );
+        }
+
+        if ($subscriptionAmount > 0) {
+            app(ReferralRewardService::class)->distribute(
+                $userId,
+                'SUBSCRIPTION_PURCHASE',
+                'crypto-payment:'.$payment->id,
+                $subscriptionAmount,
+            );
+        }
     }
 
     private function ipnCallbackUrl(Request $request): string

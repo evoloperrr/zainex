@@ -6,10 +6,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\LinksTradingAccountToUser;
 use App\Http\Controllers\Controller;
+use App\Services\Referral\CashinReferralIncomeService;
+use App\Services\Referral\ReferralRewardService;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -395,102 +396,12 @@ final class AdminController extends Controller
         int $months,
         ?string $referenceKey = null,
     ): array {
-        return DB::transaction(function () use ($targetEmail, $planName, $months, $referenceKey): array {
-            $target = DB::table('users')
-                ->whereRaw('LOWER(email) = ?', [$targetEmail])
-                ->lockForUpdate()
-                ->first();
-
-            if ($target === null) {
-                return [
-                    'status' => 404,
-                    'payload' => $this->errorPayload(
-                        'TARGET_USER_NOT_FOUND',
-                        'No user was found with that email.',
-                    ),
-                ];
-            }
-
-            $currentExpiry = $target->vip_expires_at !== null
-                ? Carbon::parse($target->vip_expires_at)
-                : null;
-
-            $base = ($currentExpiry !== null && $currentExpiry->isFuture())
-                ? $currentExpiry
-                : now();
-
-            $expiresAt = $base->copy()->addMonths($months);
-            $occurredAt = now();
-
-            DB::table('users')
-                ->where('id', $target->id)
-                ->update([
-                    'vip_tier' => $planName,
-                    'vip_expires_at' => $expiresAt,
-                    'updated_at' => $occurredAt,
-                ]);
-
-            // VIP grants don't move any wallet funds, but they're still an
-            // admin-driven credit the user should see a record of — log it
-            // in the same wallet_transactions ledger (before/after balances
-            // are unchanged, the grant details live in metadata) so it
-            // shows up both in the admin Wallet ledger tab and the user's
-            // own wallet activity feed.
-            $account = DB::table('trading_accounts')
-                ->where('user_id', $target->id)
-                ->where('account_type', 'PAPER')
-                ->where('status', 'ACTIVE')
-                ->first();
-
-            $balance = $account !== null
-                ? DB::table('trading_balances')
-                    ->where('trading_account_id', $account->id)
-                    ->where('asset', self::ASSET)
-                    ->first()
-                : null;
-
-            if ($account !== null && $balance !== null) {
-                DB::table('wallet_transactions')->insert([
-                    'trading_account_id' => $account->id,
-                    'user_id' => $target->id,
-                    'strategy_activation_id' => null,
-                    'event_type' => 'ADMIN_VIP_GRANT',
-                    'direction' => 'CREDIT',
-                    'asset' => 'VIP',
-                    'amount' => '0.00000000',
-                    'wallet_balance_before' => (string) $target->wallet_balance,
-                    'wallet_balance_after' => (string) $target->wallet_balance,
-                    'available_balance_before' => (string) $balance->available_balance,
-                    'available_balance_after' => (string) $balance->available_balance,
-                    'strategy_locked_before' => (string) ($balance->strategy_locked_balance ?? '0'),
-                    'strategy_locked_after' => (string) ($balance->strategy_locked_balance ?? '0'),
-                    'ai_credits_before' => (int) $target->ai_credits,
-                    'ai_credits_after' => (int) $target->ai_credits,
-                    'reference_key' => $referenceKey ?? 'vip-grant:manual:'.Str::uuid(),
-                    'description' => "Granted {$planName} for {$months} month(s).",
-                    'metadata' => json_encode([
-                        'vipTier' => $planName,
-                        'months' => $months,
-                        'expiresAt' => (string) $expiresAt,
-                    ], JSON_THROW_ON_ERROR),
-                    'occurred_at' => $occurredAt,
-                    'created_at' => $occurredAt,
-                ]);
-            }
-
-            return [
-                'status' => 200,
-                'payload' => [
-                    'ok' => true,
-                    'user' => [
-                        'id' => (int) $target->id,
-                        'email' => (string) $target->email,
-                        'vipTier' => $planName,
-                        'vipExpiresAt' => (string) $expiresAt,
-                    ],
-                ],
-            ];
-        }, 5);
+        return app(\App\Services\Vip\VipGrantService::class)->grant(
+            $targetEmail,
+            $planName,
+            $months,
+            $referenceKey,
+        );
     }
 
     /**
@@ -1020,25 +931,15 @@ final class AdminController extends Controller
         $targetEmail = strtolower((string) $targetUser->email);
 
         try {
-            // A "subscription" cash-in is just GoTyme payment confirmation
-            // for a plan the user intends to fund — it always credits the
-            // wallet like any other top-up. VIP tier itself is never
-            // granted here; it's decided on the strategy page when the
-            // user actually activates a VIP-tier strategy by spending the
-            // credits/wallet funds this credit makes available.
-            $description = $cashin->purpose === 'subscription'
-                ? sprintf(
-                    'Approved GoTyme merchant cash-in #%d (%s plan funding).',
-                    $cashin->id,
-                    (string) $cashin->plan_name,
-                )
-                : 'Approved GoTyme merchant cash-in #'.$cashin->id;
+            if ($cashin->purpose === 'subscription') {
+                return $this->approveSubscriptionCashin($cashin, $admin, $targetEmail, (int) $targetUser->id);
+            }
 
             $result = $this->applyWalletCredit(
                 $targetEmail,
                 (string) $cashin->amount,
                 fn (int $accountId): string => 'merchant-cashin:'.$cashin->id,
-                $description,
+                'Approved GoTyme merchant cash-in #'.$cashin->id,
             );
 
             if ($result['status'] >= 400) {
@@ -1064,6 +965,102 @@ final class AdminController extends Controller
 
             return $this->error(500, 'MERCHANT_CASHIN_APPROVE_FAILED', 'The cash-in could not be approved.');
         }
+    }
+
+    /**
+     * A "subscription" cash-in bundles a VIP plan with an optional extra
+     * wallet top-up amount, all in one approved payment (see
+     * MerchantCashinController::store()). Approving it in one click now:
+     *   1. Grants the VIP tier directly (this is the one deliberate,
+     *      admin-driven exception to "VIP is only ganap via strategy
+     *      activation" — the strategies page still governs repeat
+     *      activation and its own referral income, untouched).
+     *   2. Credits the wallet with only the top-up portion, not the
+     *      subscription price itself.
+     *   3. Pays the direct inviter 10% of the top-up portion (same
+     *      mechanism/rate as strategy-activation referral income).
+     *   4. Pays the 3-level unilevel referral (25%/15%/5%) on the
+     *      subscription price portion via the existing generic
+     *      ReferralRewardService, under the SUBSCRIPTION_PURCHASE source
+     *      type it was already whitelisted for but never used.
+     */
+    private function approveSubscriptionCashin(
+        object $cashin,
+        ?object $admin,
+        string $targetEmail,
+        int $targetUserId,
+    ): JsonResponse {
+        $walletTopUpAmount = round((float) ($cashin->wallet_top_up_amount ?? 0), 2);
+        $subscriptionAmount = round(((float) $cashin->amount) - $walletTopUpAmount, 2);
+        $cleanTierName = trim(str_replace('(Annual)', '', (string) $cashin->plan_name));
+        $months = ((string) ($cashin->billing_cycle ?? 'monthly')) === 'annual' ? 12 : 1;
+
+        $vipResult = $this->applyVipGrant(
+            $targetEmail,
+            $cleanTierName,
+            $months,
+            'merchant-cashin-vip:'.$cashin->id,
+        );
+
+        if ($vipResult['status'] >= 400) {
+            return response()
+                ->json($vipResult['payload'], $vipResult['status'])
+                ->header('Cache-Control', 'no-store');
+        }
+
+        $walletResult = null;
+
+        if ($walletTopUpAmount > 0) {
+            $walletResult = $this->applyWalletCredit(
+                $targetEmail,
+                (string) $walletTopUpAmount,
+                fn (int $accountId): string => 'merchant-cashin-topup:'.$cashin->id,
+                sprintf(
+                    'Wallet top-up bundled with GoTyme merchant cash-in #%d (%s plan).',
+                    $cashin->id,
+                    $cleanTierName,
+                ),
+            );
+
+            if ($walletResult['status'] >= 400) {
+                return response()
+                    ->json($walletResult['payload'], $walletResult['status'])
+                    ->header('Cache-Control', 'no-store');
+            }
+
+            app(CashinReferralIncomeService::class)->credit(
+                $targetUserId,
+                'merchant-cashin',
+                (int) $cashin->id,
+                $walletTopUpAmount,
+            );
+        }
+
+        if ($subscriptionAmount > 0) {
+            app(ReferralRewardService::class)->distribute(
+                $targetUserId,
+                'SUBSCRIPTION_PURCHASE',
+                'merchant-cashin:'.$cashin->id,
+                $subscriptionAmount,
+            );
+        }
+
+        DB::table('merchant_cashins')
+            ->where('id', $cashin->id)
+            ->update([
+                'status' => 'approved',
+                'reviewed_by' => $admin?->id,
+                'reviewed_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return response()
+            ->json([
+                'ok' => true,
+                'vip' => $vipResult['payload'],
+                'walletCredit' => $walletResult['payload'] ?? null,
+            ])
+            ->header('Cache-Control', 'no-store');
     }
 
     public function rejectMerchantCashin(Request $request, string $id): JsonResponse

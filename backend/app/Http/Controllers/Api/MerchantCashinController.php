@@ -53,6 +53,7 @@ final class MerchantCashinController extends Controller
             'planName' => ['required_if:purpose,subscription', 'string'],
             'billingCycle' => ['nullable', 'string', 'in:monthly,annual'],
             'amount' => ['required_if:purpose,wallet', 'numeric'],
+            'walletTopUpAmount' => ['nullable', 'numeric', 'min:0'],
             'proofImage' => ['nullable', 'string', 'max:3000000'],
         ]);
 
@@ -62,6 +63,8 @@ final class MerchantCashinController extends Controller
 
         $validated = $validator->validated();
         $purpose = (string) $validated['purpose'];
+        $billingCycle = null;
+        $walletTopUpAmount = 0.0;
 
         if ($purpose === 'subscription') {
             $tierName = (string) $validated['planName'];
@@ -74,12 +77,27 @@ final class MerchantCashinController extends Controller
             $billingCycle = (string) ($validated['billingCycle'] ?? 'monthly');
 
             if ($billingCycle === 'annual') {
-                $amount = round($monthlyPrice * 12 * (1 - self::ANNUAL_DISCOUNT_RATE), 2);
+                $subscriptionAmount = round($monthlyPrice * 12 * (1 - self::ANNUAL_DISCOUNT_RATE), 2);
                 $planName = "{$tierName} (Annual)";
             } else {
-                $amount = $monthlyPrice;
+                $subscriptionAmount = $monthlyPrice;
                 $planName = $tierName;
             }
+
+            // The wallet top-up bundled into a subscription payment is
+            // optional and unbounded below by the standalone wallet-only
+            // minimum — 0 just means "no extra funds this time."
+            $walletTopUpAmount = round((float) ($validated['walletTopUpAmount'] ?? 0), 2);
+
+            if ($walletTopUpAmount < 0 || $walletTopUpAmount > self::MAX_WALLET_FUNDING_USD) {
+                return $this->error(
+                    422,
+                    'INVALID_WALLET_FUNDING_AMOUNT',
+                    sprintf('Enter a wallet top-up amount up to $%s.', number_format(self::MAX_WALLET_FUNDING_USD, 2)),
+                );
+            }
+
+            $amount = round($subscriptionAmount + $walletTopUpAmount, 2);
         } else {
             $planName = null;
             $amount = (float) $validated['amount'];
@@ -117,7 +135,9 @@ final class MerchantCashinController extends Controller
             'trading_account_id' => $account->id,
             'purpose' => $purpose,
             'plan_name' => $planName,
+            'billing_cycle' => $billingCycle,
             'amount' => (string) $amount,
+            'wallet_top_up_amount' => (string) $walletTopUpAmount,
             'proof_image' => $proofImage,
             'status' => 'pending',
             'created_at' => now(),
@@ -129,6 +149,8 @@ final class MerchantCashinController extends Controller
                 'ok' => true,
                 'cashinId' => $cashinId,
                 'status' => 'pending',
+                'amount' => $amount,
+                'walletTopUpAmount' => $walletTopUpAmount,
             ], 201)
             ->header('Cache-Control', 'no-store');
     }
