@@ -110,18 +110,26 @@ final class OkxApiClient
                 config('okx.base_url').$requestPath,
             );
         } catch (Throwable $exception) {
+            // We never got a response — OKX may or may not have received
+            // and acted on the request. Callers placing real orders must
+            // not treat this as a confirmed rejection.
             throw new OkxApiException(
                 'Could not reach OKX: '.$exception->getMessage(),
                 httpStatus: 502,
+                isTransportFailure: true,
             );
         }
 
         $payload = $response->json();
 
         if (! is_array($payload)) {
+            // A response arrived, but not one we can interpret — treat as
+            // ambiguous rather than a confirmed rejection, same reasoning
+            // as the transport-failure case above.
             throw new OkxApiException(
                 'OKX returned a non-JSON response.',
                 httpStatus: $response->status(),
+                isTransportFailure: true,
             );
         }
 

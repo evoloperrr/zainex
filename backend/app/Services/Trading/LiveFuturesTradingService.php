@@ -257,6 +257,30 @@ final class LiveFuturesTradingService
                 ]],
             ]);
         } catch (OkxApiException $exception) {
+            if ($exception->isTransportFailure) {
+                // We never got a confirmed response from OKX — the order
+                // may have actually gone through. Leave it SUBMITTING (do
+                // NOT mark REJECTED) so ReconcileOkxOrders can resolve
+                // the real state via GET /trade/order instead of us
+                // guessing and potentially hiding a real live position.
+                $this->audit(
+                    $account,
+                    'live_futures_order_ambiguous',
+                    $requestId,
+                    $request['clientOrderId'],
+                    $requestHash,
+                    ['message' => $exception->getMessage()],
+                    $ipAddress,
+                    $userAgent,
+                );
+
+                throw new FuturesTradingException(
+                    'OKX_ORDER_STATUS_UNKNOWN',
+                    'We could not confirm whether this order reached OKX. Do not resubmit — check your positions in a moment; this will resolve automatically.',
+                    503,
+                );
+            }
+
             $order->update([
                 'status' => 'REJECTED',
                 'rejection_code' => $exception->sCode ?? 'OKX_ERROR',
@@ -562,6 +586,29 @@ final class LiveFuturesTradingService
                 'autoCxl' => true,
             ]);
         } catch (OkxApiException $exception) {
+            if ($exception->isTransportFailure) {
+                // We never got a confirmed response — the close may have
+                // actually gone through on OKX. Leave the order
+                // SUBMITTING so ReconcileOkxOrders resolves the real
+                // state instead of us guessing.
+                $this->audit(
+                    $account,
+                    'live_futures_close_ambiguous',
+                    $requestId,
+                    $request['clientOrderId'],
+                    $requestHash,
+                    ['message' => $exception->getMessage()],
+                    $ipAddress,
+                    $userAgent,
+                );
+
+                throw new FuturesTradingException(
+                    'OKX_CLOSE_STATUS_UNKNOWN',
+                    'We could not confirm whether this close request reached OKX. Do not resubmit — check your positions in a moment; this will resolve automatically.',
+                    503,
+                );
+            }
+
             $closeOrder->update([
                 'status' => 'REJECTED',
                 'rejection_code' => $exception->sCode ?? 'OKX_ERROR',
