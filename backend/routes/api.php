@@ -237,6 +237,8 @@ Route::controller(
         ->middleware('throttle:60,1');
     Route::get('/users', 'users')
         ->middleware('throttle:60,1');
+    Route::get('/referral-diagnostics', 'referralDiagnostics')
+        ->middleware('throttle:60,1');
     Route::post('/users/update-name', 'updateUserName')
         ->middleware('throttle:20,1');
     Route::post('/users/update-role', 'updateUserRole')

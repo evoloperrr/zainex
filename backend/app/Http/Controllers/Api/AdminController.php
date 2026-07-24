@@ -144,6 +144,90 @@ final class AdminController extends Controller
             ->header('Cache-Control', 'no-store');
     }
 
+    /**
+     * Read-only diagnostic: for a given user, shows their inviter, their
+     * strategy activations, and whether the 10% direct-inviter referral
+     * income was actually recorded for each one — for tracking down a
+     * specific "the referral reward didn't arrive" report without needing
+     * direct database access.
+     */
+    public function referralDiagnostics(Request $request): JsonResponse
+    {
+        $guard = $this->authorize($request);
+
+        if ($guard !== null) {
+            return $guard;
+        }
+
+        $email = trim((string) $request->query('email', ''));
+
+        if ($email === '') {
+            return $this->error(422, 'INVALID_DIAGNOSTICS_REQUEST', 'An email query parameter is required.');
+        }
+
+        $user = DB::table('users')
+            ->whereRaw('LOWER(email) = ?', [strtolower($email)])
+            ->first();
+
+        if ($user === null) {
+            return $this->error(404, 'USER_NOT_FOUND', 'No user was found with that email.');
+        }
+
+        $inviter = $user->inviter_id === null
+            ? null
+            : DB::table('users')->where('id', $user->inviter_id)->first(['id', 'email', 'name']);
+
+        $activations = DB::table('strategy_activations')
+            ->where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->limit(20)
+            ->get(['id', 'tier', 'allocated_amount', 'billing_cycle', 'status', 'created_at']);
+
+        $activationRows = $activations->map(function (object $activation) use ($user): array {
+            $referenceKey = $user->inviter_id === null
+                ? null
+                : sprintf('strategy:%d:direct-inviter:%d', $activation->id, (int) $user->inviter_id);
+
+            $rewardTransaction = $referenceKey === null
+                ? null
+                : DB::table('wallet_transactions')
+                    ->where('reference_key', $referenceKey)
+                    ->first(['id', 'amount', 'occurred_at']);
+
+            return [
+                'activationId' => (int) $activation->id,
+                'tier' => $activation->tier,
+                'allocatedAmount' => (string) $activation->allocated_amount,
+                'billingCycle' => $activation->billing_cycle,
+                'status' => $activation->status,
+                'createdAt' => (string) $activation->created_at,
+                'referralRewardRecorded' => $rewardTransaction !== null,
+                'referralRewardAmount' => $rewardTransaction === null ? null : (string) $rewardTransaction->amount,
+                'referralRewardOccurredAt' => $rewardTransaction === null ? null : (string) $rewardTransaction->occurred_at,
+            ];
+        })->values()->all();
+
+        return response()
+            ->json([
+                'ok' => true,
+                'user' => [
+                    'id' => (int) $user->id,
+                    'email' => $user->email,
+                    'inviterId' => $user->inviter_id === null ? null : (int) $user->inviter_id,
+                ],
+                'inviter' => $inviter === null
+                    ? null
+                    : [
+                        'id' => (int) $inviter->id,
+                        'email' => $inviter->email,
+                        'name' => $inviter->name,
+                    ],
+                'strategyRewardRateBps' => (int) config('referral_rewards.strategy_trading_amount_rate_bps', 1000),
+                'activations' => $activationRows,
+            ])
+            ->header('Cache-Control', 'no-store');
+    }
+
     public function updateUserName(Request $request): JsonResponse
     {
         $guard = $this->authorize($request);
