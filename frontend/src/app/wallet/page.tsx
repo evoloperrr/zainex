@@ -471,13 +471,15 @@ function WalletContent({
               <article className={styles.walletCard}>
                 <span>WALLET BALANCE</span>
                 <strong>
-                  {formatUsd(user?.walletBalance)}
+                  {formatUsd(
+                    account.availableBalance,
+                  )}
                 </strong>
                 <small>
-                  Your total account value — includes
-                  funds locked in active strategies or
-                  a pending cashout, which Available
-                  Balance excludes
+                  What you can spend right now —
+                  funds locked in an active strategy
+                  or a pending cashout are already
+                  set aside and excluded here
                 </small>
 
                 <div className={styles.cardActionRow}>
@@ -585,24 +587,15 @@ function WalletContent({
               </article>
 
               <article className={styles.walletCard}>
-                <span>AVAILABLE BALANCE</span>
-                <strong>
-                  {formatUsd(
-                    account.availableBalance,
-                  )}
-                </strong>
-                <small>
-                  Available for new Futures positions
-                </small>
-              </article>
-
-              <article className={styles.walletCard}>
                 <span>TOTAL EQUITY</span>
                 <strong>
                   {formatUsd(account.totalEquity)}
                 </strong>
                 <small>
-                  Current equity including open PnL
+                  Your full account value — wallet
+                  balance plus funds locked in active
+                  strategies, a pending cashout, and
+                  any open Futures PnL
                 </small>
               </article>
             </section>
