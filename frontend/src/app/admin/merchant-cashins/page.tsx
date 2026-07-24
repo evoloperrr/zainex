@@ -244,6 +244,7 @@ export default function AdminMerchantCashinsPage() {
             "Content-Type":
               "application/json",
           },
+          body: JSON.stringify({}),
         },
       );
 
