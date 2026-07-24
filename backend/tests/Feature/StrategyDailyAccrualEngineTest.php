@@ -448,6 +448,46 @@ final class StrategyDailyAccrualEngineTest extends TestCase
         );
     }
 
+    public function test_next_payouts_lists_one_countdown_entry_per_active_activation(): void
+    {
+        $start = Carbon::parse(
+            '2026-07-01 00:00:00',
+        );
+
+        Carbon::setTestNow($start);
+
+        $this
+            ->activate('VIP 1', '100')
+            ->assertCreated();
+
+        $this
+            ->activate('VIP 2', '200')
+            ->assertCreated();
+
+        $response = $this
+            ->withHeaders($this->headers())
+            ->getJson(
+                '/api/trading/futures/strategies/current',
+            )
+            ->assertOk();
+
+        $payouts = $response->json('nextPayouts');
+
+        self::assertCount(2, $payouts);
+
+        self::assertSame(
+            ['VIP 1', 'VIP 2'],
+            array_column($payouts, 'tier'),
+        );
+
+        // The singular field stays backward compatible: it's the first
+        // (soonest) entry of the plural list, not dropped.
+        $response->assertJsonPath(
+            'nextPayout.tier',
+            'VIP 1',
+        );
+    }
+
     private function activate(
         string $tier,
         string $amount,

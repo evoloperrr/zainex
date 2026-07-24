@@ -59,6 +59,7 @@ type LogsPayload = {
   ok?: boolean;
   logs?: StrategyLog[];
   nextPayout?: NextPayout | null;
+  nextPayouts?: NextPayout[];
   error?: {
     message?: string;
   };
@@ -337,6 +338,100 @@ function eventClassName(
   }
 }
 
+function NextPayoutCard({
+  payout,
+  now,
+  formatUsd,
+}: {
+  payout: NextPayout;
+  now: number;
+  formatUsd: FormatUsd;
+}) {
+  const countdown = countdownParts(
+    payout.scheduledAt,
+    now,
+  );
+
+  return (
+    <section
+      className={styles.profitDropPanel}
+      aria-label={`Next profit drop for ${payout.tier}`}
+    >
+      <div
+        className={styles.profitDropAura}
+        aria-hidden="true"
+      />
+
+      <div className={styles.profitDropIntro}>
+        <span className={styles.profitDropEyebrow}>
+          <i /> LIVE PROFIT STREAM
+        </span>
+
+        <h2>
+          Next profit
+          <strong> drop.</strong>
+        </h2>
+
+        <p>
+          {payout.cadence ===
+          "RANDOM_15_OF_30"
+            ? "Free random schedule • 15 drops across 30 days"
+            : "VIP fixed schedule • every 24 hours from activation"}
+        </p>
+      </div>
+
+      <div className={styles.profitDropClock}>
+        {[
+          [countdown.days, "DAYS"],
+          [countdown.hours, "HRS"],
+          [countdown.minutes, "MIN"],
+          [countdown.seconds, "SEC"],
+        ].map(([value, label]) => (
+          <div key={String(label)}>
+            <strong>
+              {padCountdown(
+                Number(value),
+              )}
+            </strong>
+            <span>{label}</span>
+          </div>
+        ))}
+
+        {countdown.due ? (
+          <small>
+            Processing wallet credit…
+          </small>
+        ) : null}
+      </div>
+
+      <div className={styles.profitDropValue}>
+        <span>{payout.tier}</span>
+        <strong>
+          +{formatUsd(
+            payout.expectedAmount,
+          )}
+        </strong>
+        <small>
+          {formatPercent(payout.dailyRate)} of {formatUsd(payout.principalBasis)}
+        </small>
+        <em>
+          Drop {payout.payoutNumber}/{payout.totalPayouts}
+          {payout.cadence ===
+            "RANDOM_15_OF_30" &&
+          payout.calendarDay
+            ? ` • Random day ${payout.calendarDay}/${payout.windowDays}`
+            : ""}
+        </em>
+        <time dateTime={payout.scheduledAt}>
+          {formatDateTime(
+            payout.scheduledAt,
+          )}
+        </time>
+      </div>
+    </section>
+  );
+}
+
 export function StrategyTransactionLogs() {
   const {
     formatUsd: formatDisplayCurrency,
@@ -352,8 +447,8 @@ export function StrategyTransactionLogs() {
   const [logs, setLogs] =
     useState<StrategyLog[]>([]);
 
-  const [nextPayout, setNextPayout] =
-    useState<NextPayout | null>(null);
+  const [nextPayouts, setNextPayouts] =
+    useState<NextPayout[]>([]);
 
   const [now, setNow] =
     useState(() => Date.now());
@@ -393,8 +488,12 @@ export function StrategyTransactionLogs() {
             : [],
         );
 
-        setNextPayout(
-          payload.nextPayout ?? null,
+        setNextPayouts(
+          Array.isArray(
+            payload.nextPayouts,
+          )
+            ? payload.nextPayouts
+            : [],
         );
 
         setNow(Date.now());
@@ -469,95 +568,8 @@ export function StrategyTransactionLogs() {
     };
   }, []);
 
-  const countdown =
-    nextPayout === null
-      ? null
-      : countdownParts(
-          nextPayout.scheduledAt,
-          now,
-        );
-
   return (
     <>
-      {nextPayout && countdown ? (
-        <section
-          className={styles.profitDropPanel}
-          aria-label="Next strategy profit drop"
-        >
-          <div
-            className={styles.profitDropAura}
-            aria-hidden="true"
-          />
-
-          <div className={styles.profitDropIntro}>
-            <span className={styles.profitDropEyebrow}>
-              <i /> LIVE PROFIT STREAM
-            </span>
-
-            <h2>
-              Next profit
-              <strong> drop.</strong>
-            </h2>
-
-            <p>
-              {nextPayout.cadence ===
-              "RANDOM_15_OF_30"
-                ? "Free random schedule • 15 drops across 30 days"
-                : "VIP fixed schedule • every 24 hours from activation"}
-            </p>
-          </div>
-
-          <div className={styles.profitDropClock}>
-            {[
-              [countdown.days, "DAYS"],
-              [countdown.hours, "HRS"],
-              [countdown.minutes, "MIN"],
-              [countdown.seconds, "SEC"],
-            ].map(([value, label]) => (
-              <div key={String(label)}>
-                <strong>
-                  {padCountdown(
-                    Number(value),
-                  )}
-                </strong>
-                <span>{label}</span>
-              </div>
-            ))}
-
-            {countdown.due ? (
-              <small>
-                Processing wallet credit…
-              </small>
-            ) : null}
-          </div>
-
-          <div className={styles.profitDropValue}>
-            <span>{nextPayout.tier}</span>
-            <strong>
-              +{formatUsd(
-                nextPayout.expectedAmount,
-              )}
-            </strong>
-            <small>
-              {formatPercent(nextPayout.dailyRate)} of {formatUsd(nextPayout.principalBasis)}
-            </small>
-            <em>
-              Drop {nextPayout.payoutNumber}/{nextPayout.totalPayouts}
-              {nextPayout.cadence ===
-                "RANDOM_15_OF_30" &&
-              nextPayout.calendarDay
-                ? ` • Random day ${nextPayout.calendarDay}/${nextPayout.windowDays}`
-                : ""}
-            </em>
-            <time dateTime={nextPayout.scheduledAt}>
-              {formatDateTime(
-                nextPayout.scheduledAt,
-              )}
-            </time>
-          </div>
-        </section>
-      ) : null}
-
       <section
         className={styles.logsPanel}
         aria-label="Strategy transaction logs"
@@ -577,6 +589,19 @@ export function StrategyTransactionLogs() {
           Latest 10 records
         </small>
       </header>
+
+      {nextPayouts.length > 0 ? (
+        <div className={styles.profitDropList}>
+          {nextPayouts.map((payout) => (
+            <NextPayoutCard
+              key={payout.activationId}
+              payout={payout}
+              now={now}
+              formatUsd={formatUsd}
+            />
+          ))}
+        </div>
+      ) : null}
 
       {loading ? (
         <div className={styles.combinedLogState}>

@@ -84,7 +84,7 @@ final class FuturesStrategyStatusController extends Controller
                 ->orderByDesc('id')
                 ->first();
 
-            $nextPayoutActivation = DB::table(
+            $nextPayoutActivations = DB::table(
                 'strategy_activations',
             )
                 ->where(
@@ -95,64 +95,16 @@ final class FuturesStrategyStatusController extends Controller
                 ->whereNotNull('next_accrual_at')
                 ->orderBy('next_accrual_at')
                 ->orderBy('id')
-                ->first();
+                ->get();
 
-            $nextPayout = null;
-
-            if ($nextPayoutActivation !== null) {
-                $isFreeTier =
-                    $nextPayoutActivation->tier ===
-                    'FREE TIER';
-
-                $payoutNumber =
-                    (int) $nextPayoutActivation->paid_days + 1;
-
-                $totalPayouts =
-                    $isFreeTier
-                        ? StrategyPayoutSchedule::FREE_PAYOUT_COUNT
-                        : (int) $nextPayoutActivation->term_days;
-
-                $calendarDay =
-                    $isFreeTier
-                        ? (
-                            StrategyPayoutSchedule::normalizeFreeDays(
-                                $nextPayoutActivation->payout_days ?? null,
-                            )[$payoutNumber - 1] ?? null
-                        )
-                        : $payoutNumber;
-
-                $expectedAmount = BigDecimal::of(
-                    (string) $nextPayoutActivation->allocated_amount,
+            $nextPayouts = $nextPayoutActivations
+                ->map(
+                    fn (object $activation): array => $this->buildNextPayoutEntry($activation),
                 )
-                    ->multipliedBy(
-                        BigDecimal::of(
-                            (string) $nextPayoutActivation->daily_rate,
-                        ),
-                    )
-                    ->toScale(8, RoundingMode::Down);
+                ->values()
+                ->all();
 
-                $nextPayout = [
-                    'activationId' => (int) $nextPayoutActivation->id,
-                    'tier' => (string) $nextPayoutActivation->tier,
-                    'cadence' => $isFreeTier
-                            ? 'RANDOM_15_OF_30'
-                            : 'EVERY_24_HOURS',
-                    'scheduledAt' => Carbon::parse(
-                        (string) $nextPayoutActivation->next_accrual_at,
-                    )
-                        ->utc()
-                        ->toIso8601String(),
-                    'expectedAmount' => (float) (string) $expectedAmount,
-                    'principalBasis' => (float) $nextPayoutActivation->allocated_amount,
-                    'dailyRate' => (float) $nextPayoutActivation->daily_rate,
-                    'payoutNumber' => $payoutNumber,
-                    'totalPayouts' => $totalPayouts,
-                    'calendarDay' => $calendarDay,
-                    'windowDays' => $isFreeTier
-                            ? StrategyPayoutSchedule::FREE_WINDOW_DAYS
-                            : $totalPayouts,
-                ];
-            }
+            $nextPayout = $nextPayouts[0] ?? null;
 
             $openPositionCount = DB::table(
                 'futures_positions',
@@ -562,6 +514,7 @@ final class FuturesStrategyStatusController extends Controller
                         'activatedAt' => $latest?->created_at,
                     ],
                     'nextPayout' => $nextPayout,
+                    'nextPayouts' => $nextPayouts,
                     'tradingExposure' => [
                         'activationAllowed' => $activationAllowed,
                         'openPositions' => $openPositionCount,
@@ -632,6 +585,66 @@ final class FuturesStrategyStatusController extends Controller
                     'no-store',
                 );
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildNextPayoutEntry(
+        object $activation,
+    ): array {
+        $isFreeTier =
+            $activation->tier ===
+            'FREE TIER';
+
+        $payoutNumber =
+            (int) $activation->paid_days + 1;
+
+        $totalPayouts =
+            $isFreeTier
+                ? StrategyPayoutSchedule::FREE_PAYOUT_COUNT
+                : (int) $activation->term_days;
+
+        $calendarDay =
+            $isFreeTier
+                ? (
+                    StrategyPayoutSchedule::normalizeFreeDays(
+                        $activation->payout_days ?? null,
+                    )[$payoutNumber - 1] ?? null
+                )
+                : $payoutNumber;
+
+        $expectedAmount = BigDecimal::of(
+            (string) $activation->allocated_amount,
+        )
+            ->multipliedBy(
+                BigDecimal::of(
+                    (string) $activation->daily_rate,
+                ),
+            )
+            ->toScale(8, RoundingMode::Down);
+
+        return [
+            'activationId' => (int) $activation->id,
+            'tier' => (string) $activation->tier,
+            'cadence' => $isFreeTier
+                    ? 'RANDOM_15_OF_30'
+                    : 'EVERY_24_HOURS',
+            'scheduledAt' => Carbon::parse(
+                (string) $activation->next_accrual_at,
+            )
+                ->utc()
+                ->toIso8601String(),
+            'expectedAmount' => (float) (string) $expectedAmount,
+            'principalBasis' => (float) $activation->allocated_amount,
+            'dailyRate' => (float) $activation->daily_rate,
+            'payoutNumber' => $payoutNumber,
+            'totalPayouts' => $totalPayouts,
+            'calendarDay' => $calendarDay,
+            'windowDays' => $isFreeTier
+                    ? StrategyPayoutSchedule::FREE_WINDOW_DAYS
+                    : $totalPayouts,
+        ];
     }
 
     private function authorizeInternalRequest(

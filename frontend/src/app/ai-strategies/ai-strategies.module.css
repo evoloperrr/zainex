@@ -470,6 +470,18 @@
 }
 /* ZAINEX_STRATEGY_LOGS_BELOW_CARDS_V1_1 */
 
+.profitDropList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+  margin-bottom: 30px;
+}
+
+.profitDropList .profitDropPanel {
+  margin-top: 0;
+}
+
 .profitDropPanel {
   position: relative;
   display: grid;
