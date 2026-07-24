@@ -13,6 +13,7 @@ use App\Services\Trading\StrategyPayoutSchedule;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -549,12 +550,35 @@ final class FuturesStrategyActivationController extends Controller
                         RoundingMode::Down,
                     );
 
+                // A user who already holds an unexpired subscription at
+                // this exact VIP tier (granted via billing) isn't buying
+                // anything new by activating the same tier here — waive
+                // the credit cost. An upgrade to a higher tier, a
+                // downgrade, or a repeat activation after the
+                // subscription lapsed all still charge the tier's normal
+                // credit cost.
+                $vipTierNormalized = strtoupper(
+                    trim(
+                        (string) ($user->vip_tier ?? ''),
+                    ),
+                );
+
+                $alreadyHasThisVip =
+                    $tier !== 'FREE TIER' &&
+                    $vipTierNormalized === $tier &&
+                    $user->vip_expires_at !== null &&
+                    Carbon::parse(
+                        $user->vip_expires_at,
+                    )->isFuture();
+
                 $creditCost =
-                    (int)
-                        $strategy['creditCost'] *
-                    ($billingCycle === 'annual'
-                        ? 12
-                        : 1);
+                    $alreadyHasThisVip
+                        ? 0
+                        : (int)
+                            $strategy['creditCost'] *
+                        ($billingCycle === 'annual'
+                            ? 12
+                            : 1);
 
                 $currentCredits =
                     (int)

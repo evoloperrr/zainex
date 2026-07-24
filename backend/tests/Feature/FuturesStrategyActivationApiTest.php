@@ -247,6 +247,103 @@ final class FuturesStrategyActivationApiTest extends TestCase
             );
     }
 
+    public function test_activating_the_same_vip_tier_already_held_waives_the_credit_cost(): void
+    {
+        DB::table('users')
+            ->where('email', 'evoloperr@gmail.com')
+            ->update([
+                'vip_tier' => 'VIP 2',
+                'vip_expires_at' => now()->addDays(10),
+            ]);
+
+        $response = $this
+            ->withHeaders($this->headers())
+            ->postJson(
+                '/api/trading/futures/strategies/activate',
+                [
+                    'tier' => 'VIP 2',
+                    'amount' => '500',
+                    'clientRequestId' => (string) Str::uuid(),
+                ],
+            );
+
+        $this->dumpUnexpected(
+            $response->status(),
+            201,
+            $response->getContent(),
+        );
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('result.activation.creditCost', 0)
+            ->assertJsonPath('result.account.credits', 1000)
+            ->assertJsonPath('result.account.availableBalance', 99500);
+    }
+
+    public function test_upgrading_to_a_higher_vip_tier_still_charges_the_full_credit_cost(): void
+    {
+        DB::table('users')
+            ->where('email', 'evoloperr@gmail.com')
+            ->update([
+                'vip_tier' => 'VIP 2',
+                'vip_expires_at' => now()->addDays(10),
+            ]);
+
+        $response = $this
+            ->withHeaders($this->headers())
+            ->postJson(
+                '/api/trading/futures/strategies/activate',
+                [
+                    'tier' => 'VIP 3',
+                    'amount' => '500',
+                    'clientRequestId' => (string) Str::uuid(),
+                ],
+            );
+
+        $this->dumpUnexpected(
+            $response->status(),
+            201,
+            $response->getContent(),
+        );
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('result.activation.creditCost', 45)
+            ->assertJsonPath('result.account.credits', 955);
+    }
+
+    public function test_reactivating_the_same_vip_tier_after_it_expired_still_charges_the_credit_cost(): void
+    {
+        DB::table('users')
+            ->where('email', 'evoloperr@gmail.com')
+            ->update([
+                'vip_tier' => 'VIP 2',
+                'vip_expires_at' => now()->subDay(),
+            ]);
+
+        $response = $this
+            ->withHeaders($this->headers())
+            ->postJson(
+                '/api/trading/futures/strategies/activate',
+                [
+                    'tier' => 'VIP 2',
+                    'amount' => '500',
+                    'clientRequestId' => (string) Str::uuid(),
+                ],
+            );
+
+        $this->dumpUnexpected(
+            $response->status(),
+            201,
+            $response->getContent(),
+        );
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('result.activation.creditCost', 15)
+            ->assertJsonPath('result.account.credits', 985);
+    }
+
     public function test_insufficient_balance_does_not_modify_wallet_or_credits(): void
     {
         $response = $this
