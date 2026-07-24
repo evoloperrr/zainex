@@ -96,14 +96,21 @@ export function WalletToCreditsConverter({
     useState("");
 
   const [
-    liveAvailable,
-    setLiveAvailable,
-  ] = useState(availableBalance);
+    availableOverride,
+    setAvailableOverride,
+  ] = useState<number | null>(null);
 
   const [
-    liveCredits,
-    setLiveCredits,
-  ] = useState(credits);
+    creditsOverride,
+    setCreditsOverride,
+  ] = useState<number | null>(null);
+
+  const liveAvailable =
+    availableOverride ??
+    availableBalance;
+
+  const liveCredits =
+    creditsOverride ?? credits;
 
   const [logs, setLogs] =
     useState<ConversionLog[]>([]);
@@ -119,16 +126,6 @@ export function WalletToCreditsConverter({
 
   const [error, setError] =
     useState("");
-
-  useEffect(() => {
-    setLiveAvailable(
-      availableBalance,
-    );
-  }, [availableBalance]);
-
-  useEffect(() => {
-    setLiveCredits(credits);
-  }, [credits]);
 
   useEffect(() => {
     let disposed = false;
@@ -157,12 +154,12 @@ export function WalletToCreditsConverter({
         }
 
         if (payload.state) {
-          setLiveAvailable(
+          setAvailableOverride(
             payload.state
               .availableBalance,
           );
 
-          setLiveCredits(
+          setCreditsOverride(
             payload.state.credits,
           );
         }
@@ -299,12 +296,12 @@ export function WalletToCreditsConverter({
         );
       }
 
-      setLiveAvailable(
+      setAvailableOverride(
         payload.state
           .availableBalance,
       );
 
-      setLiveCredits(
+      setCreditsOverride(
         payload.state.credits,
       );
 
