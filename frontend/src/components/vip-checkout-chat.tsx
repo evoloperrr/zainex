@@ -344,6 +344,9 @@ function cryptoStatusLabel(
 
 function buildIntro(
   plan: VipPlan,
+  formatUsd: (
+    value: number,
+  ) => string,
 ): ScriptStep[] {
   return [
     {
@@ -352,7 +355,7 @@ function buildIntro(
     },
     {
       kind: "message",
-      text: `I see you'd like to activate ${plan.name} — ${plan.price} ${plan.period}.`,
+      text: `I see you'd like to activate ${plan.name} — ${formatUsd(parsePlanPriceUsd(plan.price))} ${plan.period}.`,
     },
     {
       kind: "message",
@@ -1143,12 +1146,18 @@ export function VipCheckoutChat({
     setCurrency,
   } = useCurrency();
 
-  const [introScript] = useState(
-    () =>
-      mode === "wallet"
-        ? buildWalletIntro()
-        : buildIntro(plan),
-  );
+  // Recomputed every render (not frozen at mount) so the plan-price
+  // message stays in sync if the currency changes mid-conversation —
+  // e.g. picking a merchant country switches the display currency,
+  // and every message should reflect that, not just the ones appended
+  // after the switch.
+  const introScript =
+    mode === "wallet"
+      ? buildWalletIntro()
+      : buildIntro(
+          plan,
+          formatUsd,
+        );
 
   const [
     method,
